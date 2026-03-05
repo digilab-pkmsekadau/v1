@@ -1,26 +1,305 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary: #0f766e;
+  --primary-dark: #0d6960;
+  --primary-light: #ccfbf1;
+  --bg-body: #f0f4f8;
+  --text-main: #1e293b;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --white: #ffffff;
+
+  /* Gradient tokens */
+  --grad-teal: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+  --grad-blue: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  --grad-red: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+  --grad-amber: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  --grad-dark: linear-gradient(135deg, #0f172a 0%, #0f302b 50%, #0f172a 100%);
+
+  /* Premium shadows */
+  --shadow-teal: 0 8px 24px -4px rgba(13, 148, 136, 0.35);
+  --shadow-blue: 0 8px 24px -4px rgba(37, 99, 235, 0.30);
+  --shadow-card: 0 2px 16px -2px rgba(0, 0, 0, 0.08);
+  --shadow-nav: 0 -4px 30px rgba(0, 0, 0, 0.08), 0 4px 30px rgba(0, 0, 0, 0.08);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  body {
+    font-family: 'Inter', var(--font-sans, system-ui, sans-serif);
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.3s ease, color 0.2s ease;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Dark mode overrides */
+  html.dark {
+    --bg-body: #0f172a;
+    --text-main: #e2e8f0;
+    --text-muted: #94a3b8;
+    --border: #1e293b;
+    --white: #1e293b;
+    --shadow-card: 0 2px 16px -2px rgba(0, 0, 0, 0.4);
+  }
+
+  html.dark body {
+    background-color: #0f172a;
+    color: #e2e8f0;
+  }
+
+  * {
+    box-sizing: border-box;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+
+@layer utilities {
+  /* Glass panel card */
+  .glass-panel {
+    background: var(--white);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 20px;
+    box-shadow: var(--shadow-card);
+    transition: box-shadow 0.2s ease;
+  }
+
+  .glass-panel:hover {
+    box-shadow: 0 4px 24px -4px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Gradient stat cards */
+  .card-stat-teal {
+    background: var(--grad-teal);
+    border-radius: 20px;
+    box-shadow: var(--shadow-teal);
+    color: white;
+  }
+
+  .card-stat-blue {
+    background: var(--grad-blue);
+    border-radius: 20px;
+    box-shadow: var(--shadow-blue);
+    color: white;
+  }
+
+  /* Premium input */
+  .input-modern {
+    width: 100%;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    color: var(--text-main);
+    background: white;
+    outline: none;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    font-family: 'Inter', sans-serif;
+  }
+
+  .input-modern:focus {
+    border-color: #0d9488;
+    box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+  }
+
+  /* Section badge */
+  .section-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  /* Slide up animation */
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Fade in */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* Float animation */
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+
+  .animate-float {
+    animation: float 3s ease-in-out infinite;
+  }
+
+  /* Test tube fill animation */
+  @keyframes fillTube {
+    0% {
+      height: 0%;
+    }
+    100% {
+      height: 85%;
+    }
+  }
+
+  @keyframes bubbleUp {
+    0% {
+      bottom: 0;
+      opacity: 1;
+    }
+    100% {
+      bottom: 80%;
+      opacity: 0;
+    }
+  }
+
+  /* Pulse glow */
+  @keyframes pulseGlow {
+    0%,
+    100% {
+      box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 12px rgba(45, 212, 191, 0);
+    }
+  }
+
+  .animate-pulse-glow {
+    animation: pulseGlow 2s infinite;
+  }
+
+  /* Flask loader */
+  @keyframes fillFlask {
+    0% {
+      height: 0%;
+    }
+    100% {
+      height: 80%;
+    }
+  }
+
+  /* Shimmer skeleton */
+  @keyframes shimmer {
+    0% {
+      background-position: -200px 0;
+    }
+    100% {
+      background-position: calc(200px + 100%) 0;
+    }
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+    background-size: 400px 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+  }
+
+  /* ─── LAB ANIMATIONS ──────────────────────────────────────────── */
+
+  /* Bubble rising up */
+  @keyframes bubbleRise {
+    0%   { transform: translateY(0) scale(1);   opacity: 0.7; }
+    50%  { transform: translateY(-40vh) scale(1.1); opacity: 0.5; }
+    100% { transform: translateY(-80vh) scale(0.8); opacity: 0; }
+  }
+
+  /* Particle float with wobble */
+  @keyframes particleDrift {
+    0%   { transform: translate(0, 0) rotate(0deg);   opacity: 0; }
+    10%  { opacity: 0.6; }
+    90%  { opacity: 0.4; }
+    100% { transform: translate(var(--dx, 40px), -100vh) rotate(360deg); opacity: 0; }
+  }
+
+  /* Molecule orbit */
+  @keyframes orbit {
+    from { transform: rotate(0deg) translateX(22px) rotate(0deg); }
+    to   { transform: rotate(360deg) translateX(22px) rotate(-360deg); }
+  }
+
+  /* DNA strand drift sideways */
+  @keyframes dnaDrift {
+    0%   { transform: translateY(100vh) rotate(15deg); opacity: 0; }
+    5%   { opacity: 0.18; }
+    95%  { opacity: 0.12; }
+    100% { transform: translateY(-20vh) rotate(15deg); opacity: 0; }
+  }
+
+  /* Scan line sweep */
+  @keyframes scanLine {
+    0%   { top: -4px; opacity: 0; }
+    5%   { opacity: 1; }
+    95%  { opacity: 0.6; }
+    100% { top: 100%; opacity: 0; }
+  }
+
+  /* Pulse ring expand */
+  @keyframes pulseRing {
+    0%   { transform: scale(0.8); opacity: 0.6; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  .lab-bubble {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, rgba(45,212,191,0.45), rgba(14,165,233,0.15));
+    border: 1px solid rgba(45,212,191,0.3);
+    animation: bubbleRise linear infinite;
+    pointer-events: none;
+  }
+
+  .lab-particle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(45,212,191,0.5);
+    animation: particleDrift linear infinite;
+    pointer-events: none;
+  }
+
+  .lab-scan {
+    position: absolute;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(45,212,191,0.6), transparent);
+    animation: scanLine 4s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  .lab-pulse-ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 1.5px solid rgba(45,212,191,0.4);
+    animation: pulseRing 2.5s ease-out infinite;
+    pointer-events: none;
+  }
 }

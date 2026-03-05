@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-export const dynamic = 'force-dynamic';
 import { createServerClient } from '@/lib/supabase';
 import { formatDateDisplay, getTodayWIB } from '@/lib/utils';
 import { DashboardStats, HistoryRow } from '@/types';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
   try {
@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get('end') || '';
     const todayWIB = getTodayWIB();
 
-    // Single table query - ambil semua kolom hasil lab sekaligus
     const { data: examinations, error: examError } = await db
       .from('examinations')
       .select(`
@@ -85,7 +84,6 @@ export async function GET(request: NextRequest) {
 
     for (const exam of examinations || []) {
       const tgl = exam.tgl_permintaan;
-
       if (tgl === todayWIB) stats.today++;
 
       const patient = Array.isArray(exam.patient) ? exam.patient[0] : exam.patient;
@@ -101,7 +99,6 @@ export async function GET(request: NextRequest) {
       if (!isInRange(tgl)) continue;
       stats.filtered++;
 
-      // Chemistry - langsung dari kolom single table
       if (exam.gds) stats.chemistry['Gula Darah Sewaktu']++;
       if (exam.gdp) stats.chemistry['Gula Darah Puasa']++;
       if (exam.gd2pp) stats.chemistry['Gula Darah 2 Jam PP']++;
@@ -109,7 +106,6 @@ export async function GET(request: NextRequest) {
       if (exam.trigliserida) stats.chemistry['Trigliserida']++;
       if (exam.asam_urat) stats.chemistry['Asam Urat']++;
 
-      // Immunology
       countImmuno(exam.hbsag, 'HBsAg');
       countImmuno(exam.hiv, 'Anti HIV');
       countImmuno(exam.syphilis, 'Syphilis');
@@ -120,7 +116,6 @@ export async function GET(request: NextRequest) {
       countImmuno(exam.malaria_rapid, 'Malaria Rapid');
       countImmuno(exam.widal, 'Widal');
 
-      // Microbiology
       countMicro(exam.bta, 'Pewarnaan BTA');
       countMicro(exam.gram, 'Pewarnaan Gram');
       countMicro(exam.malaria_slide, 'Malaria Slide');

@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-export const dynamic = 'force-dynamic';
 import { createServerClient } from '@/lib/supabase';
 import { generateNoUrut, formatDateDisplay } from '@/lib/utils';
 import { FormInputData, ParamItem } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 // Mapping: paramKey → { dbCol, unit? }
-// unit: jika ada, nilai angka akan ditambah satuan saat disimpan
 const PARAM_MAP: Record<string, { col: string; unit?: string }> = {
   // Hematologi
   rbc:           { col: 'rbc',   unit: '10^6/µl' },

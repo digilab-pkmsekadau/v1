@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
-import { createServerClient } from '@/lib/supabase';
 
 // GET /api/audit — ambil log aktivitas terbaru
 export async function GET(request: NextRequest) {
@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST /api/audit — catat aktivitas (dipanggil dari client/server-side)
+// POST /api/audit — catat aktivitas
 export async function POST(request: NextRequest) {
   try {
     const db = createServerClient();
@@ -38,15 +38,14 @@ export async function POST(request: NextRequest) {
     const { action, entity, entity_id, description, user_email } = body;
 
     const { error } = await db.from('audit_log').insert({
-      action,       // CREATE | UPDATE | DELETE
-      entity,       // examinations | patients | settings
-      entity_id,    // ID record yang diubah
-      description,  // Deskripsi human-readable
-      user_email,   // Email petugas
+      action,
+      entity,
+      entity_id,
+      description,
+      user_email,
     });
 
     if (error) {
-      // Graceful kalau tabel belum ada
       if (error.code === '42P01') {
         return NextResponse.json({ success: true, message: 'audit_log table not found, skipped' });
       }

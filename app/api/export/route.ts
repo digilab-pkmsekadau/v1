@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-export const dynamic = 'force-dynamic';
 import { createServerClient } from '@/lib/supabase';
 import { ExportRow } from '@/types';
 import { formatDateDisplay } from '@/lib/utils';
 
-// Map label dashboard → kolom di tabel examinations
+export const dynamic = 'force-dynamic';
+
 const PARAM_COLUMN: Record<string, string> = {
   'HBsAg': 'hbsag', 'Anti HIV': 'hiv', 'Syphilis': 'syphilis',
   'Anti HCV': 'hcv', 'Anti HBs': 'anti_hbs', 'NS1 Ag Dengue': 'ns1',
@@ -29,7 +28,6 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Parameter tidak valid' }, { status: 400 });
     }
 
-    // Ambil semua kolom (termasuk kolom param dinamis)
     const { data: examinations, error } = await db
       .from('examinations')
       .select('*')
@@ -63,7 +61,6 @@ export async function GET(request: NextRequest) {
 
       if (!shouldExport) continue;
 
-      // Ambil data pasien terpisah
       const { data: patient } = await db
         .from('patients')
         .select('nama, nik, alamat, tgl_lahir')

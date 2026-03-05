@@ -1,14 +1,16 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { Home, Syringe, Settings } from 'lucide-react';
+import { Home, Syringe, Settings, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: Home, href: '/dashboard' },
-  { id: 'input', label: 'Input Data', icon: Syringe, href: '/input' },
-  { id: 'settings', label: 'Pengaturan', icon: Settings, href: '/settings' },
+  { id: 'dashboard', label: 'Dashboard', icon: Home,     href: '/dashboard' },
+  { id: 'input',     label: 'Input Data', icon: Syringe,  href: '/input' },
+  { id: 'pasien',    label: 'Pasien',     icon: Users,    href: '/pasien' },
+  { id: 'settings',  label: 'Pengaturan', icon: Settings, href: '/settings' },
 ];
+
 
 export default function NavDock() {
   const router = useRouter();

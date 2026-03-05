@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Settings, Users, Stethoscope, Save, Loader2, Lock, Eye, EyeOff } from 'lucide-react';
+import { Settings, Users, Stethoscope, Save, Loader2, Lock, Eye, EyeOff, Shield } from 'lucide-react';
+
 import { createSupabaseBrowserClient } from '@/lib/supabase';
 
 export default function SettingsPage() {
@@ -178,6 +179,28 @@ export default function SettingsPage() {
         </p>
       </div>
 
+      {/* ── Audit Log ─────────────────────────────────────────── */}
+      <div className="glass-panel p-4 mb-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-7 h-7 rounded-xl bg-purple-50 flex items-center justify-center">
+              <Shield size={14} className="text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-sm font-extrabold text-slate-700">Audit Log</h2>
+              <p className="text-[11px] text-slate-400">Riwayat perubahan data sistem</p>
+            </div>
+          </div>
+          <a
+            href="/settings/audit"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold text-white transition-all"
+            style={{ background: 'linear-gradient(135deg, #7c3aed, #9333ea)' }}
+          >
+            Lihat Log →
+          </a>
+        </div>
+      </div>
+
       {/* Info */}
       <div className="glass-panel p-4 bg-slate-50 border-slate-200">
         <p className="text-xs text-slate-500 text-center font-medium">DigiLab Puskesmas • Versi 1.0.0</p>
@@ -186,3 +209,4 @@ export default function SettingsPage() {
     </div>
   );
 }
+

@@ -7,7 +7,7 @@ export interface NormalRange {
   max?: number;
   pria?: { min?: number; max?: number };
   wanita?: { min?: number; max?: number };
-  validValues?: string[]; // untuk parameter kategorikal
+  text?: string; // Contoh: "Negatif" atau "Non Reaktif"
   unit?: string;
 }
 
@@ -50,6 +50,21 @@ export const NORMAL_RANGES: Record<string, NormalRange> = {
   // ── URINALISA ─────────────────────────────────────────────────
   u_ph:             { min: 4.5, max: 8.5,  unit: '' },
 
+  // ── SEROLOGI / IMUNOLOGI ──────────────────────────────────────
+  hbsag:            { text: 'Non Reaktif' },
+  hiv:              { text: 'Non Reaktif' },
+  syphilis:         { text: 'Non Reaktif' },
+  hcv:              { text: 'Non Reaktif' },
+  anti_hbs:         { text: 'Non Reaktif' },
+  ns1:              { text: 'Negatif' },
+  dengue_ig:        { text: 'Negatif' },
+  malaria_rapid:    { text: 'Negatif' },
+  widal:            { text: 'Negatif' },
+
+  // ── MIKROBIOLOGI ──────────────────────────────────────────────
+  bta:              { text: 'Negatif' },
+  gram:             { text: 'Negatif' },
+  malaria_slide:    { text: 'Negatif' },
 };
 
 /**
@@ -60,10 +75,19 @@ export const NORMAL_RANGES: Record<string, NormalRange> = {
  */
 export function isAbnormal(key: string, value: string | undefined | null, gender?: 'L' | 'P' | string | null): boolean {
   if (!value) return false;
+
+  // 1. Cek nilai kategorikal (Teks)
+  const v = value.toLowerCase();
+  // Jika mengandung "positif" atau "reaktif" (dan bukan "non reaktif")
+  if (v.includes('positif')) return true;
+  if (v.includes('reaktif') && !v.includes('non')) return true;
+  if (v.includes('(+)')) return true;
+
+  // 2. Cek nilai numerik
   const range = NORMAL_RANGES[key];
   if (!range) return false;
 
-  const numeric = parseFloat(value);
+  const numeric = parseFloat(value.replace(',', '.')); // Handle koma desimal
   if (isNaN(numeric)) return false;
 
   let min = range.min;
@@ -100,5 +124,6 @@ export function getNormalRangeText(key: string, gender?: 'L' | 'P' | string | nu
   if (min !== undefined && max !== undefined) {
     return `${min} - ${max} ${range.unit ?? ''}`.trim();
   }
-  return '';
+
+  return range.text ?? '';
 }

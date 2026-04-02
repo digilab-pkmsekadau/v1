@@ -57,7 +57,10 @@ function LabValue({
       );
     }
     return (
-      <input type={param?.type === 'number' ? 'number' : 'text'} value={value}
+      <input
+        type="text"
+        inputMode={param?.type === 'number' ? 'decimal' : 'text'}
+        value={value}
         onChange={e => onChange(e.target.value)}
         className="w-full border border-slate-200 rounded-xl px-2 py-1.5 text-sm bg-white focus:outline-none focus:border-teal-400"
       />

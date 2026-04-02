@@ -378,6 +378,8 @@ export default function InputPage() {
               <input type="text" value={patient.nik}
                 onChange={e => setField('nik', e.target.value)}
                 placeholder="16 digit NIK"
+                inputMode="numeric"
+                pattern="[0-9]*"
                 className="input-premium" />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -496,8 +498,8 @@ export default function InputPage() {
 
                 {/* Input nilai */}
                 {item.paramKey && info && (() => {
-                  const abnormal = item.value ? isAbnormal(item.paramKey, item.value) : false;
-                  const rangeText = getNormalRangeText(item.paramKey);
+                  const abnormal = item.value ? isAbnormal(item.paramKey, item.value, patient.jenis_kelamin) : false;
+                  const rangeText = getNormalRangeText(item.paramKey, patient.jenis_kelamin);
                   return (
                     <div className="flex flex-col gap-1">
                       <div className="flex items-center justify-between">
@@ -521,8 +523,8 @@ export default function InputPage() {
                         </select>
                       ) : (
                         <input
-                          type={info.type === 'number' ? 'number' : 'text'}
-                          step="any"
+                          type="text"
+                          inputMode={info.type === 'number' ? 'decimal' : 'text'}
                           value={item.value}
                           onChange={e => updateParam(item.id, 'value', e.target.value)}
                           placeholder={info.type === 'number' ? '0' : 'Isi hasil...'}

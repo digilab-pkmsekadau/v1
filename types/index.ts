@@ -4,6 +4,7 @@ export interface Patient {
   id: string;
   nama: string;
   nik?: string;
+  jenis_kelamin?: 'L' | 'P' | string;
   alamat?: string;
   tgl_lahir?: string;
   created_at?: string;
@@ -79,6 +80,7 @@ export interface FormInputData {
   // Patient info
   nama_pasien: string;
   nik?: string;
+  jenis_kelamin?: 'L' | 'P' | string;
   alamat?: string;
   tgl_lahir?: string;
   tgl_permintaan: string;

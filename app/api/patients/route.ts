@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
     let query = db
       .from('patients')
-      .select('id, nama, nik, alamat, tgl_lahir, created_at')
+      .select('id, nama, nik, jenis_kelamin, alamat, tgl_lahir, created_at')
       .order('nama', { ascending: true })
       .limit(50);
 

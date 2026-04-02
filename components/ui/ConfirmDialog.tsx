@@ -12,6 +12,7 @@ interface ConfirmOptions {
   cancelLabel?: string;
   variant?: ConfirmVariant;
   icon?: 'trash' | 'logout' | 'warning';
+  verificationText?: string;
 }
 
 interface ConfirmContextValue {
@@ -26,9 +27,11 @@ interface DialogState extends ConfirmOptions {
 
 export function ConfirmProvider({ children }: { children: ReactNode }) {
   const [dialog, setDialog] = useState<DialogState | null>(null);
+  const [verifyInput, setVerifyInput] = useState('');
 
   const confirm = useCallback((options: ConfirmOptions): Promise<boolean> => {
     return new Promise((resolve) => {
+      setVerifyInput('');
       setDialog({ ...options, resolve });
     });
   }, []);
@@ -67,6 +70,9 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
   const variant = dialog?.variant ?? 'danger';
   const styles = variantStyles[variant];
 
+  const requiresVerification = !!dialog?.verificationText;
+  const isVerified = !requiresVerification || verifyInput === dialog?.verificationText;
+
   return (
     <ConfirmContext.Provider value={{ confirm }}>
       {children}
@@ -97,12 +103,29 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
             </div>
 
             {/* Title */}
-            <h3 className="text-base font-extrabold text-slate-800 mb-1.5">
+            <h3 className="text-base font-extrabold text-slate-800 mb-1.5 text-center">
               {dialog.title}
             </h3>
-            <p className="text-sm text-slate-500 mb-6 leading-relaxed">
+            <p className="text-sm text-slate-500 mb-6 leading-relaxed text-center">
               {dialog.message}
             </p>
+
+            {/* Verification Block */}
+            {dialog.verificationText && (
+              <div className="mb-6 flex flex-col gap-1.5 bg-slate-50/50 p-3 rounded-2xl border border-slate-100 dark:border-slate-800/50">
+                <label className="text-[11px] font-bold text-slate-500 uppercase tracking-widest text-center">
+                  Ketik <span className="text-red-600 font-black px-1.5 py-0.5 bg-red-50 rounded select-all">{dialog.verificationText}</span> untuk konfirmasi
+                </label>
+                <input
+                  type="text"
+                  value={verifyInput}
+                  onChange={(e) => setVerifyInput(e.target.value)}
+                  placeholder={`Ketik ${dialog.verificationText}`}
+                  className="w-full text-center font-bold px-3 py-2.5 rounded-xl border border-slate-200 focus:border-red-400 focus:ring-2 focus:ring-red-100 outline-none transition-all"
+                  autoFocus
+                />
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex gap-3">
@@ -114,7 +137,8 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
               </button>
               <button
                 onClick={handleConfirm}
-                className={`flex-1 py-2.5 rounded-2xl text-sm font-bold transition-all active:scale-95 ${styles.button}`}
+                disabled={!isVerified}
+                className={`flex-1 py-2.5 rounded-2xl text-sm font-bold transition-all disabled:opacity-50 disabled:scale-100 active:scale-95 ${styles.button}`}
               >
                 {dialog.confirmLabel ?? 'Ya, Lanjutkan'}
               </button>

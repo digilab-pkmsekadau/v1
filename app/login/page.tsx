@@ -6,32 +6,22 @@ import { Activity, Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { createSupabaseBrowserClient } from '@/lib/supabase';
 
-// Bubbles data: size, left%, delay, duration
+// Reduced bubbles for performance (was 8, now 4)
 const BUBBLES = [
-  { size: 10, left: 8,  delay: 0,   dur: 7  },
-  { size: 16, left: 20, delay: 1.5, dur: 9  },
-  { size: 8,  left: 35, delay: 3,   dur: 6  },
-  { size: 20, left: 50, delay: 0.5, dur: 11 },
-  { size: 12, left: 65, delay: 2,   dur: 8  },
-  { size: 6,  left: 78, delay: 4,   dur: 5  },
-  { size: 18, left: 88, delay: 1,   dur: 10 },
-  { size: 9,  left: 95, delay: 3.5, dur: 7  },
+  { size: 14, left: 15, delay: 0,   dur: 8  },
+  { size: 20, left: 45, delay: 1.5, dur: 10 },
+  { size: 10, left: 70, delay: 3,   dur: 7  },
+  { size: 16, left: 90, delay: 2,   dur: 9  },
 ];
 
-// Particles: size, left%, bottom%, delay, duration, dx
+// Reduced particles for performance (was 12, now 6)
 const PARTICLES = [
-  { size: 3, left: 5,  bottom: 10, delay: 0,   dur: 12, dx: 30  },
-  { size: 2, left: 15, bottom: 25, delay: 2,   dur: 9,  dx: -20 },
-  { size: 4, left: 28, bottom: 5,  delay: 1,   dur: 14, dx: 40  },
-  { size: 2, left: 42, bottom: 30, delay: 3.5, dur: 10, dx: -30 },
-  { size: 3, left: 55, bottom: 15, delay: 0.5, dur: 11, dx: 25  },
-  { size: 5, left: 68, bottom: 8,  delay: 2.5, dur: 13, dx: -40 },
-  { size: 2, left: 75, bottom: 20, delay: 1.5, dur: 8,  dx: 35  },
-  { size: 3, left: 85, bottom: 35, delay: 4,   dur: 15, dx: -25 },
-  { size: 4, left: 92, bottom: 12, delay: 0.8, dur: 10, dx: 20  },
-  { size: 2, left: 12, bottom: 40, delay: 3,   dur: 12, dx: 30  },
-  { size: 3, left: 48, bottom: 45, delay: 1.8, dur: 9,  dx: -15 },
-  { size: 2, left: 60, bottom: 50, delay: 2.8, dur: 11, dx: 10  },
+  { size: 3, left: 10, bottom: 10, delay: 0,   dur: 12, dx: 30  },
+  { size: 4, left: 30, bottom: 5,  delay: 1.5, dur: 14, dx: 40  },
+  { size: 3, left: 50, bottom: 20, delay: 0.5, dur: 11, dx: 25  },
+  { size: 5, left: 70, bottom: 8,  delay: 2.5, dur: 13, dx: -40 },
+  { size: 3, left: 85, bottom: 35, delay: 3,   dur: 15, dx: -25 },
+  { size: 2, left: 60, bottom: 45, delay: 1.8, dur: 9,  dx: -15 },
 ];
 
 // DNA strands: left position, delay, duration
@@ -83,8 +73,8 @@ export default function LoginPage() {
       className="min-h-screen flex flex-col items-center justify-center relative overflow-hidden"
       style={{ background: 'linear-gradient(135deg, #0a1628 0%, #0d2d26 50%, #0a1628 100%)' }}
     >
-      {/* ── LAB ANIMATION LAYER ─────────────────────────────── */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {/* ── LAB ANIMATION LAYER (GPU-optimized) ──────────── */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none" style={{ contain: 'layout paint', willChange: 'auto' }}>
 
         {/* Static glow orbs */}
         <div className="absolute -top-32 -right-32 w-96 h-96 rounded-full"

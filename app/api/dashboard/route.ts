@@ -86,6 +86,9 @@ export async function GET(request: NextRequest) {
       const tgl = exam.tgl_permintaan;
       if (tgl === todayWIB) stats.today++;
 
+      if (!isInRange(tgl)) continue;
+      stats.filtered++;
+
       const patient = Array.isArray(exam.patient) ? exam.patient[0] : exam.patient;
       history.push({
         no: exam.no_urut,
@@ -95,9 +98,6 @@ export async function GET(request: NextRequest) {
         biaya: exam.status_biaya,
         exam_id: exam.id,
       });
-
-      if (!isInRange(tgl)) continue;
-      stats.filtered++;
 
       if (exam.gds) stats.chemistry['Gula Darah Sewaktu']++;
       if (exam.gdp) stats.chemistry['Gula Darah Puasa']++;

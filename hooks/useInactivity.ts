@@ -6,12 +6,14 @@ import { toast } from 'sonner';
 
 const INACTIVITY_LIMIT_MS = 30 * 60 * 1000; // 30 menit
 const WARNING_BEFORE_MS = 60 * 1000;          // warning 1 menit sebelum logout
+const THROTTLE_MS = 5000;                     // Throttle activity events (5 detik)
 
 export function useInactivity() {
   const router = useRouter();
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const warningRef = useRef<NodeJS.Timeout | null>(null);
   const warnToastRef = useRef<string | number | null>(null);
+  const lastActivityRef = useRef(Date.now());
 
   const logout = useCallback(async () => {
     try {
@@ -43,7 +45,13 @@ export function useInactivity() {
   useEffect(() => {
     const events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'];
 
-    const handleActivity = () => resetTimer();
+    const handleActivity = () => {
+      // Throttle: only reset timer if enough time has passed
+      const now = Date.now();
+      if (now - lastActivityRef.current < THROTTLE_MS) return;
+      lastActivityRef.current = now;
+      resetTimer();
+    };
 
     events.forEach(e => window.addEventListener(e, handleActivity, { passive: true }));
     resetTimer(); // Start on mount

@@ -28,9 +28,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Parameter tidak valid' }, { status: 400 });
     }
 
+    // Single query with JOIN — fixes N+1 problem
     const { data: examinations, error } = await db
       .from('examinations')
-      .select('*')
+      .select(`
+        no_urut, tgl_permintaan, dokter, petugas, ${column},
+        patient:patients(nama, nik, alamat, tgl_lahir)
+      `)
       .gte('tgl_permintaan', startDate)
       .lte('tgl_permintaan', endDate)
       .not(column, 'is', null)
@@ -61,11 +65,7 @@ export async function GET(request: NextRequest) {
 
       if (!shouldExport) continue;
 
-      const { data: patient } = await db
-        .from('patients')
-        .select('nama, nik, alamat, tgl_lahir')
-        .eq('id', examAny.patient_id)
-        .single();
+      const patient = Array.isArray(examAny.patient) ? examAny.patient[0] : examAny.patient;
 
       result.push({
         'No Urut': examAny.no_urut,

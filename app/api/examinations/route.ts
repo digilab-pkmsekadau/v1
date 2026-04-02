@@ -70,7 +70,7 @@ export async function GET() {
       .from('examinations')
       .select(`
         id, no_urut, tgl_permintaan, dokter, petugas, status_biaya, created_at,
-        patient:patients(id, nama, nik, alamat, tgl_lahir)
+        patient:patients(id, nama, nik, jenis_kelamin, alamat, tgl_lahir)
       `)
       .order('created_at', { ascending: false });
 
@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     const db = createServerClient();
     const body: FormInputData = await request.json();
 
-    const { nama_pasien, nik, alamat, tgl_lahir, tgl_permintaan,
+    const { nama_pasien, nik, jenis_kelamin, alamat, tgl_lahir, tgl_permintaan,
             dokter, petugas, status_biaya, params } = body;
 
     if (!nama_pasien?.trim()) {
@@ -109,10 +109,13 @@ export async function POST(request: NextRequest) {
         .from('patients').select('id').eq('nik', nikClean).maybeSingle();
       if (existing) {
         patientId = existing.id;
+        if (jenis_kelamin) {
+          await db.from('patients').update({ jenis_kelamin }).eq('id', patientId);
+        }
       } else {
         const { data: newP, error: pErr } = await db
           .from('patients')
-          .insert({ nama: nama_pasien.trim(), nik: nikClean, alamat: alamat?.trim() || null, tgl_lahir: tgl_lahir || null })
+          .insert({ nama: nama_pasien.trim(), nik: nikClean, jenis_kelamin: jenis_kelamin || null, alamat: alamat?.trim() || null, tgl_lahir: tgl_lahir || null })
           .select('id').single();
         if (pErr || !newP) return NextResponse.json({ error: 'Gagal simpan pasien: ' + pErr?.message }, { status: 500 });
         patientId = newP.id;
@@ -120,7 +123,7 @@ export async function POST(request: NextRequest) {
     } else {
       const { data: newP, error: pErr } = await db
         .from('patients')
-        .insert({ nama: nama_pasien.trim(), nik: null, alamat: alamat?.trim() || null, tgl_lahir: tgl_lahir || null })
+        .insert({ nama: nama_pasien.trim(), nik: null, jenis_kelamin: jenis_kelamin || null, alamat: alamat?.trim() || null, tgl_lahir: tgl_lahir || null })
         .select('id').single();
       if (pErr || !newP) return NextResponse.json({ error: 'Gagal simpan pasien: ' + pErr?.message }, { status: 500 });
       patientId = newP.id;

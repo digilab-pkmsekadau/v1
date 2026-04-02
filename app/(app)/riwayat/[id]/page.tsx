@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, Fragment } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import {
@@ -25,6 +25,7 @@ interface ExamDetail {
   patients: {
     nama: string;
     nik?: string;
+    jenis_kelamin?: string;
     alamat?: string;
     tgl_lahir?: string;
   };
@@ -33,16 +34,17 @@ interface ExamDetail {
 
 // ─── Komponen nilai lab ───────────────────────────────────────────────────────
 function LabValue({
-  paramKey, value, editMode, onChange,
+  paramKey, value, editMode, onChange, gender
 }: {
   paramKey: string;
   value: string;
   editMode: boolean;
   onChange: (v: string) => void;
+  gender?: string;
 }) {
   const param = ALL_PARAMS.find(p => p.key === paramKey);
-  const abnormal = isAbnormal(paramKey, value);
-  const rangeText = getNormalRangeText(paramKey);
+  const abnormal = isAbnormal(paramKey, value, gender);
+  const rangeText = getNormalRangeText(paramKey, gender);
 
   if (editMode) {
     if (param?.type === 'select' && param.opts) {
@@ -167,18 +169,125 @@ export default function RiwayatDetailPage() {
     }),
   })).filter(g => g.params.length > 0);
 
-  const abnormalCount = ALL_PARAMS.filter(p => isAbnormal(p.key, data[p.key] as string)).length;
+  const abnormalCount = ALL_PARAMS.filter(p => isAbnormal(p.key, data[p.key] as string, data.patients?.jenis_kelamin)).length;
 
   return (
     <>
-      {/* ── Print-only header ─────────────────────────────────── */}
-      <div className="print:block hidden mb-4 text-center border-b pb-3">
-        <h1 className="text-xl font-extrabold">DigiLab Puskesmas Sekadau</h1>
-        <p className="text-sm text-gray-500">Hasil Pemeriksaan Laboratorium</p>
+      {/* ── Print-only Layout ─────────────────────────────────── */}
+      <div className="hidden print:block text-black bg-white" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
+        {/* Kop Surat */}
+        <div className="flex items-center justify-center border-b-[3px] border-black pb-4 mb-6">
+          <div className="text-center">
+            <h1 className="text-xl font-bold uppercase tracking-wider mb-1">Pemerintah Kabupaten Sekadau</h1>
+            <h2 className="text-lg font-bold uppercase mb-1">Dinas Kesehatan, Pengendalian Penduduk dan KB</h2>
+            <h3 className="text-2xl font-black uppercase tracking-widest mb-1">UPTD Puskesmas Sekadau</h3>
+            <p className="text-xs">Jl. Merdeka Timur, Kec. Sekadau Hilir, Kab. Sekadau, Kalimantan Barat</p>
+          </div>
+        </div>
+
+        <h4 className="text-center text-lg font-bold underline mb-6">HASIL PEMERIKSAAN LABORATORIUM</h4>
+
+        {/* Info Pasien */}
+        <table className="w-full text-sm mb-6">
+          <tbody>
+            <tr>
+              <td className="py-1 w-32 font-bold">No. Pemeriksaan</td>
+              <td className="py-1 w-4">:</td>
+              <td className="py-1">{data.no_urut}</td>
+              <td className="py-1 w-32 font-bold">Dokter Pengirim</td>
+              <td className="py-1 w-4">:</td>
+              <td className="py-1">{data.dokter || '-'}</td>
+            </tr>
+            <tr>
+              <td className="py-1 font-bold">Nama Pasien</td>
+              <td className="py-1">:</td>
+              <td className="py-1 font-bold uppercase">{data.patients?.nama || '-'}</td>
+              <td className="py-1 font-bold">Tgl. Pemeriksaan</td>
+              <td className="py-1">:</td>
+              <td className="py-1">
+                {data.tgl_permintaan 
+                  ? new Date(data.tgl_permintaan).toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'}) 
+                  : '-'}
+              </td>
+            </tr>
+            <tr>
+              <td className="py-1 font-bold">NIK</td>
+              <td className="py-1">:</td>
+              <td className="py-1">{data.patients?.nik || '-'}</td>
+              <td className="py-1 font-bold">Jenis Kelamin</td>
+              <td className="py-1">:</td>
+              <td className="py-1">{data.patients?.jenis_kelamin === 'L' ? 'Laki-Laki' : data.patients?.jenis_kelamin === 'P' ? 'Perempuan' : '-'}</td>
+            </tr>
+            <tr>
+              <td className="py-1 font-bold align-top">Alamat</td>
+              <td className="py-1 align-top">:</td>
+              <td className="py-1">{data.patients?.alamat || '-'}</td>
+              <td className="py-1 font-bold">Status Biaya</td>
+              <td className="py-1">:</td>
+              <td className="py-1">{data.status_biaya}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* Tabel Hasil */}
+        <table className="w-full text-sm border-collapse mb-10">
+          <thead>
+            <tr>
+              <th className="border-b-2 border-t-2 border-black py-2 px-2 text-left w-10">No</th>
+              <th className="border-b-2 border-t-2 border-black py-2 px-2 text-left">Pemeriksaan</th>
+              <th className="border-b-2 border-t-2 border-black py-2 px-2 text-center">Hasil</th>
+              <th className="border-b-2 border-t-2 border-black py-2 px-2 text-center">Satuan</th>
+              <th className="border-b-2 border-t-2 border-black py-2 px-2 text-center">Nilai Rujukan</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filledGroups.map((group) => (
+              <Fragment key={group.group}>
+                <tr>
+                  <td colSpan={5} className="py-2 px-2 font-bold bg-slate-50 italic">
+                    {group.group}
+                  </td>
+                </tr>
+                {group.params.map((param, pIdx) => {
+                  const val = getVal(param.key);
+                  const isAbn = isAbnormal(param.key, val, data.patients?.jenis_kelamin);
+                  return (
+                    <tr key={param.key} className="border-b border-dashed border-gray-300">
+                      <td className="py-2 px-2 text-center">{pIdx + 1}</td>
+                      <td className="py-2 px-2">{param.label}</td>
+                      <td className={`py-2 px-2 text-center font-bold`}>
+                        {val || '-'} {isAbn ? '*' : ''}
+                      </td>
+                      <td className="py-2 px-2 text-center">{param.unit || '-'}</td>
+                      <td className="py-2 px-2 text-center">{getNormalRangeText(param.key, data.patients?.jenis_kelamin) || '-'}</td>
+                    </tr>
+                  )
+                })}
+              </Fragment>
+            ))}
+          </tbody>
+        </table>
+        
+        {abnormalCount > 0 && (
+          <p className="text-xs mt-[-20px] mb-8 italic">* Cetak tebal dengan bintang menandakan nilai di luar batas rujukan normal.</p>
+        )}
+
+        {/* Tanda Tangan */}
+        <div className="flex justify-between mt-8 text-sm text-center">
+          <div className="w-48">
+            <p className="mb-20">Dokter Pengirim,</p>
+            <p className="font-bold underline">{data.dokter || '..................................'}</p>
+          </div>
+          <div className="w-56">
+            <p className="mb-1 text-right">Sekadau, {new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
+            <p className="mb-20 text-center">Petugas Laboratorium,</p>
+            <p className="font-bold underline text-center">{data.petugas || '..................................'}</p>
+          </div>
+        </div>
       </div>
 
       {/* ── Screen layout ─────────────────────────────────────── */}
-      <div className="px-4 py-5 print:px-6 print:py-4 animate-slide-up">
+      <div className="px-4 py-5 print:hidden animate-slide-up">
 
         {/* Header / Toolbar */}
         <div className="flex items-center justify-between mb-5 print:hidden">
@@ -248,6 +357,10 @@ export default function RiwayatDetailPage() {
             <div>
               <div className="text-[10px] font-bold text-slate-400 uppercase">NIK</div>
               <div className="text-slate-600">{data.patients?.nik || '—'}</div>
+            </div>
+            <div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase">Jenis Kelamin</div>
+              <div className="text-slate-600">{data.patients?.jenis_kelamin === 'L' ? 'Laki-Laki' : data.patients?.jenis_kelamin === 'P' ? 'Perempuan' : '—'}</div>
             </div>
             <div className="col-span-2">
               <div className="text-[10px] font-bold text-slate-400 uppercase">Alamat</div>
@@ -319,6 +432,7 @@ export default function RiwayatDetailPage() {
                       value={getVal(param.key)}
                       editMode={editMode}
                       onChange={v => setEditData(d => ({ ...d, [param.key]: v }))}
+                      gender={data.patients?.jenis_kelamin}
                     />
                   </div>
                 ))}
@@ -342,10 +456,9 @@ export default function RiwayatDetailPage() {
       {/* Print CSS */}
       <style>{`
         @media print {
-          .print\\:hidden { display: none !important; }
+          @page { size: auto; margin: 20mm; }
+          body { background: white !important; font-size: 11pt; }
           nav, header, footer { display: none !important; }
-          body { background: white !important; }
-          .glass-panel { box-shadow: none !important; border: 1px solid #e2e8f0 !important; }
         }
       `}</style>
     </>

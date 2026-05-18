@@ -6,90 +6,13 @@ import {
   User, Plus, Trash2, CheckCircle, RotateCcw, Loader2, Stethoscope, Search, ChevronDown
 } from 'lucide-react';
 import { FormInputData, ParamItem, StatusBiaya } from '@/types';
-import { isAbnormal, getNormalRangeText } from '@/lib/normal-ranges';
-import { AlertTriangle } from 'lucide-react';
+import { isAbnormal, getNormalRangeText, isPositivePregnancy } from '@/lib/normal-ranges';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
+import PatientAutocomplete, { type PatientSuggestion } from '@/components/input/PatientAutocomplete';
+import { PARAM_OPTIONS, ALL_PARAMS, getParamInfo } from '@/lib/param-options';
 
 // ─── Daftar semua parameter lab (dikelompokkan) ─────────────────────────────
-export const PARAM_OPTIONS: { group: string; params: { key: string; label: string; type: 'number' | 'select' | 'text'; unit?: string; opts?: string[] }[] }[] = [
-  {
-    group: 'Hematologi',
-    params: [
-      { key: 'rbc',    label: 'RBC (Eritrosit)',     type: 'number', unit: '10⁶/µl' },
-      { key: 'hgb',    label: 'HGB (Hemoglobin)',    type: 'number', unit: 'g/dl' },
-      { key: 'hct',    label: 'HCT (Hematokrit)',    type: 'number', unit: '%' },
-      { key: 'mcv',    label: 'MCV',                 type: 'number', unit: 'fL' },
-      { key: 'mch',    label: 'MCH',                 type: 'number', unit: 'pg' },
-      { key: 'mchc',   label: 'MCHC',                type: 'number', unit: 'g/dl' },
-      { key: 'plt',    label: 'PLT (Trombosit)',     type: 'number', unit: '10³/µl' },
-      { key: 'wbc',    label: 'WBC (Leukosit)',      type: 'number', unit: '10³/µl' },
-      { key: 'lym',    label: 'LYM (Limfosit)',      type: 'number', unit: '%' },
-      { key: 'mon',    label: 'MON (Monosit)',        type: 'number', unit: '%' },
-      { key: 'gra',    label: 'GRA (Granulosit)',    type: 'number', unit: '%' },
-      { key: 'led',    label: 'LED',                 type: 'number', unit: 'mm/Jam' },
-      { key: 'goldar', label: 'Golongan Darah',      type: 'select', opts: ['A+','A-','B+','B-','AB+','AB-','O+','O-','Belum Diketahui'] },
-      { key: 'bt',     label: 'BT (Masa Perdarahan)',type: 'text' },
-      { key: 'ct',     label: 'CT (Masa Pembekuan)', type: 'text' },
-    ],
-  },
-  {
-    group: 'Serologi / Imunologi',
-    params: [
-      { key: 'hbsag',         label: 'HBsAg (Hepatitis B)',  type: 'select', opts: ['Non Reaktif','Reaktif'] },
-      { key: 'hiv',           label: 'Anti HIV',              type: 'select', opts: ['Non Reaktif','Reaktif'] },
-      { key: 'syphilis',      label: 'Syphilis',              type: 'select', opts: ['Non Reaktif','Reaktif'] },
-      { key: 'hcv',           label: 'Anti HCV (Hepatitis C)',type: 'select', opts: ['Non Reaktif','Reaktif'] },
-      { key: 'anti_hbs',      label: 'Anti HBs',              type: 'select', opts: ['Non Reaktif','Reaktif'] },
-      { key: 'ns1',           label: 'NS1 Ag Dengue',        type: 'select', opts: ['Negatif','Positif'] },
-      { key: 'dengue_ig',     label: 'Dengue IgG/IgM',       type: 'select', opts: ['Negatif','Positif'] },
-      { key: 'malaria_rapid', label: 'Malaria Rapid',        type: 'select', opts: ['Negatif','Positif'] },
-      { key: 'widal',         label: 'Widal (Tifus)',        type: 'select', opts: ['Negatif','Positif'] },
-    ],
-  },
-  {
-    group: 'Kimia Darah',
-    params: [
-      { key: 'gds',          label: 'GDS (Gula Darah Sewaktu)', type: 'number', unit: 'mg/dl' },
-      { key: 'gdp',          label: 'GDP (Gula Darah Puasa)',   type: 'number', unit: 'mg/dl' },
-      { key: 'gd2pp',        label: 'GD2PP (Gula 2 Jam PP)',   type: 'number', unit: 'mg/dl' },
-      { key: 'kolesterol',   label: 'Kolesterol',              type: 'number', unit: 'mg/dl' },
-      { key: 'trigliserida', label: 'Trigliserida',            type: 'number', unit: 'mg/dl' },
-      { key: 'asam_urat',    label: 'Asam Urat',              type: 'number', unit: 'mg/dl' },
-    ],
-  },
-  {
-    group: 'Mikrobiologi',
-    params: [
-      { key: 'bta',           label: 'BTA (TBC)',       type: 'select', opts: ['Negatif','Positif (+)','Positif (++)','Positif (+++)'] },
-      { key: 'gram',          label: 'Pewarnaan Gram',  type: 'select', opts: ['Negatif','Positif'] },
-      { key: 'malaria_slide', label: 'Malaria Slide',   type: 'select', opts: ['Negatif','P. falciparum','P. vivax','P. malariae'] },
-    ],
-  },
-  {
-    group: 'Urinalisis',
-    params: [
-      { key: 'u_warna',        label: 'Warna Urin',      type: 'select', opts: ['Kuning Muda','Kuning','Kuning Tua','Merah','Keruh'] },
-      { key: 'u_jernih',       label: 'Kejernihan',      type: 'select', opts: ['Jernih','Agak Keruh','Keruh'] },
-      { key: 'u_bj',           label: 'Berat Jenis (BJ)',type: 'number' },
-      { key: 'u_leukosit',     label: 'Leukosit Urin',  type: 'number', unit: '/µl' },
-      { key: 'u_nitrit',       label: 'Nitrit',          type: 'select', opts: ['Negatif','Positif'] },
-      { key: 'u_ph',           label: 'pH Urin',         type: 'number' },
-      { key: 'u_protein',      label: 'Protein',         type: 'select', opts: ['Negatif','Positif (+1)','Positif (+2)','Positif (+3)','Positif (+4)'] },
-      { key: 'u_glukosa',      label: 'Glukosa',         type: 'select', opts: ['Negatif','Positif (+1)','Positif (+2)','Positif (+3)','Positif (+4)'] },
-      { key: 'u_keton',        label: 'Keton',            type: 'select', opts: ['Negatif','Positif'] },
-      { key: 'u_urobilinogen', label: 'Urobilinogen',    type: 'number', unit: 'mg/dl' },
-      { key: 'u_bilirubin',    label: 'Bilirubin',       type: 'select', opts: ['Negatif','Positif'] },
-      { key: 'u_blood',        label: 'Blood (Darah Samar)', type: 'select', opts: ['Negatif','Positif'] },
-      { key: 'u_hcg',          label: 'HCG (Tes Kehamilan)', type: 'select', opts: ['Negatif','Positif'] },
-      { key: 'm_leukosit',     label: 'Sedimen: Leukosit',   type: 'number', unit: '/LPB' },
-      { key: 'm_eritrosit',    label: 'Sedimen: Eritrosit',  type: 'number', unit: '/LPB' },
-      { key: 'm_epitel',       label: 'Sedimen: Epitel',     type: 'number', unit: '/LPK' },
-    ],
-  },
-];
-
-// Flatten untuk lookup
-const ALL_PARAMS = PARAM_OPTIONS.flatMap(g => g.params);
-const getParamInfo = (key: string) => ALL_PARAMS.find(p => p.key === key);
+// Konstanta dipindah ke `lib/param-options.ts`. Lihat impor di atas.
 
 // ─── Searchable Parameter Dropdown ──────────────────────────────────────────
 function SearchableParamSelect({
@@ -210,6 +133,7 @@ export default function InputPage() {
   const [petugasList, setPetugasList] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [successNo, setSuccessNo] = useState<string | null>(null);
+  const [matchedPatientId, setMatchedPatientId] = useState<string | null>(null);
   const topRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -226,6 +150,23 @@ export default function InputPage() {
 
   const setField = (field: keyof typeof initialPatient, value: string) =>
     setPatient(prev => ({ ...prev, [field]: value }));
+
+  // Saat user pilih pasien dari dropdown autocomplete → auto-isi semua field identitas
+  const handleSelectPatient = (p: PatientSuggestion) => {
+    setPatient(prev => ({
+      ...prev,
+      nama_pasien: p.nama || '',
+      nik: p.nik || '',
+      jenis_kelamin: p.jenis_kelamin || '',
+      alamat: p.alamat || '',
+      tgl_lahir: p.tgl_lahir || '',
+      status_biaya: (p.last_status_biaya as StatusBiaya) || prev.status_biaya,
+    }));
+    setMatchedPatientId(p.id);
+    toast.success(`Pasien ditemukan: ${p.nama}`, {
+      description: 'Data identitas terisi otomatis. Silakan isi pemeriksaan terbaru.',
+    });
+  };
 
   // Tambah baris parameter baru
   const addParam = () => {
@@ -253,6 +194,7 @@ export default function InputPage() {
     setPatient({ ...initialPatient, tgl_permintaan: today });
     setParams([]);
     setSuccessNo(null);
+    setMatchedPatientId(null);
     topRef.current?.scrollIntoView({ behavior: 'smooth' });
     toast.info('Form direset');
   };
@@ -364,23 +306,38 @@ export default function InputPage() {
         <div className="grid grid-cols-1 gap-3">
           {/* Nama */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Nama Lengkap *</label>
-            <input type="text" value={patient.nama_pasien}
-              onChange={e => setField('nama_pasien', e.target.value)}
-              placeholder="Nama pasien"
-              className="input-premium" />
+            <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center justify-between">
+              <span>Nama Lengkap *</span>
+              {matchedPatientId && (
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 normal-case tracking-normal flex items-center gap-1">
+                  <CheckCircle2 size={11} /> Pasien terdaftar
+                </span>
+              )}
+            </label>
+            <PatientAutocomplete
+              field="nama"
+              value={patient.nama_pasien}
+              onChange={(v) => { setField('nama_pasien', v); setMatchedPatientId(null); }}
+              onSelect={handleSelectPatient}
+              placeholder="Nama pasien (ketik untuk cari riwayat)"
+              className="input-premium"
+            />
           </div>
 
           {/* NIK, Jenis Kelamin, Tgl Lahir */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">NIK</label>
-              <input type="text" value={patient.nik}
-                onChange={e => setField('nik', e.target.value)}
+              <PatientAutocomplete
+                field="nik"
+                value={patient.nik}
+                onChange={(v) => { setField('nik', v); setMatchedPatientId(null); }}
+                onSelect={handleSelectPatient}
                 placeholder="16 digit NIK"
                 inputMode="numeric"
                 pattern="[0-9]*"
-                className="input-premium" />
+                className="input-premium"
+              />
             </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Jenis Kelamin *</label>
@@ -499,6 +456,7 @@ export default function InputPage() {
                 {/* Input nilai */}
                 {item.paramKey && info && (() => {
                   const abnormal = item.value ? isAbnormal(item.paramKey, item.value, patient.jenis_kelamin) : false;
+                  const positive = item.value ? isPositivePregnancy(item.paramKey, item.value) : false;
                   const rangeText = getNormalRangeText(item.paramKey, patient.jenis_kelamin);
                   return (
                     <div className="flex flex-col gap-1">
@@ -516,7 +474,7 @@ export default function InputPage() {
                         <select
                           value={item.value}
                           onChange={e => updateParam(item.id, 'value', e.target.value)}
-                          className="input-premium"
+                          className={`input-premium ${abnormal ? '!border-red-300 dark:!border-red-800 !text-red-700 dark:!text-red-400 !bg-red-50 dark:!bg-red-950/30' : ''} ${positive ? '!border-emerald-300 dark:!border-emerald-800 !text-emerald-700 dark:!text-emerald-400 !bg-emerald-50 dark:!bg-emerald-950/30' : ''}`}
                         >
                           <option value="">— Pilih —</option>
                           {info.opts.map(o => <option key={o} value={o}>{o}</option>)}
@@ -528,7 +486,7 @@ export default function InputPage() {
                           value={item.value}
                           onChange={e => updateParam(item.id, 'value', e.target.value)}
                           placeholder={info.type === 'number' ? '0' : 'Isi hasil...'}
-                          className={`input-premium ${abnormal ? '!border-red-300 dark:!border-red-800 !text-red-700 dark:!text-red-400 !bg-red-50 dark:!bg-red-950/30' : ''}`}
+                          className={`input-premium ${abnormal ? '!border-red-300 dark:!border-red-800 !text-red-700 dark:!text-red-400 !bg-red-50 dark:!bg-red-950/30' : ''} ${positive ? '!border-emerald-300 dark:!border-emerald-800 !text-emerald-700 dark:!text-emerald-400 !bg-emerald-50 dark:!bg-emerald-950/30' : ''}`}
                         />
                       )}
                       {/* Inline abnormal warning */}
@@ -537,6 +495,15 @@ export default function InputPage() {
                           <AlertTriangle size={11} className="text-red-500 flex-shrink-0" />
                           <span className="text-[11px] font-semibold text-red-600">
                             Nilai di luar batas normal — segera laporkan ke dokter
+                          </span>
+                        </div>
+                      )}
+                      {/* Inline pregnancy positive */}
+                      {positive && (
+                        <div className="flex items-center gap-1.5 mt-0.5">
+                          <CheckCircle2 size={11} className="text-emerald-500 flex-shrink-0" />
+                          <span className="text-[11px] font-semibold text-emerald-600">
+                            Hasil positif — kehamilan terdeteksi
                           </span>
                         </div>
                       )}

@@ -8,7 +8,7 @@ import {
   User, Stethoscope, Calendar, CreditCard, Loader2
 } from 'lucide-react';
 import { isAbnormal, getNormalRangeText } from '@/lib/normal-ranges';
-import { PARAM_OPTIONS } from '@/app/(app)/input/page';
+import { PARAM_OPTIONS } from '@/lib/param-options';
 
 // semua param flat
 const ALL_PARAMS = PARAM_OPTIONS.flatMap(g => g.params.map(p => ({ ...p, group: g.group })));

@@ -27,11 +27,11 @@ export const NORMAL_RANGES: Record<string, NormalRange> = {
   led:   { min: 0, max: 20, pria: { min: 0, max: 15 }, wanita: { min: 0, max: 20 }, unit: 'mm/jam' },
 
   // ── KIMIA KLINIK ─────────────────────────────────────────────
-  gds:              { min: 70,  max: 200,  unit: 'mg/dL' },
+  gds:              { min: 75,  max: 150,  unit: 'mg/dL' },
   gdp:              { min: 70,  max: 126,  unit: 'mg/dL' },
-  gd2pp:            { min: 70,  max: 200,  unit: 'mg/dL' },
+  gd2pp:            { min: 100, max: 150,  unit: 'mg/dL' },
   kolesterol:       { min: 0,   max: 200,  unit: 'mg/dL' },
-  trigliserida:     { min: 0,   max: 150,  unit: 'mg/dL' },
+  trigliserida:     { min: 0,   max: 200,  unit: 'mg/dL' },
 
   // Asam Urat — berbeda per gender
   asam_urat:        { min: 2.4, max: 7.0, pria: { min: 3.4, max: 7.0 }, wanita: { min: 2.4, max: 6.0 }, unit: 'mg/dL' },
@@ -78,6 +78,12 @@ export function isAbnormal(key: string, value: string | undefined | null, gender
 
   // 1. Cek nilai kategorikal (Teks)
   const v = value.toLowerCase();
+
+  // Khusus HCG kehamilan: positif bukan abnormal (justru hasil yang diinginkan)
+  if (key === 'u_hcg') {
+    return false;
+  }
+
   // Jika mengandung "positif" atau "reaktif" (dan bukan "non reaktif")
   if (v.includes('positif')) return true;
   if (v.includes('reaktif') && !v.includes('non')) return true;
@@ -104,6 +110,34 @@ export function isAbnormal(key: string, value: string | undefined | null, gender
   if (min !== undefined && numeric < min) return true;
   if (max !== undefined && numeric > max) return true;
   return false;
+}
+
+/**
+ * Cek apakah hasil HCG positif (kehamilan terdeteksi)
+ * Digunakan untuk styling khusus berwarna hijau.
+ */
+export function isPositivePregnancy(key: string, value: string | undefined | null): boolean {
+  if (!value || key !== 'u_hcg') return false;
+  const v = value.toLowerCase();
+  return v.includes('positif') || v.includes('(+)');
+}
+
+/**
+ * Status hasil pemeriksaan untuk keperluan styling
+ * - 'abnormal'  → di luar batas normal / Reaktif / Positif (selain HCG) → merah
+ * - 'positive'  → HCG kehamilan positif → hijau
+ * - 'normal'    → dalam batas normal / negatif / non-reaktif → tanpa warna
+ */
+export type ResultStatus = 'abnormal' | 'positive' | 'normal';
+
+export function getResultStatus(
+  key: string,
+  value: string | undefined | null,
+  gender?: 'L' | 'P' | string | null
+): ResultStatus {
+  if (isPositivePregnancy(key, value)) return 'positive';
+  if (isAbnormal(key, value, gender)) return 'abnormal';
+  return 'normal';
 }
 
 export function getNormalRangeText(key: string, gender?: 'L' | 'P' | string | null): string {

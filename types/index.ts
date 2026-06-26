@@ -26,8 +26,8 @@ export interface Examination {
   gra?: string; led?: string; goldar?: string; bt?: string; ct?: string;
   hbsag?: string; hiv?: string; syphilis?: string; hcv?: string;
   anti_hbs?: string; ns1?: string; dengue_ig?: string; malaria_rapid?: string;
-  widal?: string; gds?: string; gdp?: string; gd2pp?: string;
-  kolesterol?: string; trigliserida?: string; asam_urat?: string;
+  widal?: string; napza?: string; gds?: string; gdp?: string; gd2pp?: string;
+  kolesterol?: string; ldl?: string; hdl?: string; trigliserida?: string; asam_urat?: string;
   bta?: string; gram?: string; malaria_slide?: string;
   u_warna?: string; u_jernih?: string; u_bj?: string; u_leukosit?: string;
   u_nitrit?: string; u_ph?: string; u_protein?: string; u_glukosa?: string;
@@ -45,6 +45,11 @@ export interface DashboardStats {
     { type: "reactive" | "positive"; pos: number; neg: number }
   >;
   microbiology: Record<string, { pos: number; neg: number }>;
+}
+
+export interface MonthlyVisit {
+  month: string;
+  count: number;
 }
 
 export interface HistoryRow {

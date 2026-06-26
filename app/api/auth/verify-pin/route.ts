@@ -1,4 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
+
 import { verifyPin, setSession } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
@@ -8,7 +10,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { pin } = body;
 
-    if (!pin || typeof pin !== 'string' || pin.length !== 6) {
+    if (!pin || typeof pin !== 'string' || pin.length !== 6 || !/^\d{6}$/.test(pin)) {
       return NextResponse.json({ error: 'PIN harus 6 digit' }, { status: 400 });
     }
 

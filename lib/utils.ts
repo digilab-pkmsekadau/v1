@@ -56,8 +56,7 @@ export function generateNoUrut(lastNo: string | null): string {
   if (isNaN(num)) return 'P-01';
   
   const next = num + 1;
-  // Pad hanya jika <= 9 (single digit)
-  const padded = next < 10 ? next.toString().padStart(2, '0') : next.toString();
+  const padded = next.toString().padStart(2, '0');
   return `P-${padded}`;
 }
 

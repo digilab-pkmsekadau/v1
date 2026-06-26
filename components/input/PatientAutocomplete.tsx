@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useRef, useState, useCallback } from 'react';
 import { Loader2, History, X } from 'lucide-react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 
 export interface PatientSuggestion {
   id: string;
@@ -11,6 +11,7 @@ export interface PatientSuggestion {
   alamat: string | null;
   tgl_lahir: string | null;
   last_status_biaya?: string | null;
+  last_exam_count?: number;
 }
 
 interface Props {
@@ -144,7 +145,7 @@ export default function PatientAutocomplete({
         <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden"
           style={{ maxHeight: 320 }}>
           <div className="px-3 py-2 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-800/50 flex items-center gap-1.5 border-b border-slate-100 dark:border-slate-800">
-            <History size={11} /> Riwayat Pasien — {items.length} hasil
+            <History size={11} /> Pasien Ditemukan — {items.length} hasil
           </div>
           <div className="overflow-y-auto" style={{ maxHeight: 280 }}>
             {items.map((p, idx) => (
@@ -166,9 +167,16 @@ export default function PatientAutocomplete({
                       p.nama
                     )}
                   </div>
-                  <span className="text-[10px] font-bold text-slate-400 flex-shrink-0">
-                    {p.jenis_kelamin === 'L' ? '♂ L' : p.jenis_kelamin === 'P' ? '♀ P' : '-'}
-                  </span>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    {p.last_exam_count && p.last_exam_count > 0 && (
+                      <span className="text-[9px] font-bold bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-300 px-1.5 py-0.5 rounded-full">
+                        {p.last_exam_count}x
+                      </span>
+                    )}
+                    <span className="text-[10px] font-bold text-slate-400">
+                      {p.jenis_kelamin === 'L' ? '♂ L' : p.jenis_kelamin === 'P' ? '♀ P' : '-'}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                   {field !== 'nik' && p.nik && <span className="font-mono">{p.nik}</span>}

@@ -21,9 +21,9 @@ export const NORMAL_RANGES: Record<string, NormalRange> = {
   mchc:  { min: 31,    max: 37,    unit: 'g/dL' },
   plt:   { min: 150,   max: 400,   unit: '10³/µl' },
   wbc:   { min: 4.0,   max: 11.0,  unit: '10³/µl' },
-  lym:   { min: 1.0,   max: 4.5,   unit: '10³/µl' },
-  mon:   { min: 0.2,   max: 1.0,   unit: '10³/µl' },
-  gra:   { min: 1.8,   max: 8.0,   unit: '10³/µl' },
+  lym:   { min: 20,    max: 40,    unit: '%' },
+  mon:   { min: 2,     max: 8,     unit: '%' },
+  gra:   { min: 50,    max: 70,    unit: '%' },
   led:   { min: 0, max: 20, pria: { min: 0, max: 15 }, wanita: { min: 0, max: 20 }, unit: 'mm/jam' },
 
   // ── KIMIA KLINIK ─────────────────────────────────────────────
@@ -31,6 +31,8 @@ export const NORMAL_RANGES: Record<string, NormalRange> = {
   gdp:              { min: 70,  max: 126,  unit: 'mg/dL' },
   gd2pp:            { min: 100, max: 150,  unit: 'mg/dL' },
   kolesterol:       { min: 0,   max: 200,  unit: 'mg/dL' },
+  ldl:              { max: 100,  unit: 'mg/dL' }, // Kurang dari 100
+  hdl:              { min: 40,   pria: { min: 40 }, wanita: { min: 50 },  unit: 'mg/dL' }, // >40 pria, >50 wanita
   trigliserida:     { min: 0,   max: 200,  unit: 'mg/dL' },
 
   // Asam Urat — berbeda per gender
@@ -60,6 +62,7 @@ export const NORMAL_RANGES: Record<string, NormalRange> = {
   dengue_ig:        { text: 'Negatif' },
   malaria_rapid:    { text: 'Negatif' },
   widal:            { text: 'Negatif' },
+  napza:            { text: 'Negatif' },
 
   // ── MIKROBIOLOGI ──────────────────────────────────────────────
   bta:              { text: 'Negatif' },
@@ -157,6 +160,10 @@ export function getNormalRangeText(key: string, gender?: 'L' | 'P' | string | nu
 
   if (min !== undefined && max !== undefined) {
     return `${min} - ${max} ${range.unit ?? ''}`.trim();
+  } else if (min !== undefined && max === undefined) {
+    return `> ${min} ${range.unit ?? ''}`.trim();
+  } else if (min === undefined && max !== undefined) {
+    return `< ${max} ${range.unit ?? ''}`.trim();
   }
 
   return range.text ?? '';

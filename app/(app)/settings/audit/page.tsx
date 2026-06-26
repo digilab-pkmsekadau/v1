@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Shield, Loader2, AlertCircle, CheckCircle, Trash2, Edit, Plus } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface AuditEntry {
   id: string;
@@ -41,6 +41,8 @@ export default function AuditLogPage() {
           setTableExists(false);
         }
         setLogs(json.data ?? []);
+      } catch {
+        setLogs([]);
       } finally {
         setLoading(false);
       }
@@ -127,7 +129,7 @@ CREATE POLICY "Allow all" ON audit_log USING (true) WITH CHECK (true);`}
                       {log.user_email && (
                         <span className="text-[10px] text-slate-400">{log.user_email}</span>
                       )}
-                      <span className="text-[10px] text-slate-300">•</span>
+                      {log.user_email && <span className="text-[10px] text-slate-300">•</span>}
                       <span className="text-[10px] text-slate-400">{timeAgo(log.created_at)}</span>
                     </div>
                   </div>

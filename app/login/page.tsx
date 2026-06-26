@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Activity, Eye, EyeOff, Mail, Lock, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { toast } from 'sonner';
+
 import { createSupabaseBrowserClient } from '@/lib/supabase';
 
 // Reduced bubbles for performance (was 8, now 4)

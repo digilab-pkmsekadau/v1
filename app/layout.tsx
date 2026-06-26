@@ -1,12 +1,22 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans } from 'next/font/google';
+import { Plus_Jakarta_Sans, Noto_Sans } from 'next/font/google';
+
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
+import { validateEnv } from '@/lib/validate-env';
+
+validateEnv();
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   variable: '--font-sans',
   weight: ['300', '400', '500', '600', '700', '800'],
+});
+
+const notoSans = Noto_Sans({
+  subsets: ['latin'],
+  variable: '--font-noto-sans',
+  weight: ['300', '400', '500', '700'],
 });
 
 export const metadata: Metadata = {
@@ -26,13 +36,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-        <meta name="theme-color" content="#0d9488" />
+        <meta name="theme-color" content="#0891b2" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={plusJakarta.variable}>
+      <body className={`${plusJakarta.variable} ${notoSans.variable} font-sans antialiased text-slate-900 bg-cyan-50 dark:bg-slate-950 dark:text-slate-100 selection:bg-cyan-200 dark:selection:bg-cyan-900 motion-safe:transition-colors motion-safe:duration-200`}>
         {children}
         <Toaster position="top-center" richColors />
       </body>

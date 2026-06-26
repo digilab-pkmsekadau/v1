@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
 import { Trash2, Search, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
-import { HistoryRow } from '@/types';
+import { useRouter } from 'next/navigation';
+import { useState, useMemo, useEffect } from 'react';
+
 import EmptyState from '@/components/ui/EmptyState';
+import type { HistoryRow } from '@/types';
 
 interface Props {
   data: HistoryRow[];
@@ -18,6 +19,10 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    setPage(1);
+  }, [data]);
 
   const filtered = useMemo(() => {
     const q = search.toLowerCase();

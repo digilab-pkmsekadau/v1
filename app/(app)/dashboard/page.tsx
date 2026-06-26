@@ -1,15 +1,92 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { RefreshCw, TrendingUp, FlaskConical, Dna, Microscope, Download, TestTube, ChevronRight, CalendarDays } from 'lucide-react';
-import { toast } from 'sonner';
-import { DashboardStats, HistoryRow } from '@/types';
-import { getStartOfMonth, getTodayWIB } from '@/lib/utils';
-import { exportToExcel } from '@/lib/export';
-import { ExportRow } from '@/types';
+import { RefreshCw, TrendingUp, FlaskConical, Dna, Microscope, Download, TestTube, ChevronRight, CalendarDays, BarChart3, PieChart } from 'lucide-react';
 import Link from 'next/link';
+import { useEffect, useState, useCallback } from 'react';
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart as RechartsPie, Pie, Cell, Legend
+} from 'recharts';
+import { toast } from 'sonner';
+
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import { exportToExcel } from '@/lib/export';
+import { getStartOfMonth, getTodayWIB } from '@/lib/utils';
+import type { DashboardStats, HistoryRow, MonthlyVisit } from '@/types';
+import type { ExportRow } from '@/types';
+
+
+const COLORS = ['#0d9488', '#2563eb', '#7c3aed', '#dc2626', '#f97316', '#84cc16', '#d97706', '#059669', '#db2777', '#0891b2'];
+
+const SkeletonCard = () => (
+  <div className="flex-1 min-w-[45%] rounded-2xl p-4" style={{ background: 'var(--surface)' }}>
+    <div className="skeleton h-3 w-24 mb-3 rounded" />
+    <div className="skeleton h-8 w-16 mb-2 rounded" />
+    <div className="skeleton h-7 w-20 rounded-full" />
+  </div>
+);
+
+function DownloadMenu({
+  menuKey,
+  options,
+  openMenu,
+  setOpenMenu,
+  onDownload,
+  startDate,
+  endDate,
+}: {
+  menuKey: string;
+  options: { label: string; filterMode: string; color: string }[];
+  openMenu: string | null;
+  setOpenMenu: (v: string | null) => void;
+  onDownload: (param: string, filterMode: string) => void;
+  startDate: string;
+  endDate: string;
+}) {
+  const isOpen = openMenu === menuKey;
+  const paramName = menuKey.replace('micro_', '');
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpenMenu(isOpen ? null : menuKey)}
+        className="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/60 dark:bg-white/5 hover:bg-teal-50 dark:hover:bg-teal-950/40 hover:text-teal-700 dark:hover:text-teal-400 text-slate-400 dark:text-slate-500 transition-all duration-200 active:scale-90 border border-slate-100 dark:border-slate-700/50"
+      >
+        <Download size={12} />
+      </button>
+      {isOpen && (
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => setOpenMenu(null)} />
+          <div className="absolute right-0 top-full mt-1.5 z-50 rounded-2xl shadow-xl border overflow-hidden min-w-[190px]"
+            style={{
+              background: 'var(--surface)',
+              backdropFilter: 'blur(20px)',
+              borderColor: 'var(--border)',
+            }}
+          >
+            <div className="px-3 py-2.5 border-b" style={{ borderColor: 'var(--border)' }}>
+              <div className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                Export: {paramName}
+              </div>
+              <div className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold mt-0.5">
+                📅 {startDate} s/d {endDate}
+              </div>
+            </div>
+            {options.map((opt) => (
+              <button
+                key={opt.filterMode}
+                onClick={() => { onDownload(paramName, opt.filterMode); setOpenMenu(null); }}
+                className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800/50 ${opt.color} transition-colors active:scale-95`}
+              >
+                <Download size={13} /> {opt.label}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  );
+}
 
 export default function DashboardPage() {
   const today = getTodayWIB();
@@ -17,6 +94,7 @@ export default function DashboardPage() {
   const [endDate, setEndDate] = useState(today);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [history, setHistory] = useState<HistoryRow[]>([]);
+  const [monthlyData, setMonthlyData] = useState<MonthlyVisit[]>([]);
   const [loading, setLoading] = useState(true);
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const confirm = useConfirm();
@@ -24,11 +102,18 @@ export default function DashboardPage() {
   const fetchDashboard = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/dashboard?start=${startDate}&end=${endDate}`);
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      setStats(data.stats);
-      setHistory(data.history);
+      const [dashboardRes, monthlyRes] = await Promise.all([
+        fetch(`/api/dashboard?start=${startDate}&end=${endDate}`),
+        fetch(`/api/dashboard?monthly=true&year=${new Date().getFullYear()}`)
+      ]);
+      if (!dashboardRes.ok) throw new Error();
+      const dashboardData = await dashboardRes.json();
+      setStats(dashboardData.stats);
+      setHistory(dashboardData.history);
+      if (monthlyRes.ok) {
+        const monthlyJson = await monthlyRes.json();
+        setMonthlyData(monthlyJson.monthlyData || []);
+      }
     } catch {
       toast.error('Gagal memuat data dashboard');
     } finally {
@@ -82,68 +167,6 @@ export default function DashboardPage() {
     }
   };
 
-
-  const SkeletonCard = () => (
-    <div className="flex-1 min-w-[45%] rounded-2xl p-4" style={{ background: 'var(--surface)' }}>
-      <div className="skeleton h-3 w-24 mb-3 rounded" />
-      <div className="skeleton h-8 w-16 mb-2 rounded" />
-      <div className="skeleton h-7 w-20 rounded-full" />
-    </div>
-  );
-
-  // Komponen download popup per card
-  const DownloadMenu = ({
-    menuKey,
-    options,
-  }: {
-    menuKey: string;
-    options: { label: string; filterMode: string; color: string }[];
-  }) => {
-    const isOpen = openMenu === menuKey;
-    const paramName = menuKey.replace('micro_', '');
-    return (
-      <div className="relative">
-        <button
-          onClick={() => setOpenMenu(isOpen ? null : menuKey)}
-          className="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/60 dark:bg-white/5 hover:bg-teal-50 dark:hover:bg-teal-950/40 hover:text-teal-700 dark:hover:text-teal-400 text-slate-400 dark:text-slate-500 transition-all duration-200 active:scale-90 border border-slate-100 dark:border-slate-700/50"
-        >
-          <Download size={12} />
-        </button>
-        {isOpen && (
-          <>
-            <div className="fixed inset-0 z-40" onClick={() => setOpenMenu(null)} />
-            <div className="absolute right-0 top-full mt-1.5 z-50 rounded-2xl shadow-xl border overflow-hidden min-w-[190px]"
-              style={{
-                background: 'var(--surface)',
-                backdropFilter: 'blur(20px)',
-                borderColor: 'var(--border)',
-              }}
-            >
-              {/* Header dengan info periode aktif */}
-              <div className="px-3 py-2.5 border-b" style={{ borderColor: 'var(--border)' }}>
-                <div className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                  Export: {paramName}
-                </div>
-                <div className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold mt-0.5">
-                  📅 {startDate} s/d {endDate}
-                </div>
-              </div>
-              {options.map((opt) => (
-                <button
-                  key={opt.filterMode}
-                  onClick={() => { handleDownload(paramName, opt.filterMode); setOpenMenu(null); }}
-                  className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800/50 ${opt.color} transition-colors active:scale-95`}
-                >
-                  <Download size={13} /> {opt.label}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-      </div>
-    );
-  };
-
   return (
     <div className="px-4 py-5 animate-slide-up">
       {/* Header */}
@@ -173,24 +196,24 @@ export default function DashboardPage() {
           <CalendarDays size={14} className="text-teal-600 dark:text-teal-400" />
           <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Filter Periode</h2>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">Dari</label>
-            <input
-              type="date" value={startDate}
-              onChange={e => setStartDate(e.target.value)}
-              className="input-premium"
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">Dari</label>
+              <input
+                type="date" value={startDate}
+                onChange={e => setStartDate(e.target.value)}
+                className="input-premium bg-white dark:bg-slate-900 shadow-sm"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">Sampai</label>
+              <input
+                type="date" value={endDate}
+                onChange={e => setEndDate(e.target.value)}
+                className="input-premium bg-white dark:bg-slate-900 shadow-sm"
+              />
+            </div>
           </div>
-          <div>
-            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">Sampai</label>
-            <input
-              type="date" value={endDate}
-              onChange={e => setEndDate(e.target.value)}
-              className="input-premium"
-            />
-          </div>
-        </div>
       </div>
 
       {/* Summary Stats */}
@@ -302,7 +325,7 @@ export default function DashboardPage() {
                 >
                   <div className="flex items-start justify-between gap-1">
                     <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase leading-tight flex-1">{label}</div>
-                    <DownloadMenu menuKey={label} options={menuOptions} />
+                    <DownloadMenu menuKey={label} options={menuOptions} openMenu={openMenu} setOpenMenu={setOpenMenu} onDownload={handleDownload} startDate={startDate} endDate={endDate} />
                   </div>
                   <div className="text-sm font-bold leading-tight">
                     {isReactive ? (
@@ -349,7 +372,7 @@ export default function DashboardPage() {
                 >
                   <div className="flex items-start justify-between gap-1">
                     <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase leading-tight flex-1">{label}</div>
-                    <DownloadMenu menuKey={`micro_${label}`} options={menuOptions} />
+                    <DownloadMenu menuKey={`micro_${label}`} options={menuOptions} openMenu={openMenu} setOpenMenu={setOpenMenu} onDownload={handleDownload} startDate={startDate} endDate={endDate} />
                   </div>
                   <div className="text-sm font-bold leading-tight">
                     <span className="text-amber-700 dark:text-amber-400">{obj.pos} Positif</span>
@@ -361,6 +384,78 @@ export default function DashboardPage() {
           ) : null}
         </div>
       </div>
+
+      {/* Monthly Trend Chart */}
+      <div className="mb-3 flex items-center gap-2">
+        <div className="section-badge" style={{ background: 'rgba(13,148,136,0.08)', color: '#0d9488' }}>
+          <BarChart3 size={13} />
+          <span>Tren Bulanan</span>
+        </div>
+      </div>
+      <div className="glass-panel p-4 mb-6">
+        {loading ? (
+          <div className="h-[200px] skeleton rounded" />
+        ) : monthlyData.length === 0 ? (
+          <div className="py-8 text-center text-slate-400 text-sm">Tidak ada data</div>
+        ) : (
+          <>
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-300 mb-3">Jumlah Pemeriksaan per Bulan</p>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={monthlyData} margin={{ top: 4, right: 8, left: -10, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 11 }}
+                />
+                <Bar dataKey="count" fill="#0d9488" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </>
+        )}
+      </div>
+
+      {/* Chemistry Distribution Pie Chart */}
+      {stats && Object.values(stats.chemistry).some(v => v > 0) && (
+        <>
+          <div className="mb-3 flex items-center gap-2">
+            <div className="section-badge" style={{ background: 'rgba(37,99,235,0.08)', color: '#2563eb' }}>
+              <PieChart size={13} />
+              <span>Distribusi Kimia Klinik</span>
+            </div>
+          </div>
+          <div className="glass-panel p-4 mb-6">
+            <p className="text-xs font-bold text-slate-600 dark:text-slate-300 mb-3">Parameter Pemeriksaan</p>
+            <ResponsiveContainer width="100%" height={220}>
+              <RechartsPie>
+                <Pie
+                  data={Object.entries(stats.chemistry)
+                    .filter(([, v]) => v > 0)
+                    .map(([name, value], i) => ({ name, value, color: COLORS[i % COLORS.length] }))}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={50}
+                  outerRadius={80}
+                  paddingAngle={2}
+                  dataKey="value"
+                  label={({ name, percent }) => `${name} (${((percent ?? 0) * 100).toFixed(0)}%)`}
+                  labelLine={false}
+                >
+                  {Object.entries(stats.chemistry)
+                    .filter(([, v]) => v > 0)
+                    .map((_, i) => (
+                      <Cell key={`cell-${i}`} fill={COLORS[i % COLORS.length]} />
+                    ))}
+                </Pie>
+                <Tooltip
+                  contentStyle={{ borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 11 }}
+                />
+                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
+              </RechartsPie>
+            </ResponsiveContainer>
+          </div>
+        </>
+      )}
 
       {/* View All History Table CTA */}
       <Link

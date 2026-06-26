@@ -1,5 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
 import { createBrowserClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
 
 // Fallback ditambahkan untuk mencegah error "URL is required" saat proses BUILD di Vercel
 // di mana environment variable mungkin kosong/belum terbaca.

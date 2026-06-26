@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
+
 import { createServerClient } from '@/lib/supabase';
-import { ExportRow } from '@/types';
 import { formatDateDisplay } from '@/lib/utils';
+import type { ExportRow } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -54,7 +56,7 @@ export async function GET(request: NextRequest) {
 
       const valLower = val.toLowerCase();
       const isNeg = valLower.includes('non') || valLower.includes('negatif');
-      const isPos = !isNeg;
+      const isPos = valLower.includes('positif') || (valLower.includes('reaktif') && !valLower.includes('non'));
 
       let shouldExport = false;
       if (filterMode === 'all_filled') shouldExport = true;
@@ -74,8 +76,8 @@ export async function GET(request: NextRequest) {
         'Alamat': patient?.alamat || '-',
         'Tgl Lahir': patient?.tgl_lahir ? formatDateDisplay(patient.tgl_lahir) : '-',
         'Tgl Pemeriksaan': formatDateDisplay(examAny.tgl_permintaan),
-        'Dokter Perujuk': examAny.dokter,
-        'Petugas': examAny.petugas,
+        'Dokter Perujuk': examAny.dokter || '-',
+        'Petugas': examAny.petugas || '-',
         'Hasil Pemeriksaan': val,
       });
     }

@@ -1,6 +1,7 @@
-import { createServerClient } from './supabase';
 import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest, NextResponse } from 'next/server';
+
+import { createServerClient } from './supabase';
 
 const SESSION_COOKIE = 'digilab_session';
 const SESSION_VALUE = 'authenticated';
@@ -14,7 +15,7 @@ export async function verifyPin(pin: string): Promise<boolean> {
     .single();
 
   if (error || !data) return false;
-  return data.value.trim() === pin.trim();
+  return (data.value ?? '').trim() === pin.trim();
 }
 
 export async function setSession(response: NextResponse): Promise<NextResponse> {

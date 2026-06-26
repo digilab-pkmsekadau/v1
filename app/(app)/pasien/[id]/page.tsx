@@ -1,25 +1,28 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 import { ArrowLeft, Loader2, User, Calendar, QrCode, TrendingUp, ClipboardList, Eye } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState, useCallback } from 'react';
 import {
   LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, Legend
 } from 'recharts';
-import dynamic from 'next/dynamic';
+import { toast } from 'sonner';
+
 import { isAbnormal } from '@/lib/normal-ranges';
 
 // QR Code - lazy loaded (client only)
 const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => m.QRCodeSVG), { ssr: false });
 
-// Parameter numerik yang bisa digrafik
+// Parameter numerik yang bisa digrafik (termasuk LDL, HDL, NAPZA)
 const TREND_PARAMS: { key: string; label: string; color: string }[] = [
   { key: 'gds',         label: 'GDS',         color: '#0d9488' },
   { key: 'gdp',         label: 'GDP',         color: '#2563eb' },
   { key: 'gd2pp',       label: 'GD2PP',       color: '#7c3aed' },
   { key: 'kolesterol',  label: 'Kolesterol',  color: '#dc2626' },
+  { key: 'ldl',         label: 'LDL',         color: '#f97316' },
+  { key: 'hdl',         label: 'HDL',         color: '#84cc16' },
   { key: 'trigliserida',label: 'Trigliserida',color: '#d97706' },
   { key: 'asam_urat',   label: 'Asam Urat',   color: '#059669' },
   { key: 'hgb',         label: 'HGB',         color: '#db2777' },
@@ -28,6 +31,7 @@ const TREND_PARAMS: { key: string; label: string; color: string }[] = [
   { key: 'sgot',        label: 'SGOT',        color: '#9333ea' },
   { key: 'sgpt',        label: 'SGPT',        color: '#ea580c' },
   { key: 'ureum',       label: 'Ureum',       color: '#0284c7' },
+  { key: 'napza',       label: 'NAPZA',       color: '#6366f1' },
 ];
 
 interface Patient {
@@ -69,15 +73,22 @@ export default function PasienDetailPage() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   // Build chart data — hanya param numerik yang ada nilainya
-  const availableParams = TREND_PARAMS.filter(p =>
-    exams.some(e => parseNum(e[p.key] as string) !== null)
-  );
+  const availableParams = TREND_PARAMS.filter(p => {
+    if (p.key === 'napza') return false; // Skip categorical field
+    return exams.some(e => {
+      const val = e[p.key] as string;
+      if (!val) return false;
+      const n = parseFloat(val);
+      return !isNaN(n) && val !== '';
+    });
+  });
 
   const chartData = exams.map(e => {
     const row: Record<string, string | number> = {
       tgl: new Date(e.tgl_permintaan).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }),
     };
     TREND_PARAMS.forEach(p => {
+      if (p.key === 'napza') return; // NAPZA is categorical, skip charting
       const n = parseNum(e[p.key] as string);
       if (n !== null) row[p.key] = n;
     });
@@ -298,7 +309,7 @@ export default function PasienDetailPage() {
       {/* === TAB: QR CODE === */}
       {tab === 'qr' && (
         <div className="glass-panel p-6 flex flex-col items-center gap-4">
-          <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100">
+          <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 qr-container">
             <QRCodeSVG
               value={qrUrl || `patient:${id}`}
               size={200}
@@ -316,9 +327,9 @@ export default function PasienDetailPage() {
           </div>
           <button
             onClick={() => {
-              const svg = document.querySelector('svg');
-              if (!svg) return;
-              const blob = new Blob([svg.outerHTML], { type: 'image/svg+xml' });
+              const qrContainer = document.querySelector('.qr-container svg');
+              if (!qrContainer) return;
+              const blob = new Blob([qrContainer.outerHTML], { type: 'image/svg+xml' });
               const url = URL.createObjectURL(blob);
               const a = document.createElement('a');
               a.href = url;

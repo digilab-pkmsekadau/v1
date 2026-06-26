@@ -48,6 +48,7 @@ export const PARAM_OPTIONS: ParamGroup[] = [
       { key: 'dengue_ig',     label: 'Dengue IgG/IgM',       type: 'select', opts: ['Negatif','Positif'] },
       { key: 'malaria_rapid', label: 'Malaria Rapid',        type: 'select', opts: ['Negatif','Positif'] },
       { key: 'widal',         label: 'Widal (Tifus)',        type: 'select', opts: ['Negatif','Positif'] },
+      { key: 'napza',         label: 'NAPZA',                type: 'select', opts: ['Negatif','Positif'] },
     ],
   },
   {
@@ -57,6 +58,8 @@ export const PARAM_OPTIONS: ParamGroup[] = [
       { key: 'gdp',          label: 'GDP (Gula Darah Puasa)',   type: 'number', unit: 'mg/dl' },
       { key: 'gd2pp',        label: 'GD2PP (Gula 2 Jam PP)',   type: 'number', unit: 'mg/dl' },
       { key: 'kolesterol',   label: 'Kolesterol',              type: 'number', unit: 'mg/dl' },
+      { key: 'ldl',          label: 'LDL',                     type: 'number', unit: 'mg/dl' },
+      { key: 'hdl',          label: 'HDL',                     type: 'number', unit: 'mg/dl' },
       { key: 'trigliserida', label: 'Trigliserida',            type: 'number', unit: 'mg/dl' },
       { key: 'asam_urat',    label: 'Asam Urat',              type: 'number', unit: 'mg/dl' },
     ],

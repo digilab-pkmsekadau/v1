@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx';
-import { ExportRow } from '@/types';
+
+import type { ExportRow } from '@/types';
 
 /**
  * Export array of ExportRow ke file Excel (.xlsx)

@@ -1,4 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
+
 import { createServerClient } from '@/lib/supabase';
 import { formatDateDisplay } from '@/lib/utils';
 
@@ -10,8 +12,14 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const month = searchParams.get('month') || new Date().toISOString().slice(0, 7);
 
-    // Fix: hitung hari terakhir bulan dengan benar (bukan hardcode -31)
+    if (!/^\d{4}-\d{2}$/.test(month)) {
+      return NextResponse.json({ error: 'Format bulan tidak valid (YYYY-MM)' }, { status: 400 });
+    }
+
     const [year, mon] = month.split('-').map(Number);
+    if (isNaN(year) || isNaN(mon) || mon < 1 || mon > 12) {
+      return NextResponse.json({ error: 'Bulan tidak valid' }, { status: 400 });
+    }
     const startDate = `${month}-01`;
     const lastDay = new Date(year, mon, 0).getDate(); // hari terakhir bulan
     const endDate = `${month}-${String(lastDay).padStart(2, '0')}`;

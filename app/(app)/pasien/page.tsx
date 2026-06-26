@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Search, User, ChevronRight, Loader2, Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface Patient {
   id: string;
@@ -38,26 +38,24 @@ export default function PasienPage() {
   const [searched, setSearched] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(async () => {
-      if (query.trim().length < 2) {
-        setPatients([]);
-        setSearched(false);
-        return;
-      }
-      setLoading(true);
-      try {
-        const res = await fetch(`/api/patients?q=${encodeURIComponent(query)}`);
-        const json = await res.json();
-        setPatients(json.data ?? []);
-        setSearched(true);
-      } finally {
-        setLoading(false);
-      }
-    }, 400);
-    return () => clearTimeout(timer);
+    if (query.trim().length >= 2) {
+      const timer = setTimeout(async () => {
+        setLoading(true);
+        try {
+          const res = await fetch(`/api/patients?q=${encodeURIComponent(query)}`);
+          const json = await res.json();
+          setPatients(json.data ?? []);
+          setSearched(true);
+        } catch {
+          setPatients([]);
+        } finally {
+          setLoading(false);
+        }
+      }, 400);
+      return () => clearTimeout(timer);
+    }
   }, [query]);
 
-  // Load semua pasien saat halaman pertama dibuka
   useEffect(() => {
     (async () => {
       setLoading(true);
@@ -66,6 +64,8 @@ export default function PasienPage() {
         const json = await res.json();
         setPatients(json.data ?? []);
         setSearched(true);
+      } catch {
+        setPatients([]);
       } finally {
         setLoading(false);
       }

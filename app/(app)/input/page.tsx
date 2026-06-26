@@ -1,20 +1,40 @@
 'use client';
 
-import { useEffect, useState, useRef, useCallback } from 'react';
-import { toast } from 'sonner';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import {
   User, Plus, Trash2, CheckCircle, RotateCcw, Loader2, Stethoscope, Search, ChevronDown
 } from 'lucide-react';
-import { FormInputData, ParamItem, StatusBiaya } from '@/types';
-import { isAbnormal, getNormalRangeText, isPositivePregnancy } from '@/lib/normal-ranges';
-import { AlertTriangle, CheckCircle2 } from 'lucide-react';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
 import PatientAutocomplete, { type PatientSuggestion } from '@/components/input/PatientAutocomplete';
+import { isAbnormal, getNormalRangeText, isPositivePregnancy } from '@/lib/normal-ranges';
 import { PARAM_OPTIONS, ALL_PARAMS, getParamInfo } from '@/lib/param-options';
+import type { FormInputData, ParamItem, StatusBiaya } from '@/types';
 
 // ─── Daftar semua parameter lab (dikelompokkan) ─────────────────────────────
 // Konstanta dipindah ke `lib/param-options.ts`. Lihat impor di atas.
 
 // ─── Searchable Parameter Dropdown ──────────────────────────────────────────
+
+// Define Zod schema
+const patientSchema = z.object({
+  nama_pasien: z.string().min(1, 'Nama pasien wajib diisi'),
+  nik: z.string().optional(),
+  jenis_kelamin: z.string().min(1, 'Jenis kelamin wajib dipilih'),
+  alamat: z.string().optional(),
+  tgl_lahir: z.string().optional(),
+  tgl_permintaan: z.string().min(1, 'Tanggal permintaan wajib diisi'),
+  dokter: z.string().min(1, 'Dokter perujuk wajib dipilih'),
+  petugas: z.string().min(1, 'Petugas pemeriksa wajib dipilih'),
+  status_biaya: z.enum(['Umum', 'BPJS', 'Gratis']),
+});
+
+type PatientFormData = z.infer<typeof patientSchema>;
+
 function SearchableParamSelect({
   value, onChange, usedKeys,
 }: {
@@ -127,7 +147,15 @@ const initialPatient = {
 };
 
 export default function InputPage() {
-  const [patient, setPatient] = useState(initialPatient);
+  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<PatientFormData>({
+    resolver: zodResolver(patientSchema),
+    defaultValues: {
+      nama_pasien: '', nik: '', jenis_kelamin: '', alamat: '', tgl_lahir: '', tgl_permintaan: '',
+      dokter: '', petugas: '', status_biaya: 'Umum'
+    }
+  });
+
+  const patient = watch();
   const [params, setParams] = useState<ParamItem[]>([]);
   const [dokters, setDokters] = useState<string[]>([]);
   const [petugasList, setPetugasList] = useState<string[]>([]);
@@ -138,7 +166,7 @@ export default function InputPage() {
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
-    setPatient(prev => ({ ...prev, tgl_permintaan: today }));
+    setValue('tgl_permintaan', today);
     fetch('/api/config')
       .then(r => r.json())
       .then(data => {
@@ -148,20 +176,18 @@ export default function InputPage() {
       .catch(() => toast.error('Gagal memuat data dokter/petugas'));
   }, []);
 
-  const setField = (field: keyof typeof initialPatient, value: string) =>
-    setPatient(prev => ({ ...prev, [field]: value }));
+  const setField = (field: keyof PatientFormData, value: string) => {
+    setValue(field, value as any, { shouldValidate: true });
+  };
 
   // Saat user pilih pasien dari dropdown autocomplete → auto-isi semua field identitas
   const handleSelectPatient = (p: PatientSuggestion) => {
-    setPatient(prev => ({
-      ...prev,
-      nama_pasien: p.nama || '',
-      nik: p.nik || '',
-      jenis_kelamin: p.jenis_kelamin || '',
-      alamat: p.alamat || '',
-      tgl_lahir: p.tgl_lahir || '',
-      status_biaya: (p.last_status_biaya as StatusBiaya) || prev.status_biaya,
-    }));
+    setValue('nama_pasien', p.nama || '', { shouldValidate: true });
+    setValue('nik', p.nik || '', { shouldValidate: true });
+    setValue('jenis_kelamin', p.jenis_kelamin || '', { shouldValidate: true });
+    setValue('alamat', p.alamat || '');
+    setValue('tgl_lahir', p.tgl_lahir || '');
+    setValue('status_biaya', (p.last_status_biaya as StatusBiaya) || 'Umum');
     setMatchedPatientId(p.id);
     toast.success(`Pasien ditemukan: ${p.nama}`, {
       description: 'Data identitas terisi otomatis. Silakan isi pemeriksaan terbaru.',
@@ -191,7 +217,10 @@ export default function InputPage() {
 
   const handleReset = () => {
     const today = new Date().toISOString().split('T')[0];
-    setPatient({ ...initialPatient, tgl_permintaan: today });
+    reset({
+      nama_pasien: '', nik: '', jenis_kelamin: '', alamat: '', tgl_lahir: '',
+      tgl_permintaan: today, dokter: '', petugas: '', status_biaya: 'Umum'
+    });
     setParams([]);
     setSuccessNo(null);
     setMatchedPatientId(null);
@@ -199,22 +228,7 @@ export default function InputPage() {
     toast.info('Form direset');
   };
 
-  const handleSubmit = async () => {
-    if (!patient.nama_pasien.trim()) {
-      toast.error('Nama pasien wajib diisi'); return;
-    }
-    if (!patient.jenis_kelamin) {
-      toast.error('Jenis kelamin wajib dipilih'); return;
-    }
-    if (!patient.tgl_permintaan) {
-      toast.error('Tanggal permintaan wajib diisi'); return;
-    }
-    if (!patient.dokter) {
-      toast.error('Dokter perujuk wajib dipilih'); return;
-    }
-    if (!patient.petugas) {
-      toast.error('Petugas pemeriksa wajib dipilih'); return;
-    }
+  const onSubmitForm = async (data: PatientFormData) => {
     const filledParams = params.filter(p => p.paramKey && p.value.trim());
     if (filledParams.length === 0) {
       toast.error('Minimal satu parameter pemeriksaan harus diisi'); return;
@@ -222,18 +236,18 @@ export default function InputPage() {
 
     setLoading(true);
     try {
-      const body: FormInputData = { ...patient, params: filledParams };
+      const body: FormInputData = { ...data, params: filledParams } as FormInputData;
       const res = await fetch('/api/examinations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
-      const data = await res.json();
-      if (!res.ok) { toast.error(data.error || 'Gagal menyimpan data'); return; }
+      const responseData = await res.json();
+      if (!res.ok) { toast.error(responseData.error || 'Gagal menyimpan data'); return; }
 
       // ── Cek nilai kritis setelah simpan ──
       const abnormals = filledParams.filter(p => isAbnormal(p.paramKey, p.value, patient.jenis_kelamin));
-      setSuccessNo(data.no_urut);
+      setSuccessNo(responseData.no_urut);
       handleReset();
 
       if (abnormals.length > 0) {
@@ -246,7 +260,7 @@ export default function InputPage() {
           { duration: 8000, description: 'Segera laporkan ke dokter perujuk.' }
         );
       } else {
-        toast.success(`Data tersimpan! No Urut: ${data.no_urut}`);
+        toast.success(`Data tersimpan! No Urut: ${responseData.no_urut}`);
       }
     } catch {
       toast.error('Gagal menyimpan data');
@@ -330,7 +344,7 @@ export default function InputPage() {
               <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">NIK</label>
               <PatientAutocomplete
                 field="nik"
-                value={patient.nik}
+                value={patient.nik || ''}
                 onChange={(v) => { setField('nik', v); setMatchedPatientId(null); }}
                 onSelect={handleSelectPatient}
                 placeholder="16 digit NIK"
@@ -340,8 +354,8 @@ export default function InputPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Jenis Kelamin *</label>
-              <select value={patient.jenis_kelamin}
+              <label className={`text-[11px] font-bold uppercase tracking-widest flex justify-between ${errors.jenis_kelamin ? "text-red-500" : "text-slate-400 dark:text-slate-500"}`}><span>Jenis Kelamin *</span>{errors.jenis_kelamin && <span className="text-[10px] text-red-500 normal-case tracking-normal">{errors.jenis_kelamin.message}</span>}</label>
+              <select value={patient.jenis_kelamin || ""}
                 onChange={e => setField('jenis_kelamin', e.target.value)}
                 className="input-premium appearance-none bg-white/50 backdrop-blur"
               >
@@ -370,7 +384,7 @@ export default function InputPage() {
           {/* Tgl Permintaan + Status Biaya */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1">
-              <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Tgl Permintaan *</label>
+              <label className={`text-[11px] font-bold uppercase tracking-widest flex justify-between ${errors.tgl_permintaan ? "text-red-500" : "text-slate-400 dark:text-slate-500"}`}><span>Tgl Permintaan *</span>{errors.tgl_permintaan && <span className="text-[10px] text-red-500 normal-case tracking-normal">{errors.tgl_permintaan.message}</span>}</label>
               <input type="date" value={patient.tgl_permintaan}
                 onChange={e => setField('tgl_permintaan', e.target.value)}
                 className="input-premium" />
@@ -387,7 +401,7 @@ export default function InputPage() {
 
           {/* Dokter */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Dokter Perujuk *</label>
+            <label className={`text-[11px] font-bold uppercase tracking-widest flex justify-between ${errors.dokter ? "text-red-500" : "text-slate-400 dark:text-slate-500"}`}><span>Dokter Perujuk *</span>{errors.dokter && <span className="text-[10px] text-red-500 normal-case tracking-normal">{errors.dokter.message}</span>}</label>
             <select value={patient.dokter}
               onChange={e => setField('dokter', e.target.value)}
               className="input-premium">
@@ -398,7 +412,7 @@ export default function InputPage() {
 
           {/* Petugas */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Petugas Pemeriksa *</label>
+            <label className={`text-[11px] font-bold uppercase tracking-widest flex justify-between ${errors.petugas ? "text-red-500" : "text-slate-400 dark:text-slate-500"}`}><span>Petugas Pemeriksa *</span>{errors.petugas && <span className="text-[10px] text-red-500 normal-case tracking-normal">{errors.petugas.message}</span>}</label>
             <select value={patient.petugas}
               onChange={e => setField('petugas', e.target.value)}
               className="input-premium">
@@ -540,7 +554,7 @@ export default function InputPage() {
         </button>
         <button
           type="button"
-          onClick={handleSubmit}
+          onClick={handleSubmit(onSubmitForm)}
           disabled={loading}
           className="flex-[2] flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold text-sm text-white transition-all duration-300 disabled:opacity-50 hover:scale-[1.02] hover:-translate-y-0.5 active:scale-95"
           style={{ background: 'linear-gradient(135deg, #0d9488, #0f766e)', boxShadow: '0 8px 28px -4px rgba(13,149,136,0.35)' }}

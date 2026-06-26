@@ -1,10 +1,39 @@
 'use client';
 
+import { Settings, Users, Stethoscope, Save, Loader2, Shield, Tag, Trash2, AlertTriangle, Download, DatabaseBackup, Upload, Image, FileText } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
-import { Settings, Users, Stethoscope, Save, Loader2, Shield, Tag, Trash2, AlertTriangle, Download, DatabaseBackup } from 'lucide-react';
 
 import { useConfirm } from '@/components/ui/ConfirmDialog';
+
+function SaveButton({ keyName, label, value, saving, onSave }: { keyName: string; label: string; value: string; saving: string | null; onSave: (key: string, value: string, label: string) => void }) {
+  return (
+    <button
+      onClick={() => onSave(keyName, value, label)}
+      disabled={saving === keyName}
+      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] active:scale-95"
+      style={{ background: 'linear-gradient(135deg, #0d9488, #0f766e)', boxShadow: '0 4px 16px -4px rgba(13,148,136,0.35)' }}
+    >
+      {saving === keyName ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+      Simpan
+    </button>
+  );
+}
+
+function TagPills({ text, color }: { text: string; color: string }) {
+  const items = text.split(',').map(s => s.trim()).filter(Boolean);
+  if (items.length === 0) return <span className="text-xs text-slate-400 dark:text-slate-500 italic">Belum ada data</span>;
+  return (
+    <div className="flex flex-wrap gap-1.5 mt-2">
+      {items.map((item, i) => (
+        <span key={i} className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${color}`}>
+          <Tag size={10} />
+          {item}
+        </span>
+      ))}
+    </div>
+  );
+}
 
 export default function SettingsPage() {
   const [dokterList, setDokterList] = useState('');
@@ -13,6 +42,10 @@ export default function SettingsPage() {
   const [backingUp, setBackingUp] = useState(false);
   
   const [deleteYear, setDeleteYear] = useState('');
+  const [logoUrl, setLogoUrl] = useState('');
+  const [doctorSignature, setDoctorSignature] = useState('');
+  const [techSignature, setTechSignature] = useState('');
+  const [printTemplate, setPrintTemplate] = useState('');
   const confirm = useConfirm();
 
   useEffect(() => {
@@ -21,11 +54,20 @@ export default function SettingsPage() {
       .then(data => {
         setDokterList((data.dokters || []).join(', '));
         setPetugasList((data.petugas || []).join(', '));
+        setLogoUrl(data.logo_url || '');
+        setDoctorSignature(data.doctor_signature || '');
+        setTechSignature(data.tech_signature || '');
+        setPrintTemplate(data.print_template || '');
+      })
+      .catch(() => {
+        toast.error('Gagal memuat konfigurasi');
       });
   }, []);
 
   const handleSave = async (key: string, value: string, label: string) => {
-    if (!value.trim()) { toast.error(`${label} tidak boleh kosong`); return; }
+    if (!value.trim() && key !== 'logo_url' && key !== 'doctor_signature' && key !== 'tech_signature' && key !== 'print_template') { 
+      toast.error(`${label} tidak boleh kosong`); return; 
+    }
     setSaving(key);
     try {
       const res = await fetch('/api/config', {
@@ -102,34 +144,6 @@ export default function SettingsPage() {
     }
   };
 
-  const SaveButton = ({ keyName, label }: { keyName: string; label: string }) => (
-    <button
-      onClick={() => handleSave(keyName, keyName === 'LIST_DOKTER' ? dokterList : petugasList, label)}
-      disabled={saving === keyName}
-      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] active:scale-95"
-      style={{ background: 'linear-gradient(135deg, #0d9488, #0f766e)', boxShadow: '0 4px 16px -4px rgba(13,148,136,0.35)' }}
-    >
-      {saving === keyName ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
-      Simpan
-    </button>
-  );
-
-  // Helper: render tag pills from comma list
-  const TagPills = ({ text, color }: { text: string; color: string }) => {
-    const items = text.split(',').map(s => s.trim()).filter(Boolean);
-    if (items.length === 0) return <span className="text-xs text-slate-400 dark:text-slate-500 italic">Belum ada data</span>;
-    return (
-      <div className="flex flex-wrap gap-1.5 mt-2">
-        {items.map((item, i) => (
-          <span key={i} className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${color}`}>
-            <Tag size={10} />
-            {item}
-          </span>
-        ))}
-      </div>
-    );
-  };
-
   return (
     <div className="px-4 py-5 animate-slide-up">
       <div className="flex items-center gap-3 mb-6">
@@ -157,7 +171,7 @@ export default function SettingsPage() {
             </div>
             <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Daftar Dokter</h2>
           </div>
-          <SaveButton keyName="LIST_DOKTER" label="Daftar Dokter" />
+          <SaveButton keyName="LIST_DOKTER" label="Daftar Dokter" value={dokterList} saving={saving} onSave={handleSave} />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Pisahkan dengan koma (,)</label>
@@ -183,7 +197,7 @@ export default function SettingsPage() {
             </div>
             <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Daftar Petugas</h2>
           </div>
-          <SaveButton keyName="LIST_PETUGAS" label="Daftar Petugas" />
+          <SaveButton keyName="LIST_PETUGAS" label="Daftar Petugas" value={petugasList} saving={saving} onSave={handleSave} />
         </div>
         <div className="flex flex-col gap-1.5">
           <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Pisahkan dengan koma (,)</label>
@@ -303,6 +317,111 @@ export default function SettingsPage() {
               Hapus Data
             </button>
           </div>
+        </div>
+      </div>
+
+      {/* ── Kustomisasi Kop Surat ──────────────────────────────── */}
+      <div className="glass-panel p-5 mt-6 mb-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-9 h-9 rounded-2xl flex items-center justify-center"
+            style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.14), rgba(234,179,8,0.08))' }}
+          >
+            <FileText size={16} className="text-amber-600 dark:text-amber-400" />
+          </div>
+          <div>
+            <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Kustomisasi Kop Surat</h2>
+            <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Konfigurasi tampilan cetak hasil lab</p>
+          </div>
+        </div>
+
+        {/* Logo Puskesmas */}
+        <div className="mb-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700/50">
+          <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 block">
+            Logo Puskesmas
+          </label>
+          <div className="flex items-center gap-3">
+            <div className="w-16 h-16 rounded-lg overflow-hidden border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800">
+              {logoUrl ? (
+                <img src={logoUrl} alt="Logo Puskesmas" className="w-full h-full object-cover" />
+              ) : (
+                <div className="flex items-center justify-center w-full h-full text-slate-400 text-xs">Belum ada</div>
+              )}
+            </div>
+            <div className="flex-1">
+              <input
+                type="text"
+                value={logoUrl}
+                onChange={e => setLogoUrl(e.target.value)}
+                placeholder="URL gambar logo (http/https)"
+                className="input-premium mb-2"
+              />
+              <div className="flex items-center gap-2">
+                <label className="cursor-pointer flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-400 transition-colors">
+                  <Upload size={12} />
+                  Upload (placeholder)
+                </label>
+                {logoUrl && (
+                  <button
+                    onClick={() => { setLogoUrl(''); handleSave('logo_url', '', 'Logo'); }}
+                    className="text-xs text-red-500 hover:text-red-600 font-semibold"
+                  >
+                    Hapus
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Tanda Tangan Dokter */}
+        <div className="mb-4">
+          <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 block">
+            Tanda Tangan Dokter (Nama/License)
+          </label>
+          <input
+            type="text"
+            value={doctorSignature}
+            onChange={e => setDoctorSignature(e.target.value)}
+            placeholder="Nama Dokter / Nomor SIP"
+            className="input-premium"
+          />
+        </div>
+
+        {/* Tanda Tangan Petugas */}
+        <div className="mb-4">
+          <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 block">
+            Tanda Tangan Petugas Laboratorium
+          </label>
+          <input
+            type="text"
+            value={techSignature}
+            onChange={e => setTechSignature(e.target.value)}
+            placeholder="Nama Petugas"
+            className="input-premium"
+          />
+        </div>
+
+        {/* Template Cetak */}
+        <div>
+          <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 block">
+            Template Cetak (Custom Header)
+          </label>
+          <textarea
+            value={printTemplate}
+            onChange={e => setPrintTemplate(e.target.value)}
+            rows={3}
+            placeholder="Header khusus untuk cetak (opsional)"
+            className="input-premium resize-none"
+          />
+          <button
+            onClick={() => handleSave('print_template', printTemplate, 'Template Cetak')}
+            disabled={saving === 'print_template'}
+            className="mt-2 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] active:scale-95"
+            style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', boxShadow: '0 4px 16px -4px rgba(245,158,11,0.35)' }}
+          >
+            {saving === 'print_template' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
+            Simpan Template
+          </button>
         </div>
       </div>
 

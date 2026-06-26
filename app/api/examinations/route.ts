@@ -1,7 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
+
 import { createServerClient } from '@/lib/supabase';
 import { generateNoUrut, formatDateDisplay } from '@/lib/utils';
-import { FormInputData, ParamItem } from '@/types';
+import type { FormInputData, ParamItem } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
@@ -137,6 +139,9 @@ export async function POST(request: NextRequest) {
 
     // 3. Konversi dynamic params → object kolom
     const labCols: Record<string, string> = {};
+    if (params && !Array.isArray(params)) {
+      return NextResponse.json({ error: 'params harus berupa array' }, { status: 400 });
+    }
     for (const item of (params || []) as ParamItem[]) {
       const { paramKey, value } = item;
       if (!paramKey || !value?.trim()) continue;
@@ -155,8 +160,8 @@ export async function POST(request: NextRequest) {
         no_urut: noUrut,
         patient_id: patientId,
         tgl_permintaan,
-        dokter: dokter.trim(),
-        petugas: petugas.trim(),
+        dokter: dokter?.trim() || null,
+        petugas: petugas?.trim() || null,
         status_biaya: status_biaya || 'Umum',
         ...labCols,
       })

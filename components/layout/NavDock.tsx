@@ -1,8 +1,9 @@
 'use client';
 
-import { usePathname } from 'next/navigation';
-import Link from 'next/link';
 import { Home, Syringe, Settings, Users, ClipboardList } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
 import { cn } from '@/lib/utils';
 
 const navItems = [

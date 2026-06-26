@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 interface ShortcutConfig {
   onRefresh?: () => void;
@@ -38,12 +38,12 @@ export function useKeyboardShortcuts({ onRefresh }: ShortcutConfig = {}) {
           e.preventDefault();
           router.push('/dashboard');
           break;
-        case '/':
-          // / = focus search input if exists
+        case '/': {
           e.preventDefault();
           const searchInput = document.querySelector<HTMLInputElement>('input[type="text"][placeholder*="Cari"]');
           if (searchInput) searchInput.focus();
           break;
+        }
       }
     };
 

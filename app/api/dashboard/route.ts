@@ -1,11 +1,61 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
+
 import { createServerClient } from '@/lib/supabase';
 import { formatDateDisplay, getTodayWIB } from '@/lib/utils';
-import { DashboardStats, HistoryRow } from '@/types';
+import type { DashboardStats, HistoryRow } from '@/types';
+
+async function getMonthlyStats(request: NextRequest) {
+  try {
+    const db = createServerClient();
+    const { searchParams } = new URL(request.url);
+    const year = parseInt(searchParams.get('year') || new Date().getFullYear().toString());
+    
+    const { data: examinations, error } = await db
+      .from('examinations')
+      .select('tgl_permintaan')
+      .gte('tgl_permintaan', `${year}-01-01`)
+      .lte('tgl_permintaan', `${year}-12-31`);
+    
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+    
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const monthlyData: Record<string, number> = {};
+    
+    for (let i = 1; i <= 12; i++) {
+      monthlyData[i] = 0;
+    }
+    
+    for (const exam of examinations || []) {
+      const month = parseInt(exam.tgl_permintaan?.substring(5, 7) || '0');
+      if (month >= 1 && month <= 12) {
+        monthlyData[month]++;
+      }
+    }
+    
+    const result = Object.entries(monthlyData).map(([month, count]) => ({
+      month: monthNames[parseInt(month) - 1],
+      count,
+    }));
+    
+    return NextResponse.json({ monthlyData: result, year });
+  } catch (err) {
+    console.error('monthly stats error:', err);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  }
+}
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
+  const monthly = request.nextUrl.searchParams.get('monthly');
+  
+  if (monthly === 'true') {
+    return getMonthlyStats(request);
+  }
+  
   try {
     const db = createServerClient();
     const { searchParams } = new URL(request.url);

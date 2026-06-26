@@ -1,4 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+
 import { createServerClient } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -7,10 +9,16 @@ export async function DELETE(request: NextRequest) {
   try {
     const db = createServerClient();
     const body = await request.json();
-    const { year } = body;
+    const year = String(body.year ?? '').trim();
 
-    if (!year || year.toString().length !== 4) {
+    if (!/^\d{4}$/.test(year)) {
       return NextResponse.json({ error: 'Format tahun tidak valid (harus 4 digit)' }, { status: 400 });
+    }
+
+    const yearNumber = Number(year);
+    const currentYear = new Date().getFullYear();
+    if (yearNumber < 2000 || yearNumber > currentYear + 1) {
+      return NextResponse.json({ error: 'Tahun di luar rentang yang diizinkan' }, { status: 400 });
     }
 
     const { error } = await db

@@ -1,10 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
+
+import { validateEnv } from '@/lib/validate-env';
 
 const PUBLIC_PATHS = ['/login', '/api/auth'];
 
+validateEnv();
+
 // Halaman yang hanya bisa diakses admin
-const ADMIN_ONLY_PATHS = ['/settings'];
+const ADMIN_ONLY_PATHS = ['/settings', '/api/examinations/yearly', '/api/backup', '/api/audit'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -31,24 +36,24 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data, error: authError } = await supabase.auth.getUser();
 
-  if (!user) {
+  if (authError || !data?.user) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Cek role untuk halaman admin-only (permissive: kalau tabel belum ada, izinkan)
+  const user = data.user;
+
+  // Cek role untuk halaman admin-only. Default deny jika role tidak valid.
   const isAdminPath = ADMIN_ONLY_PATHS.some(p => pathname.startsWith(p));
   if (isAdminPath) {
     const { data: roleData, error: roleError } = await supabase
       .from('user_roles')
       .select('role')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
-    // Hanya blokir kalau tabel ada DAN role eksplisit bukan admin
-    // Kalau error (tabel belum ada) atau belum ada row → izinkan akses
-    if (!roleError && roleData && roleData.role !== 'admin') {
+    if (roleError || roleData?.role !== 'admin') {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }

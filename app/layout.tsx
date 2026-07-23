@@ -3,9 +3,6 @@ import { Plus_Jakarta_Sans, Noto_Sans } from 'next/font/google';
 
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
-import { validateEnv } from '@/lib/validate-env';
-
-validateEnv();
 
 const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],

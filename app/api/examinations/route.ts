@@ -40,8 +40,11 @@ const PARAM_MAP: Record<string, { col: string; unit?: string }> = {
   gdp:           { col: 'gdp',          unit: 'mg/dl' },
   gd2pp:         { col: 'gd2pp',        unit: 'mg/dl' },
   kolesterol:    { col: 'kolesterol',   unit: 'mg/dl' },
+  ldl:           { col: 'ldl',          unit: 'mg/dl' },
+  hdl:           { col: 'hdl',          unit: 'mg/dl' },
   trigliserida:  { col: 'trigliserida', unit: 'mg/dl' },
   asam_urat:     { col: 'asam_urat',    unit: 'mg/dl' },
+  napza:         { col: 'napza' },
   // Mikrobiologi
   bta:           { col: 'bta' },
   gram:          { col: 'gram' },

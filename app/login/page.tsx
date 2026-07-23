@@ -278,10 +278,11 @@ export default function LoginPage() {
 
           {/* Email field */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-white/50 uppercase tracking-widest">Email</label>
+            <label htmlFor="email" className="text-xs font-semibold text-white/50 uppercase tracking-widest">Email</label>
             <div className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 focus-within:border-teal-400 focus-within:bg-white/15 transition-all">
               <Mail size={15} className="text-white/40 flex-shrink-0" />
               <input
+                id="email"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
@@ -295,10 +296,11 @@ export default function LoginPage() {
 
           {/* Password field */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-white/50 uppercase tracking-widest">Password</label>
+            <label htmlFor="password" className="text-xs font-semibold text-white/50 uppercase tracking-widest">Password</label>
             <div className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-4 py-3 focus-within:border-teal-400 focus-within:bg-white/15 transition-all">
               <Lock size={15} className="text-white/40 flex-shrink-0" />
               <input
+                id="password"
                 type={showPass ? 'text' : 'password'}
                 value={password}
                 onChange={e => setPassword(e.target.value)}
@@ -310,7 +312,8 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={() => setShowPass(!showPass)}
-                className="text-white/40 hover:text-white/70 transition-colors flex-shrink-0"
+                aria-label={showPass ? 'Sembunyikan password' : 'Tampilkan password'}
+                className="text-white/40 hover:text-white/70 cursor-pointer transition-colors flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
               >
                 {showPass ? <EyeOff size={15} /> : <Eye size={15} />}
               </button>
@@ -321,7 +324,8 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading || !email || !password}
-            className="mt-2 w-full py-3.5 rounded-2xl font-bold text-sm tracking-widest uppercase transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98]"
+            aria-label={loading ? 'Memverifikasi...' : 'Masuk ke sistem'}
+            className="mt-2 w-full py-3.5 rounded-2xl font-bold text-sm tracking-widest uppercase transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center justify-center gap-2 hover:scale-[1.02] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-900"
             style={{
               background: 'linear-gradient(135deg, #0d9488, #0f766e)',
               color: 'white',

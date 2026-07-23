@@ -5,7 +5,14 @@ import { createSupabaseServerClient } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
 
-const READABLE_CONFIG_KEYS = ['LIST_DOKTER', 'LIST_PETUGAS'] as const;
+const READABLE_CONFIG_KEYS = [
+  'LIST_DOKTER',
+  'LIST_PETUGAS',
+  'logo_url',
+  'doctor_signature',
+  'tech_signature',
+  'print_template',
+] as const;
 const WRITABLE_CONFIG_KEYS = [
   'LIST_DOKTER',
   'LIST_PETUGAS',
@@ -58,7 +65,16 @@ export async function GET() {
       ? petugasRow.value.split(',').map((s: string) => s.trim()).filter(Boolean)
       : [];
 
-    return NextResponse.json({ dokters, petugas });
+    const valueOf = (key: string) => data?.find(r => r.key === key)?.value ?? '';
+
+    return NextResponse.json({
+      dokters,
+      petugas,
+      logo_url: valueOf('logo_url'),
+      doctor_signature: valueOf('doctor_signature'),
+      tech_signature: valueOf('tech_signature'),
+      print_template: valueOf('print_template'),
+    });
   } catch (err) {
     console.error('config GET error:', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

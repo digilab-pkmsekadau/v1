@@ -11,9 +11,10 @@ const PARAM_COLUMN: Record<string, string> = {
   'HBsAg': 'hbsag', 'Anti HIV': 'hiv', 'Syphilis': 'syphilis',
   'Anti HCV': 'hcv', 'Anti HBs': 'anti_hbs', 'NS1 Ag Dengue': 'ns1',
   'Dengue IgG & IgM': 'dengue_ig', 'Malaria Rapid': 'malaria_rapid', 'Widal': 'widal',
+  'NAPZA': 'napza',
   'Pewarnaan BTA': 'bta', 'Pewarnaan Gram': 'gram', 'Malaria Slide': 'malaria_slide',
   'Gula Darah Sewaktu': 'gds', 'Gula Darah Puasa': 'gdp', 'Gula Darah 2 Jam PP': 'gd2pp',
-  'Kolesterol': 'kolesterol', 'Trigliserida': 'trigliserida', 'Asam Urat': 'asam_urat',
+  'Kolesterol': 'kolesterol', 'LDL': 'ldl', 'HDL': 'hdl', 'Trigliserida': 'trigliserida', 'Asam Urat': 'asam_urat',
 };
 
 export async function GET(request: NextRequest) {

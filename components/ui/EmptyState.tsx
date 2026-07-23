@@ -41,8 +41,8 @@ export default function EmptyState({ type = 'no-data', message }: EmptyStateProp
           <div key={i} className="w-1.5 h-1.5 rounded-full bg-slate-200" style={{ animationDelay: `${i * 0.15}s` }} />
         ))}
       </div>
-      <p className="text-sm font-bold text-slate-600 mb-1">{cfg.title}</p>
-      <p className="text-xs text-slate-400 max-w-[200px] leading-relaxed">{cfg.desc}</p>
+      <p className="text-sm font-bold text-slate-600 dark:text-slate-300 mb-1">{cfg.title}</p>
+      <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[200px] leading-relaxed">{cfg.desc}</p>
     </div>
   );
 }

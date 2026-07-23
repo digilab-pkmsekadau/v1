@@ -13,6 +13,7 @@ const ADMIN_ONLY_PATHS = ['/settings', '/api/examinations/yearly', '/api/backup'
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  const isApiPath = pathname.startsWith('/api');
 
   // Izinkan public paths
   const isPublic = PUBLIC_PATHS.some(p => pathname.startsWith(p));
@@ -39,6 +40,9 @@ export async function middleware(request: NextRequest) {
   const { data, error: authError } = await supabase.auth.getUser();
 
   if (authError || !data?.user) {
+    if (isApiPath) {
+      return NextResponse.json({ error: 'Tidak terautentikasi' }, { status: 401 });
+    }
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
@@ -54,6 +58,9 @@ export async function middleware(request: NextRequest) {
       .maybeSingle();
 
     if (roleError || roleData?.role !== 'admin') {
+      if (isApiPath) {
+        return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 });
+      }
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
   }

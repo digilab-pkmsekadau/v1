@@ -11,16 +11,26 @@ async function getMonthlyStats(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const year = parseInt(searchParams.get('year') || new Date().getFullYear().toString());
     
-    const { data: examinations, error } = await db
-      .from('examinations')
-      .select('tgl_permintaan')
-      .gte('tgl_permintaan', `${year}-01-01`)
-      .lte('tgl_permintaan', `${year}-12-31`);
-    
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    // Ambil semua baris secara paginasi agar tidak terpotong batas default 1000 baris Supabase
+    const PAGE_SIZE = 1000;
+    const examinations: { tgl_permintaan: string | null }[] = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data: page, error } = await db
+        .from('examinations')
+        .select('tgl_permintaan')
+        .gte('tgl_permintaan', `${year}-01-01`)
+        .lte('tgl_permintaan', `${year}-12-31`)
+        .range(from, from + PAGE_SIZE - 1);
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
+      }
+
+      if (!page || page.length === 0) break;
+      examinations.push(...page);
+      if (page.length < PAGE_SIZE) break;
     }
-    
+
     const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
     const monthlyData: Record<string, number> = {};
     
@@ -68,8 +78,8 @@ export async function GET(request: NextRequest) {
       .select(`
         id, no_urut, tgl_permintaan, dokter, petugas, status_biaya, created_at,
         patient:patients(nama, nik, alamat, tgl_lahir),
-        gds, gdp, gd2pp, kolesterol, trigliserida, asam_urat,
-        hbsag, hiv, syphilis, hcv, anti_hbs, ns1, dengue_ig, malaria_rapid, widal,
+        gds, gdp, gd2pp, kolesterol, ldl, hdl, trigliserida, asam_urat,
+        hbsag, hiv, syphilis, hcv, anti_hbs, ns1, dengue_ig, malaria_rapid, widal, napza,
         bta, gram, malaria_slide
       `)
       .order('created_at', { ascending: false });
@@ -86,6 +96,8 @@ export async function GET(request: NextRequest) {
         'Gula Darah Puasa': 0,
         'Gula Darah 2 Jam PP': 0,
         'Kolesterol': 0,
+        'LDL': 0,
+        'HDL': 0,
         'Trigliserida': 0,
         'Asam Urat': 0,
       },
@@ -99,6 +111,7 @@ export async function GET(request: NextRequest) {
         'Dengue IgG & IgM': { type: 'positive', pos: 0, neg: 0 },
         'Malaria Rapid': { type: 'positive', pos: 0, neg: 0 },
         'Widal': { type: 'positive', pos: 0, neg: 0 },
+        'NAPZA': { type: 'positive', pos: 0, neg: 0 },
       },
       microbiology: {
         'Pewarnaan BTA': { pos: 0, neg: 0 },
@@ -153,6 +166,8 @@ export async function GET(request: NextRequest) {
       if (exam.gdp) stats.chemistry['Gula Darah Puasa']++;
       if (exam.gd2pp) stats.chemistry['Gula Darah 2 Jam PP']++;
       if (exam.kolesterol) stats.chemistry['Kolesterol']++;
+      if (exam.ldl) stats.chemistry['LDL']++;
+      if (exam.hdl) stats.chemistry['HDL']++;
       if (exam.trigliserida) stats.chemistry['Trigliserida']++;
       if (exam.asam_urat) stats.chemistry['Asam Urat']++;
 
@@ -165,6 +180,7 @@ export async function GET(request: NextRequest) {
       countImmuno(exam.dengue_ig, 'Dengue IgG & IgM');
       countImmuno(exam.malaria_rapid, 'Malaria Rapid');
       countImmuno(exam.widal, 'Widal');
+      countImmuno(exam.napza, 'NAPZA');
 
       countMicro(exam.bta, 'Pewarnaan BTA');
       countMicro(exam.gram, 'Pewarnaan Gram');

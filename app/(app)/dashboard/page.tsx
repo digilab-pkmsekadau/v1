@@ -50,7 +50,8 @@ function DownloadMenu({
     <div className="relative">
       <button
         onClick={() => setOpenMenu(isOpen ? null : menuKey)}
-        className="w-7 h-7 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/60 dark:bg-white/5 hover:bg-teal-50 dark:hover:bg-teal-950/40 hover:text-teal-700 dark:hover:text-teal-400 text-slate-400 dark:text-slate-500 transition-all duration-200 active:scale-90 border border-slate-100 dark:border-slate-700/50"
+        aria-label={`Unduh data ${paramName}`}
+        className="w-8 h-8 flex-shrink-0 flex items-center justify-center rounded-xl bg-white/60 dark:bg-white/5 hover:bg-teal-50 dark:hover:bg-teal-950/40 hover:text-teal-700 dark:hover:text-teal-400 text-slate-400 dark:text-slate-500 cursor-pointer transition-all duration-200 active:scale-90 border border-slate-100 dark:border-slate-700/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
       >
         <Download size={12} />
       </button>
@@ -65,18 +66,18 @@ function DownloadMenu({
             }}
           >
             <div className="px-3 py-2.5 border-b" style={{ borderColor: 'var(--border)' }}>
-              <div className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+              <div className="text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
                 Export: {paramName}
               </div>
-              <div className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold mt-0.5">
-                📅 {startDate} s/d {endDate}
+              <div className="text-[10px] text-teal-600 dark:text-teal-400 font-semibold mt-0.5 flex items-center gap-1">
+                <CalendarDays size={11} /> {startDate} s/d {endDate}
               </div>
             </div>
             {options.map((opt) => (
               <button
                 key={opt.filterMode}
                 onClick={() => { onDownload(paramName, opt.filterMode); setOpenMenu(null); }}
-                className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800/50 ${opt.color} transition-colors active:scale-95`}
+                className={`w-full flex items-center gap-2 px-3 py-2.5 text-sm font-semibold hover:bg-slate-50 dark:hover:bg-slate-800/50 ${opt.color} cursor-pointer transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-inset`}
               >
                 <Download size={13} /> {opt.label}
               </button>
@@ -173,13 +174,14 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight">Dashboard</h1>
-          <p className="text-xs text-slate-400 dark:text-slate-500 font-medium mt-0.5">
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
             {new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
           </p>
         </div>
         <button
           onClick={fetchDashboard}
-          className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-90"
+          aria-label="Muat ulang data dashboard"
+          className="w-11 h-11 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
           style={{
             background: 'var(--surface)',
             border: '1px solid var(--border)',
@@ -198,16 +200,18 @@ export default function DashboardPage() {
         </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">Dari</label>
+              <label htmlFor="start-date" className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5 block">Dari</label>
               <input
+                id="start-date"
                 type="date" value={startDate}
                 onChange={e => setStartDate(e.target.value)}
                 className="input-premium bg-white dark:bg-slate-900 shadow-sm"
               />
             </div>
             <div>
-              <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">Sampai</label>
+              <label htmlFor="end-date" className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1.5 block">Sampai</label>
               <input
+                id="end-date"
                 type="date" value={endDate}
                 onChange={e => setEndDate(e.target.value)}
                 className="input-premium bg-white dark:bg-slate-900 shadow-sm"
@@ -276,7 +280,8 @@ export default function DashboardPage() {
                 <div className="text-[10px] text-blue-400/80 dark:text-blue-500/60 font-medium">pasien</div>
                 <button
                   onClick={() => handleDownload(label, 'all_filled')}
-                  className="flex items-center justify-center gap-1 py-1.5 px-3 rounded-xl text-[11px] font-bold text-white transition-all hover:opacity-90 active:scale-95 hover:shadow-md"
+                  aria-label={`Unduh data ${label}`}
+                  className="flex items-center justify-center gap-1 py-1.5 px-3 rounded-xl text-[11px] font-bold text-white cursor-pointer transition-all hover:opacity-90 active:scale-95 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   style={{ background: 'linear-gradient(135deg, #2563eb, #3b82f6)' }}
                 >
                   <Download size={11} /> Unduh
@@ -460,7 +465,8 @@ export default function DashboardPage() {
       {/* View All History Table CTA */}
       <Link
         href="/riwayat"
-        className="glass-panel p-4 mb-4 flex items-center justify-between group transition-all duration-300 hover:scale-[1.01] hover:-translate-y-0.5 active:scale-[0.99]"
+        aria-label="Lihat riwayat pemeriksaan lengkap"
+        className="glass-panel p-4 mb-4 flex items-center justify-between group cursor-pointer transition-all duration-300 hover:scale-[1.01] hover:-translate-y-0.5 active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         style={{ borderStyle: 'dashed', borderWidth: '1.5px' }}
       >
         <div className="flex items-center gap-3">
@@ -471,7 +477,7 @@ export default function DashboardPage() {
           </div>
           <div>
             <div className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Riwayat Pemeriksaan</div>
-            <div className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Lihat dan kelola hasil input data pasien</div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Lihat dan kelola hasil input data pasien</div>
           </div>
         </div>
         <ChevronRight size={18} className="text-slate-300 dark:text-slate-600 group-hover:text-teal-500 group-hover:translate-x-1 transition-all duration-300" />

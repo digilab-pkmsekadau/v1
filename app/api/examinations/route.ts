@@ -1,12 +1,30 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
 import { getAuthedUser } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
 import { generateNoUrut, formatDateDisplay } from '@/lib/utils';
-import type { FormInputData, ParamItem } from '@/types';
+import type { ParamItem } from '@/types';
 
 export const dynamic = 'force-dynamic';
+
+const examinationSchema = z.object({
+  nama_pasien: z.string().trim().min(1, 'Nama pasien wajib diisi').max(200),
+  nik: z.string().trim().max(20).optional(),
+  jenis_kelamin: z.string().max(10).optional(),
+  alamat: z.string().max(500).optional(),
+  tgl_lahir: z.string().max(20).optional(),
+  tgl_permintaan: z.string().min(1, 'Tanggal permintaan wajib diisi').max(20),
+  dokter: z.string().max(200).optional().default(''),
+  petugas: z.string().max(200).optional().default(''),
+  status_biaya: z.enum(['Umum', 'BPJS', 'Gratis']),
+  params: z.array(z.object({
+    id: z.string(),
+    paramKey: z.string().max(100),
+    value: z.string().max(500),
+  })).default([]),
+});
 
 // Mapping: paramKey → { dbCol, unit? }
 const PARAM_MAP: Record<string, { col: string; unit?: string }> = {
@@ -102,17 +120,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const db = createServerClient();
-    const body: FormInputData = await request.json();
+    const parsed = examinationSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      const firstIssue = parsed.error.issues[0];
+      return NextResponse.json({ error: firstIssue?.message ?? 'Data tidak valid' }, { status: 400 });
+    }
 
     const { nama_pasien, nik, jenis_kelamin, alamat, tgl_lahir, tgl_permintaan,
-            dokter, petugas, status_biaya, params } = body;
-
-    if (!nama_pasien?.trim()) {
-      return NextResponse.json({ error: 'Nama pasien wajib diisi' }, { status: 400 });
-    }
-    if (!tgl_permintaan) {
-      return NextResponse.json({ error: 'Tanggal permintaan wajib diisi' }, { status: 400 });
-    }
+            dokter, petugas, status_biaya, params } = parsed.data;
 
     // 1. Cari/buat patient
     let patientId: string;

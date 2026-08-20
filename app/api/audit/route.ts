@@ -1,10 +1,19 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
 import { requireAdmin, requireAuth } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
 
 export const dynamic = 'force-dynamic';
+
+const auditSchema = z.object({
+  action: z.string().min(1).max(100),
+  entity: z.string().min(1).max(100),
+  entity_id: z.string().max(100).optional(),
+  description: z.string().max(1000).optional(),
+  user_email: z.string().email().max(320).optional(),
+});
 
 // GET /api/audit — ambil log aktivitas terbaru (admin only)
 export async function GET(request: NextRequest) {
@@ -14,7 +23,8 @@ export async function GET(request: NextRequest) {
 
     const db = createServerClient();
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') ?? '50', 10);
+    const parsedLimit = parseInt(searchParams.get('limit') ?? '50', 10);
+    const limit = Number.isFinite(parsedLimit) ? Math.min(Math.max(parsedLimit, 1), 500) : 50;
 
     const { data, error } = await db
       .from('audit_log')
@@ -32,8 +42,8 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ data });
-  } catch (err) {
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
   }
 }
 
@@ -44,16 +54,12 @@ export async function POST(request: NextRequest) {
     if (denied) return denied;
 
     const db = createServerClient();
-    const body = await request.json();
-    const { action, entity, entity_id, description, user_email } = body;
+    const parsed = auditSchema.safeParse(await request.json());
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Data tidak valid' }, { status: 400 });
+    }
 
-    const { error } = await db.from('audit_log').insert({
-      action,
-      entity,
-      entity_id,
-      description,
-      user_email,
-    });
+    const { error } = await db.from('audit_log').insert(parsed.data);
 
     if (error) {
       if (error.code === '42P01') {
@@ -64,7 +70,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (err) {
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
   }
 }

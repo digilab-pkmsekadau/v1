@@ -125,24 +125,6 @@ export function isPositivePregnancy(key: string, value: string | undefined | nul
   return v.includes('positif') || v.includes('(+)');
 }
 
-/**
- * Status hasil pemeriksaan untuk keperluan styling
- * - 'abnormal'  → di luar batas normal / Reaktif / Positif (selain HCG) → merah
- * - 'positive'  → HCG kehamilan positif → hijau
- * - 'normal'    → dalam batas normal / negatif / non-reaktif → tanpa warna
- */
-export type ResultStatus = 'abnormal' | 'positive' | 'normal';
-
-export function getResultStatus(
-  key: string,
-  value: string | undefined | null,
-  gender?: 'L' | 'P' | string | null
-): ResultStatus {
-  if (isPositivePregnancy(key, value)) return 'positive';
-  if (isAbnormal(key, value, gender)) return 'abnormal';
-  return 'normal';
-}
-
 export function getNormalRangeText(key: string, gender?: 'L' | 'P' | string | null): string {
   const range = NORMAL_RANGES[key];
   if (!range) return '';

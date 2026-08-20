@@ -40,6 +40,4 @@ Please add them to your .env.local file and restart the server.
   }
 }
 
-export function getEnvValue(key: EnvVar): string | undefined {
-  return process.env[key]
-}
+

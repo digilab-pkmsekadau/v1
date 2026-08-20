@@ -22,17 +22,6 @@ export function formatDateDisplay(dateStr: string | Date | null | undefined): st
 }
 
 /**
- * Format tanggal ke ISO: yyyy-MM-dd
- */
-export function formatDateISO(date: Date | string): string {
-  const d = typeof date === 'string' ? new Date(date) : date;
-  const year = d.getFullYear();
-  const month = (d.getMonth() + 1).toString().padStart(2, '0');
-  const day = d.getDate().toString().padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
-
-/**
  * Dapatkan tanggal hari ini di WIB (Asia/Jakarta) dalam format yyyy-MM-dd
  */
 export function getTodayWIB(): string {
@@ -58,21 +47,6 @@ export function generateNoUrut(lastNo: string | null): string {
   const next = num + 1;
   const padded = next.toString().padStart(2, '0');
   return `P-${padded}`;
-}
-
-/**
- * Format nilai dengan satuan untuk kimia darah
- */
-export function formatWithUnit(value: string | undefined, unit: string): string {
-  if (!value || value.trim() === '') return '';
-  return `${value.trim()} ${unit}`.trim();
-}
-
-/**
- * Mengecek apakah object memiliki nilai (tidak semua undefined/empty)
- */
-export function hasAnyValue(obj: Record<string, string | undefined>): boolean {
-  return Object.values(obj).some(v => v !== undefined && v !== '' && v !== null);
 }
 
 /**

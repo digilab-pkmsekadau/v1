@@ -45,7 +45,8 @@ export async function GET(request: NextRequest) {
     }
 
     const { data, error } = await query;
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (error) console.error('DB error:', error);
+      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
 
     // Ambil status_biaya dari examination terbaru
     const enriched: (Record<string, unknown> & { last_status_biaya: string | null; last_exam_count: number })[] = (data || []).map((p) => {

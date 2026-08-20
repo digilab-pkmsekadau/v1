@@ -27,7 +27,8 @@ export async function GET(request: NextRequest) {
       if (error.code === '42P01') {
         return NextResponse.json({ data: [], message: 'Tabel audit_log belum dibuat' });
       }
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('DB error:', error);
+      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
     }
 
     return NextResponse.json({ data });
@@ -58,7 +59,8 @@ export async function POST(request: NextRequest) {
       if (error.code === '42P01') {
         return NextResponse.json({ success: true, message: 'audit_log table not found, skipped' });
       }
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('DB error:', error);
+      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

@@ -47,7 +47,8 @@ export async function GET(request: NextRequest) {
       .order('tgl_permintaan', { ascending: true });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('DB error:', error);
+      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
     }
 
     const result: ExportRow[] = [];

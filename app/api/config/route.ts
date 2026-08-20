@@ -40,7 +40,8 @@ export async function GET() {
       .in('key', [...READABLE_CONFIG_KEYS]);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('DB error:', error);
+      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
     }
 
     const dokterRow = data?.find(r => r.key === 'LIST_DOKTER');
@@ -93,7 +94,8 @@ export async function PUT(request: Request) {
       .eq('key', key);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      console.error('DB error:', error);
+      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

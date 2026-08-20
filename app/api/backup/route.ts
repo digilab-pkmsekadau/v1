@@ -20,10 +20,12 @@ export async function GET() {
     ]);
 
     if (patientsResult.error) {
-      return NextResponse.json({ error: 'Gagal mengambil data pasien: ' + patientsResult.error.message }, { status: 500 });
+      console.error('backup patients error:', patientsResult.error);
+      return NextResponse.json({ error: 'Gagal mengambil data pasien' }, { status: 500 });
     }
     if (examinationsResult.error) {
-      return NextResponse.json({ error: 'Gagal mengambil data pemeriksaan: ' + examinationsResult.error.message }, { status: 500 });
+      console.error('backup examinations error:', examinationsResult.error);
+      return NextResponse.json({ error: 'Gagal mengambil data pemeriksaan' }, { status: 500 });
     }
 
     const backup = {
@@ -54,6 +56,6 @@ export async function GET() {
     });
   } catch (err) {
     console.error('backup GET error:', err);
-    return NextResponse.json({ error: 'Server error: ' + String(err) }, { status: 500 });
+    return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
   }
 }

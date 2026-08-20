@@ -24,7 +24,8 @@ async function getMonthlyStats(request: NextRequest) {
         .range(from, from + PAGE_SIZE - 1);
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        console.error('DB error:', error);
+      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
       }
 
       if (!page || page.length === 0) break;

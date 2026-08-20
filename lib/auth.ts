@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import type { NextRequest, NextResponse } from 'next/server';
 
-import { createServerClient } from './supabase';
+import { createServerClient } from './supabase-service';
 
 const SESSION_COOKIE = 'digilab_session';
 const SESSION_VALUE = 'authenticated';

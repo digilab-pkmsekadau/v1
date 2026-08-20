@@ -2,7 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { getAuthedUser } from '@/lib/require-auth';
-import { createServerClient } from '@/lib/supabase';
+import { createServerClient } from '@/lib/supabase-service';
 import { generateNoUrut, formatDateDisplay } from '@/lib/utils';
 import type { FormInputData, ParamItem } from '@/types';
 

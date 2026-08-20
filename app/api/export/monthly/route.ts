@@ -2,7 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
 import { requireAuth } from '@/lib/require-auth';
-import { createServerClient } from '@/lib/supabase';
+import { createServerClient } from '@/lib/supabase-service';
 import { formatDateDisplay } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';

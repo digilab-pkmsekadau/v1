@@ -1,12 +1,23 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { ALL_PARAMS } from '@/lib/param-options';
 import { getAuthedUser } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
 
 export const dynamic = 'force-dynamic';
 
 type RouteParams = { params: Promise<{ id: string }> };
+
+// Allowlist kolom yang boleh diupdate: metadata pemeriksaan + semua kolom hasil lab.
+// Mencegah mass-assignment ke kolom sistem (id, patient_id, no_urut, created_at).
+const EDITABLE_COLUMNS = new Set<string>([
+  'tgl_permintaan',
+  'dokter',
+  'petugas',
+  'status_biaya',
+  ...ALL_PARAMS.map(p => p.key),
+]);
 
 // GET /api/examinations/[id] — ambil detail lengkap
 export async function GET(
@@ -50,8 +61,14 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
-    // Hapus field yang tidak boleh diupdate
-    const { id: _id, created_at: _ca, patient_id: _pid, no_urut: _no, patients: _pa, ...updateData } = body;
+    const updateData: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(body ?? {})) {
+      if (EDITABLE_COLUMNS.has(key)) updateData[key] = value;
+    }
+
+    if (Object.keys(updateData).length === 0) {
+      return NextResponse.json({ error: 'Tidak ada field valid untuk diupdate' }, { status: 400 });
+    }
 
     const { data, error } = await db
       .from('examinations')

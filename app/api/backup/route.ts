@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 
+import { requireAdmin } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const db = createServerClient();
 
     // Ambil semua data dari tabel-tabel utama secara paralel

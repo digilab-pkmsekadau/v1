@@ -1,6 +1,7 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { getAuthedUser } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -10,6 +11,9 @@ type RouteParams = { params: Promise<{ id: string }> };
 // GET /api/patients/[id] — riwayat lengkap pasien + semua pemeriksaan
 export async function GET(_req: NextRequest, { params }: RouteParams) {
   try {
+    if (!(await getAuthedUser())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const db = createServerClient();
     const { id } = await params;
 

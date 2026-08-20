@@ -1,12 +1,16 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { requireAdmin } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
 
 export async function DELETE(request: NextRequest) {
   try {
+    const denied = await requireAdmin();
+    if (denied) return denied;
+
     const db = createServerClient();
     const body = await request.json();
     const year = String(body.year ?? '').trim();

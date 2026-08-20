@@ -1,6 +1,7 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { getAuthedUser } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase';
 import { formatDateDisplay, getTodayWIB } from '@/lib/utils';
 import type { DashboardStats, HistoryRow } from '@/types';
@@ -50,6 +51,10 @@ async function getMonthlyStats(request: NextRequest) {
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
+  if (!(await getAuthedUser())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const monthly = request.nextUrl.searchParams.get('monthly');
   
   if (monthly === 'true') {

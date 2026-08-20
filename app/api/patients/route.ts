@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { getAuthedUser } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -17,6 +18,9 @@ function sanitizeSearchTerm(value: string) {
 // Mengembalikan juga `last_status_biaya` dari examination terbaru pasien
 export async function GET(request: NextRequest) {
   try {
+    if (!(await getAuthedUser())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const db = createServerClient();
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q')?.trim() ?? '';

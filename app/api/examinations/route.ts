@@ -1,6 +1,7 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { getAuthedUser } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase';
 import { generateNoUrut, formatDateDisplay } from '@/lib/utils';
 import type { FormInputData, ParamItem } from '@/types';
@@ -67,6 +68,9 @@ const PARAM_MAP: Record<string, { col: string; unit?: string }> = {
 
 export async function GET() {
   try {
+    if (!(await getAuthedUser())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const db = createServerClient();
     const { data, error } = await db
       .from('examinations')
@@ -89,6 +93,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!(await getAuthedUser())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const db = createServerClient();
     const body: FormInputData = await request.json();
 

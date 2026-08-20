@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
+import { requireAdmin, requireAuth } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase';
-import { createSupabaseServerClient } from '@/lib/supabase-server';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,21 +21,9 @@ const OPTIONAL_CONFIG_KEYS = new Set<string>([
   'print_template',
 ]);
 
-async function isAdminUser() {
-  const supabase = await createSupabaseServerClient();
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData.user) return false;
-
-  const { data: roleData, error: roleError } = await supabase
-    .from('user_roles')
-    .select('role')
-    .eq('user_id', userData.user.id)
-    .maybeSingle();
-
-  return !roleError && roleData?.role === 'admin';
-}
-
 export async function GET() {
+  const denied = await requireAuth();
+  if (denied) return denied;
   try {
     const db = createServerClient();
 
@@ -67,9 +55,8 @@ export async function GET() {
 
 export async function PUT(request: Request) {
   try {
-    if (!(await isAdminUser())) {
-      return NextResponse.json({ error: 'Akses ditolak' }, { status: 403 });
-    }
+    const denied = await requireAdmin();
+    if (denied) return denied;
 
     const db = createServerClient();
     const body = await request.json();

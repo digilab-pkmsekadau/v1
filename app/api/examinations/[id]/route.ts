@@ -1,6 +1,7 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { getAuthedUser } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase';
 
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,9 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
+    if (!(await getAuthedUser())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const db = createServerClient();
     const { id } = await params;
 
@@ -39,6 +43,9 @@ export async function PUT(
   { params }: RouteParams
 ) {
   try {
+    if (!(await getAuthedUser())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const db = createServerClient();
     const { id } = await params;
     const body = await request.json();
@@ -70,6 +77,9 @@ export async function DELETE(
   { params }: RouteParams
 ) {
   try {
+    if (!(await getAuthedUser())) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const db = createServerClient();
     const { id } = await params;
 

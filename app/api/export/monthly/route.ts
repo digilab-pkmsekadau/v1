@@ -1,12 +1,15 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { requireAuth } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase';
 import { formatDateDisplay } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: NextRequest) {
+  const denied = await requireAuth();
+  if (denied) return denied;
   try {
     const db = createServerClient();
     const { searchParams } = new URL(request.url);

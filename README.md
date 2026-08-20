@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+﻿# DigiLab
 
-## Getting Started
+Aplikasi pencatatan dan pelaporan hasil laboratorium untuk Puskesmas Sekadau. Petugas menginput hasil pemeriksaan lab per pasien, sistem mendeteksi nilai abnormal (gender-aware), lalu hasil bisa dicetak formal berkop-surat dan diekspor ke Excel.
 
-First, run the development server:
+## Fitur
+
+- Input hasil lab dinamis per-parameter (hematologi, kimia, imunologi, mikrobiologi, urinalisis)
+- Deteksi nilai abnormal berbasis rentang normal per jenis kelamin
+- Manajemen data pasien + riwayat pemeriksaan
+- Dashboard statistik (grafik) dan cetak hasil formal
+- Export Excel bulanan/tahunan
+- Backup database dan audit log
+- Autentikasi Supabase + kontrol akses admin
+
+## Tech Stack
+
+- Next.js 15 (App Router), React 18, TypeScript
+- Supabase (Postgres + Auth)
+- Tailwind CSS v4, shadcn/ui, Recharts
+- react-hook-form + zod, SheetJS (xlsx)
+
+## Setup
+
+1. Install dependency:
+   ```bash
+   npm install
+   ```
+2. Salin `.env.example` ke `.env.local` dan isi kredensial Supabase:
+   ```bash
+   cp .env.example .env.local
+   ```
+   Variabel wajib: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+3. Buat skema database dengan menjalankan `supabase_migration.sql` di SQL Editor Supabase.
+4. Jalankan dev server:
+   ```bash
+   npm run dev
+   ```
+   Buka http://localhost:3000.
+
+## Perintah
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run dev      # dev server
+npm run build    # production build (sekaligus typecheck de-facto)
+npm run lint     # eslint
+npx tsc --noEmit # typecheck
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Belum ada test suite; verifikasi perubahan lewat `npx tsc --noEmit` dan `npm run build`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Arsitektur singkat
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `app/api/**` - REST endpoint, memakai service-role client (`lib/supabase-service.ts`) yang bypass RLS. Otorisasi ditegakkan di `middleware.ts` dan guard `lib/require-auth.ts`.
+- `app/(app)/**` - halaman ter-autentikasi (dashboard, input, pasien, riwayat, settings).
+- `lib/normal-ranges.ts` - logika deteksi abnormal. `lib/param-options.ts` - daftar parameter lab.
+- Data pemeriksaan disimpan di satu tabel lebar `examinations` (satu kolom per parameter).
 
-## Learn More
+Menambah parameter lab baru menyentuh banyak file - lihat `CLAUDE.md`.
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Butuh SSR + API routes (bukan static export). Deploy ke Vercel atau host Node lain. Set env yang sama di dashboard hosting.

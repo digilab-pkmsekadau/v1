@@ -79,19 +79,35 @@ export async function GET(request: NextRequest) {
     const endDate = searchParams.get('end') || '';
     const todayWIB = getTodayWIB();
 
-    const { data: examinations, error: examError } = await db
-      .from('examinations')
-      .select(`
-        id, no_urut, tgl_permintaan, dokter, petugas, status_biaya, created_at,
-        patient:patients(nama, nik, alamat, tgl_lahir),
-        gds, gdp, gd2pp, kolesterol, ldl, hdl, trigliserida, asam_urat,
-        hbsag, hiv, syphilis, hcv, anti_hbs, ns1, dengue_ig, malaria_rapid, widal, napza,
-        bta, gram, malaria_slide
-      `)
-      .order('created_at', { ascending: false });
+    // Paginasi agar agregat statistik tidak terpotong batas default 1000 baris Supabase
+    const PAGE_SIZE = 1000;
+    type ExamRow = {
+      id: string; no_urut: string; tgl_permintaan: string; dokter: string; status_biaya: string;
+      patient?: { nama?: string } | { nama?: string }[] | null;
+      [col: string]: unknown;
+    };
+    const examinations: ExamRow[] = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data: page, error: examError } = await db
+        .from('examinations')
+        .select(`
+          id, no_urut, tgl_permintaan, dokter, petugas, status_biaya, created_at,
+          patient:patients(nama, nik, alamat, tgl_lahir),
+          gds, gdp, gd2pp, kolesterol, ldl, hdl, trigliserida, asam_urat,
+          hbsag, hiv, syphilis, hcv, anti_hbs, ns1, dengue_ig, malaria_rapid, widal, napza,
+          bta, gram, malaria_slide
+        `)
+        .order('created_at', { ascending: false })
+        .range(from, from + PAGE_SIZE - 1);
 
-    if (examError) {
-      return NextResponse.json({ error: examError.message }, { status: 500 });
+      if (examError) {
+        console.error('DB error:', examError);
+        return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
+      }
+
+      if (!page || page.length === 0) break;
+      examinations.push(...(page as unknown as ExamRow[]));
+      if (page.length < PAGE_SIZE) break;
     }
 
     const stats: DashboardStats = {
@@ -135,16 +151,16 @@ export async function GET(request: NextRequest) {
       return true;
     };
 
-    const countImmuno = (value: string | null | undefined, key: string) => {
-      if (!value?.trim()) return;
+    const countImmuno = (value: unknown, key: string) => {
+      if (typeof value !== 'string' || !value.trim()) return;
       const v = value.toLowerCase();
       const isNeg = v.includes('non') || v.includes('negatif');
       if (isNeg) stats.immunology[key].neg++;
       else stats.immunology[key].pos++;
     };
 
-    const countMicro = (value: string | null | undefined, key: string) => {
-      if (!value?.trim()) return;
+    const countMicro = (value: unknown, key: string) => {
+      if (typeof value !== 'string' || !value.trim()) return;
       const v = value.toLowerCase();
       const isNeg = v.includes('negatif') || v.includes('non');
       if (isNeg) stats.microbiology[key].neg++;

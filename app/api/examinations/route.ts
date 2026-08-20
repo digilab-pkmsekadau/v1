@@ -81,7 +81,8 @@ export async function GET() {
         id, no_urut, tgl_permintaan, dokter, petugas, status_biaya, created_at,
         patient:patients(id, nama, nik, jenis_kelamin, alamat, tgl_lahir)
       `)
-      .order('created_at', { ascending: false });
+      .order('created_at', { ascending: false })
+      .limit(1000);
 
     if (error) {
       console.error('DB error:', error);

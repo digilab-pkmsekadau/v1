@@ -12,12 +12,30 @@ export async function GET() {
 
     const db = createServerClient();
 
-    // Ambil semua data dari tabel-tabel utama secara paralel
-    const [patientsResult, examinationsResult, configResult] = await Promise.all([
-      db.from('patients').select('*').order('created_at', { ascending: true }),
-      db.from('examinations').select('*').order('created_at', { ascending: true }),
-      db.from('config').select('*'),
+    // Ambil SEMUA baris secara paginasi — backup wajib lengkap, jangan terpotong
+    // batas default 1000 baris Supabase (kalau terpotong, data hilang senyap).
+    async function fetchAll(table: string) {
+      const PAGE_SIZE = 1000;
+      const rows: Record<string, unknown>[] = [];
+      for (let from = 0; ; from += PAGE_SIZE) {
+        const { data, error } = await db
+          .from(table)
+          .select('*')
+          .order('created_at', { ascending: true })
+          .range(from, from + PAGE_SIZE - 1);
+        if (error) return { error };
+        if (!data || data.length === 0) break;
+        rows.push(...data);
+        if (data.length < PAGE_SIZE) break;
+      }
+      return { data: rows };
+    }
+
+    const [patientsResult, examinationsResult] = await Promise.all([
+      fetchAll('patients'),
+      fetchAll('examinations'),
     ]);
+    const configResult = await db.from('config').select('*');
 
     if (patientsResult.error) {
       console.error('backup patients error:', patientsResult.error);

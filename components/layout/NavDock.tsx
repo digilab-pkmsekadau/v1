@@ -36,12 +36,14 @@ export default function NavDock() {
               key={id}
               href={href}
               prefetch={true}
+              aria-label={label}
+              aria-current={isActive ? 'page' : undefined}
               className={cn(
-                'relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl transition-all duration-300 group',
+                'relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl cursor-pointer transition-all duration-300 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
                 'active:scale-90',
                 isActive
                   ? 'text-teal-600 dark:text-teal-400'
-                  : 'text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300'
+                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
               )}
             >
               {/* Animated pill background for active */}
@@ -68,7 +70,7 @@ export default function NavDock() {
                 'relative z-10 text-[10px] font-semibold tracking-wide transition-all duration-300',
                 isActive
                   ? 'text-teal-700 dark:text-teal-400 font-bold'
-                  : 'text-slate-400 dark:text-slate-500'
+                  : 'text-slate-500 dark:text-slate-400'
               )}>
                 {label}
               </span>

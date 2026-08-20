@@ -66,7 +66,7 @@ export default function TopHeader() {
             <div className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-700 to-teal-500 dark:from-teal-400 dark:to-teal-300 text-base leading-tight tracking-tight">
               DigiLab
             </div>
-            <div className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold leading-tight tracking-wide">
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold leading-tight tracking-wide">
               Puskesmas Sekadau
             </div>
           </div>
@@ -77,7 +77,8 @@ export default function TopHeader() {
           {/* Dark mode toggle */}
           <button
             onClick={toggle}
-            className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-90"
+            aria-label={isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
+            className="w-10 h-10 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             style={{
               background: isDark
                 ? 'rgba(148, 163, 184, 0.08)'
@@ -98,7 +99,8 @@ export default function TopHeader() {
           <button
             onClick={handleLogout}
             disabled={loggingOut}
-            className="w-10 h-10 rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-90 disabled:opacity-50"
+            aria-label="Keluar dari aplikasi"
+            className="w-10 h-10 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             style={{
               background: isDark
                 ? 'rgba(220, 38, 38, 0.08)'

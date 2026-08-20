@@ -63,12 +63,13 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
             border: '1.5px solid var(--border)',
           }}
         >
-          <Search size={14} className="text-slate-400 dark:text-slate-500" />
+          <Search size={14} className="text-slate-400 dark:text-slate-500" aria-hidden="true" />
           <input
             type="text"
             placeholder="Cari pasien, no urut, dokter..."
             value={search}
             onChange={e => handleSearch(e.target.value)}
+            aria-label="Cari pasien, no urut, atau dokter"
             className="flex-1 bg-transparent text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none"
           />
         </div>
@@ -81,11 +82,11 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
             <tr className="border-b border-slate-100/80 dark:border-slate-800/40"
               style={{ background: 'var(--surface)' }}
             >
-              <th className="text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">No</th>
-              <th className="text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Pasien</th>
-              <th className="text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Tgl</th>
-              <th className="hidden md:table-cell text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Dokter</th>
-              <th className="py-3.5 px-3 text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest text-center">Aksi</th>
+              <th className="text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">No</th>
+              <th className="text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Pasien</th>
+              <th className="text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Tgl</th>
+              <th className="hidden md:table-cell text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Dokter</th>
+              <th className="py-3.5 px-3 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center">Aksi</th>
             </tr>
           </thead>
           <tbody>
@@ -128,7 +129,8 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
                       {/* Tombol Detail */}
                       <button
                         onClick={() => router.push(`/riwayat/${row.exam_id}`)}
-                        className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-90"
+                        aria-label={`Lihat detail pemeriksaan ${row.nama}`}
+                        className="w-9 h-9 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         style={{
                           background: 'linear-gradient(135deg, rgba(13,148,136,0.08), rgba(20,184,166,0.05))',
                           border: '1px solid rgba(13,148,136,0.12)',
@@ -140,7 +142,8 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
                       {/* Tombol Hapus */}
                       <button
                         onClick={() => onDelete(row.exam_id)}
-                        className="w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 hover:scale-110 active:scale-90"
+                        aria-label={`Hapus pemeriksaan ${row.nama}`}
+                        className="w-9 h-9 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                         style={{
                           background: 'linear-gradient(135deg, rgba(220,38,38,0.06), rgba(239,68,68,0.04))',
                           border: '1px solid rgba(220,38,38,0.10)',
@@ -161,12 +164,13 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
       {/* Pagination */}
       {totalPages > 1 && (
         <div className="flex items-center justify-between p-3.5 border-t border-slate-100/80 dark:border-slate-800/40">
-          <span className="text-[11px] text-slate-400 dark:text-slate-500 font-semibold">{filtered.length} data</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold">{filtered.length} data</span>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="w-9 h-9 rounded-xl flex items-center justify-center disabled:opacity-30 transition-all duration-200 hover:scale-105 active:scale-90"
+              aria-label="Halaman sebelumnya"
+              className="w-9 h-9 rounded-xl flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all duration-200 hover:scale-105 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
             >
               <ChevronLeft size={14} className="text-slate-500 dark:text-slate-400" />
@@ -175,7 +179,8 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="w-9 h-9 rounded-xl flex items-center justify-center disabled:opacity-30 transition-all duration-200 hover:scale-105 active:scale-90"
+              aria-label="Halaman selanjutnya"
+              className="w-9 h-9 rounded-xl flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all duration-200 hover:scale-105 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
               style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
             >
               <ChevronRight size={14} className="text-slate-500 dark:text-slate-400" />

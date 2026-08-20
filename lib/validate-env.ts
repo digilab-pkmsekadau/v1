@@ -9,10 +9,6 @@ function isServer() {
   return typeof window === 'undefined'
 }
 
-function isDevelopment() {
-  return process.env.NODE_ENV === 'development'
-}
-
 export function validateEnv() {
   const missingVars: EnvVar[] = []
 
@@ -33,9 +29,9 @@ ${missingVars.map(v => `  - ${v}`).join('\n')}
 Please add them to your .env.local file and restart the server.
 `
     console.error(errorMessage)
-    if (isDevelopment()) {
-      throw new Error('Missing required environment variables')
-    }
+    // Gagal keras di server (termasuk produksi) agar konfigurasi env yang hilang
+    // tidak diam-diam membuat auth memakai kredensial dummy dan fail-open.
+    throw new Error('Missing required environment variables')
   }
 
   return {

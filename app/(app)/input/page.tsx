@@ -3,7 +3,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertTriangle, CheckCircle2 } from 'lucide-react';
 import {
-  User, Plus, Trash2, CheckCircle, RotateCcw, Loader2, Stethoscope, Search, ChevronDown
+  User, Plus, Trash2, CheckCircle, RotateCcw, Loader2, Stethoscope, Search, ChevronDown, Camera
 } from 'lucide-react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
@@ -162,7 +162,9 @@ export default function InputPage() {
   const [loading, setLoading] = useState(false);
   const [successNo, setSuccessNo] = useState<string | null>(null);
   const [matchedPatientId, setMatchedPatientId] = useState<string | null>(null);
+  const [ocrLoading, setOcrLoading] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const today = new Date().toISOString().split('T')[0];
@@ -214,6 +216,73 @@ export default function InputPage() {
 
   // Kunci para key yang sudah dipilih (cegah duplikat)
   const usedKeys = new Set(params.map(p => p.paramKey).filter(Boolean));
+
+  // Kompres + ubah file gambar jadi data URL (batasi sisi terpanjang 1600px, JPEG 80%)
+  // supaya payload OCR kecil, cepat, dan hemat kuota AI.
+  const fileToCompressedDataUrl = (file: File): Promise<string> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      const reader = new FileReader();
+      reader.onload = () => { img.src = reader.result as string; };
+      reader.onerror = () => reject(new Error('Gagal membaca file'));
+      img.onload = () => {
+        const MAX = 1600;
+        const scale = Math.min(1, MAX / Math.max(img.width, img.height));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return reject(new Error('Canvas tidak didukung'));
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.8));
+      };
+      img.onerror = () => reject(new Error('Gagal memuat gambar'));
+      reader.readAsDataURL(file);
+    });
+
+  const handlePhotoOcr = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (fileRef.current) fileRef.current.value = '';
+    if (!file) return;
+
+    setOcrLoading(true);
+    try {
+      const image = await fileToCompressedDataUrl(file);
+      const res = await fetch('/api/ocr', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image }),
+      });
+      const data = await res.json();
+      if (!res.ok) { toast.error(data.error || 'AI gagal membaca foto'); return; }
+
+      const p = data.patient ?? {};
+      const identityKeys: (keyof PatientFormData)[] = [
+        'nama_pasien', 'nik', 'jenis_kelamin', 'alamat', 'tgl_lahir', 'tgl_permintaan', 'dokter', 'status_biaya',
+      ];
+      for (const key of identityKeys) {
+        if (typeof p[key] === 'string' && p[key].trim()) {
+          setValue(key, p[key] as PatientFormData[typeof key], { shouldValidate: true });
+        }
+      }
+
+      const aiParams: ParamItem[] = Array.isArray(data.params)
+        ? data.params
+            .filter((x: { paramKey?: string; value?: string }) => x.paramKey && x.value)
+            .map((x: { paramKey: string; value: string }) => ({ id: makeId(), paramKey: x.paramKey, value: x.value }))
+        : [];
+      if (aiParams.length > 0) setParams(aiParams);
+
+      toast.success(`AI mengisi ${aiParams.length} parameter`, {
+        description: 'Periksa & koreksi bila ada yang salah baca sebelum menyimpan.',
+      });
+      topRef.current?.scrollIntoView({ behavior: 'smooth' });
+    } catch {
+      toast.error('Gagal memproses foto');
+    } finally {
+      setOcrLoading(false);
+    }
+  };
 
   const handleReset = () => {
     const today = new Date().toISOString().split('T')[0];
@@ -292,6 +361,27 @@ export default function InputPage() {
           />
         </div>
       </div>
+
+      {/* Isi dari Foto (OCR AI) */}
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+        onChange={handlePhotoOcr}
+      />
+      <button
+        type="button"
+        onClick={() => fileRef.current?.click()}
+        disabled={ocrLoading}
+        className="mb-4 w-full flex items-center justify-center gap-2 py-3 rounded-2xl border border-blue-200/60 dark:border-blue-800/40 text-sm font-bold text-blue-700 dark:text-blue-300 disabled:opacity-60 transition"
+        style={{ background: 'linear-gradient(135deg, rgba(219,234,254,0.6), rgba(191,219,254,0.3))' }}
+      >
+        {ocrLoading
+          ? <><Loader2 size={16} className="animate-spin" /> Membaca foto…</>
+          : <><Camera size={16} /> Isi dari Foto Hasil Lab</>}
+      </button>
 
       {/* Success banner */}
       {successNo && (

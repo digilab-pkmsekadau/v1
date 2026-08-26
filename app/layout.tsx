@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, Noto_Sans } from 'next/font/google';
+import { Plus_Jakarta_Sans, Noto_Sans, Sora, JetBrains_Mono } from 'next/font/google';
 
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
@@ -14,6 +14,18 @@ const notoSans = Noto_Sans({
   subsets: ['latin'],
   variable: '--font-noto-sans',
   weight: ['300', '400', '500', '700'],
+});
+
+const sora = Sora({
+  subsets: ['latin'],
+  variable: '--font-display',
+  weight: ['600', '700'],
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  weight: ['500', '600'],
 });
 
 export const metadata: Metadata = {
@@ -39,7 +51,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={`${plusJakarta.variable} ${notoSans.variable} font-sans antialiased text-slate-900 bg-cyan-50 dark:bg-slate-950 dark:text-slate-100 selection:bg-cyan-200 dark:selection:bg-cyan-900 motion-safe:transition-colors motion-safe:duration-200`}>
+      <body className={`${plusJakarta.variable} ${notoSans.variable} ${sora.variable} ${jetbrainsMono.variable} font-sans antialiased text-slate-900 bg-cyan-50 dark:bg-slate-950 dark:text-slate-100 selection:bg-cyan-200 dark:selection:bg-cyan-900 motion-safe:transition-colors motion-safe:duration-200`}>
         {children}
         <Toaster position="top-center" richColors />
       </body>

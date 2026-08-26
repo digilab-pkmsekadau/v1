@@ -11,7 +11,7 @@ import HistoryTable from '@/components/dashboard/HistoryTable';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 import { exportToExcel, exportMonthlyToExcel } from '@/lib/export';
-import { getStartOfMonth, getTodayWIB } from '@/lib/utils';
+import { getTodayWIB } from '@/lib/utils';
 import type { HistoryRow } from '@/types';
 
 interface MonthlyPreview {
@@ -24,10 +24,18 @@ interface MonthlyPreview {
   data: Record<string, any>[];
 }
 
+// Rentang tanggal (awal..akhir) untuk sebuah bulan "YYYY-MM".
+function monthRange(ym: string) {
+  const [y, m] = ym.split('-').map(Number);
+  const start = `${ym}-01`;
+  const end = new Date(y, m, 0).toISOString().slice(0, 10); // hari terakhir bulan
+  return { start, end };
+}
+
 export default function RiwayatPage() {
   const today = getTodayWIB();
-  const [startDate, setStartDate] = useState(getStartOfMonth());
-  const [endDate, setEndDate] = useState(today);
+  const [filterMonth, setFilterMonth] = useState(today.slice(0, 7));
+  const { start: startDate, end: endDate } = monthRange(filterMonth);
   const [history, setHistory] = useState<HistoryRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [monthlyMonth, setMonthlyMonth] = useState(today.slice(0, 7));
@@ -167,22 +175,18 @@ export default function RiwayatPage() {
         </button>
       </div>
 
-      {/* Date Filter */}
+      {/* Filter Bulan — mengontrol tabel riwayat di bawah */}
       <div className="glass-panel p-5 mb-5">
         <div className="flex items-center gap-2 mb-4">
           <CalendarDays size={14} className="text-teal-600 dark:text-teal-400" />
-          <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Filter Periode</h2>
+          <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Filter Bulan</h2>
         </div>
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">Dari Tanggal</label>
-            <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)} className="input-premium" />
-          </div>
-          <div>
-            <label className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1.5 block">Sampai Tanggal</label>
-            <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)} className="input-premium" />
-          </div>
-        </div>
+        <input
+          type="month"
+          value={filterMonth}
+          onChange={e => setFilterMonth(e.target.value)}
+          className="input-premium w-full"
+        />
       </div>
 
       {/* Rekap Bulanan — dengan Preview */}

@@ -2,6 +2,10 @@
 import { NextResponse } from 'next/server';
 
 import { createSupabaseServerClient } from '@/lib/supabase-server';
+import { createServerClient } from '@/lib/supabase-service';
+
+export const ALLOWED_ROLES = ['admin', 'petugas'] as const;
+export type AppRole = (typeof ALLOWED_ROLES)[number];
 
 /** Kembalikan user Supabase yang terautentikasi, atau null. */
 export async function getAuthedUser() {
@@ -11,25 +15,51 @@ export async function getAuthedUser() {
   return data.user;
 }
 
-/** True jika user login DAN role-nya admin. */
-export async function isAdminUser() {
-  const supabase = await createSupabaseServerClient();
-  const { data: userData, error: userError } = await supabase.auth.getUser();
-  if (userError || !userData.user) return false;
-
-  const { data: roleData, error: roleError } = await supabase
+/**
+ * Role user dari tabel user_roles, atau null kalau belum di-provision.
+ * Dibaca dengan service-role client: pembacaan role tidak boleh bergantung pada
+ * RLS policy user_roles, kalau tidak admin sah bisa terkunci dari fiturnya sendiri.
+ */
+export async function getUserRole(userId: string): Promise<AppRole | null> {
+  const { data, error } = await createServerClient()
     .from('user_roles')
     .select('role')
-    .eq('user_id', userData.user.id)
+    .eq('user_id', userId)
     .maybeSingle();
 
-  return !roleError && roleData?.role === 'admin';
+  if (error) {
+    console.error('user_roles lookup error:', error);
+    return null;
+  }
+  const role = data?.role;
+  return ALLOWED_ROLES.includes(role as AppRole) ? (role as AppRole) : null;
 }
 
-/** Guard: return NextResponse 401 kalau tidak login, null kalau lolos. */
+/** User login + role-nya sudah di-provision. Null kalau tidak lolos. */
+export async function getAuthorizedUser() {
+  const user = await getAuthedUser();
+  if (!user) return null;
+  const role = await getUserRole(user.id);
+  if (!role) return null;
+  return { user, role };
+}
+
+/** True jika user login DAN role-nya admin. */
+export async function isAdminUser() {
+  return (await getAuthorizedUser())?.role === 'admin';
+}
+
+/**
+ * Guard: 401 kalau belum login, 403 kalau akun belum diberi role.
+ * Signup Supabase terbuka, jadi "punya akun" saja bukan izin akses.
+ */
 export async function requireAuth() {
-  if (!(await getAuthedUser())) {
+  const user = await getAuthedUser();
+  if (!user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  if (!(await getUserRole(user.id))) {
+    return NextResponse.json({ error: 'Akun belum diberi akses' }, { status: 403 });
   }
   return null;
 }

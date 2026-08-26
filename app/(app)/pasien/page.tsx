@@ -1,6 +1,6 @@
 'use client';
 
-import { Search, User, ChevronRight, Loader2, Users } from 'lucide-react';
+import { Search, User, ChevronRight, ChevronLeft, Loader2, Users } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -11,6 +11,21 @@ interface Patient {
   jenis_kelamin?: string;
   alamat?: string;
   tgl_lahir?: string;
+}
+
+const PAGE_SIZE = 25;
+
+// Daftar nomor halaman ringkas: 1 ... (aktif-1, aktif, aktif+1) ... terakhir
+function pageNumbers(current: number, total: number): (number | 'gap')[] {
+  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+  const pages = new Set<number>([1, total, current, current - 1, current + 1]);
+  const sorted = [...pages].filter(p => p >= 1 && p <= total).sort((a, b) => a - b);
+  const out: (number | 'gap')[] = [];
+  for (let i = 0; i < sorted.length; i++) {
+    if (i > 0 && sorted[i] - sorted[i - 1] > 1) out.push('gap');
+    out.push(sorted[i]);
+  }
+  return out;
 }
 
 // Generate a consistent gradient from patient name
@@ -36,41 +51,38 @@ export default function PasienPage() {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Reset ke halaman 1 setiap kata kunci berubah.
+  useEffect(() => { setPage(1); }, [query]);
 
   useEffect(() => {
-    if (query.trim().length >= 2) {
-      const timer = setTimeout(async () => {
-        setLoading(true);
-        try {
-          const res = await fetch(`/api/patients?q=${encodeURIComponent(query)}`);
-          const json = await res.json();
-          setPatients(json.data ?? []);
-          setSearched(true);
-        } catch {
-          setPatients([]);
-        } finally {
-          setLoading(false);
-        }
-      }, 400);
-      return () => clearTimeout(timer);
-    }
-  }, [query]);
+    const q = query.trim();
+    const shouldSearch = q.length >= 2;
+    const delay = shouldSearch ? 400 : 0;
 
-  useEffect(() => {
-    (async () => {
+    const timer = setTimeout(async () => {
       setLoading(true);
       try {
-        const res = await fetch('/api/patients');
+        const params = new URLSearchParams({ page: String(page), pageSize: String(PAGE_SIZE) });
+        if (shouldSearch) params.set('q', q);
+        const res = await fetch(`/api/patients?${params.toString()}`);
         const json = await res.json();
         setPatients(json.data ?? []);
+        setTotal(json.total ?? 0);
+        setTotalPages(json.totalPages ?? 1);
         setSearched(true);
       } catch {
         setPatients([]);
       } finally {
         setLoading(false);
       }
-    })();
-  }, []);
+    }, delay);
+
+    return () => clearTimeout(timer);
+  }, [query, page]);
 
   return (
     <div className="px-4 py-5 animate-slide-up">
@@ -131,7 +143,7 @@ export default function PasienPage() {
                 style={{ background: 'var(--surface)' }}
               >
                 <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                  {patients.length} pasien terdaftar
+                  {total} pasien terdaftar — halaman {page} dari {totalPages}
                 </span>
               </div>
             )}
@@ -175,6 +187,54 @@ export default function PasienPage() {
           </div>
         )}
       </div>
+
+      {/* Paginasi */}
+      {totalPages > 1 && (
+        <div className="mt-4 flex items-center justify-center gap-1.5 flex-wrap">
+          <button
+            onClick={() => setPage(p => Math.max(p - 1, 1))}
+            disabled={page === 1 || loading}
+            aria-label="Halaman sebelumnya"
+            className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.03] active:scale-95"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+          >
+            <ChevronLeft size={14} /> Prev
+          </button>
+
+          {pageNumbers(page, totalPages).map((n, i) =>
+            n === 'gap' ? (
+              <span key={`gap-${i}`} className="px-1.5 text-xs text-slate-400">…</span>
+            ) : (
+              <button
+                key={n}
+                onClick={() => setPage(n)}
+                disabled={loading}
+                aria-current={n === page ? 'page' : undefined}
+                className={`min-w-9 px-3 py-2 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 ${
+                  n === page
+                    ? 'text-white'
+                    : 'text-slate-600 dark:text-slate-300'
+                }`}
+                style={n === page
+                  ? { background: 'linear-gradient(135deg, #2dd4bf, #0d9488)', boxShadow: '0 6px 18px -6px rgba(13,148,136,0.5)' }
+                  : { background: 'var(--surface)', border: '1px solid var(--border)' }}
+              >
+                {n}
+              </button>
+            )
+          )}
+
+          <button
+            onClick={() => setPage(p => Math.min(p + 1, totalPages))}
+            disabled={page === totalPages || loading}
+            aria-label="Halaman berikutnya"
+            className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.03] active:scale-95"
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+          >
+            Next <ChevronRight size={14} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }

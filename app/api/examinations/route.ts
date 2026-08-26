@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
+import { writeAudit } from '@/lib/audit';
 import { getAuthedUser } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
 import { generateNoUrut, formatDateDisplay } from '@/lib/utils';
@@ -19,6 +20,7 @@ const examinationSchema = z.object({
   dokter: z.string().max(200).optional().default(''),
   petugas: z.string().max(200).optional().default(''),
   status_biaya: z.enum(['Umum', 'BPJS', 'Gratis']),
+  patient_id: z.string().uuid().optional(),
   params: z.array(z.object({
     id: z.string(),
     paramKey: z.string().max(100),
@@ -116,7 +118,8 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    if (!(await getAuthedUser())) {
+    const user = await getAuthedUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const db = createServerClient();
@@ -127,34 +130,55 @@ export async function POST(request: NextRequest) {
     }
 
     const { nama_pasien, nik, jenis_kelamin, alamat, tgl_lahir, tgl_permintaan,
-            dokter, petugas, status_biaya, params } = parsed.data;
+            dokter, petugas, status_biaya, patient_id, params } = parsed.data;
 
     // 1. Cari/buat patient
-    let patientId: string;
+    let patientId: string | null = null;
     const nikClean = nik?.trim() || null;
 
-    if (nikClean) {
-      const { data: existing } = await db
-        .from('patients').select('id').eq('nik', nikClean).maybeSingle();
-      if (existing) {
-        patientId = existing.id;
-        if (jenis_kelamin) {
+    // Prioritas 1: pasien yang dipilih petugas dari autocomplete. Ini satu-satunya
+    // jalan menyatukan pemeriksaan ulang pasien TANPA NIK ke riwayat yang sama;
+    // tanpa ini nama yang sama selalu jadi baris pasien baru.
+    if (patient_id) {
+      const { data: chosen } = await db
+        .from('patients').select('id, jenis_kelamin').eq('id', patient_id).maybeSingle();
+      if (chosen) {
+        patientId = chosen.id;
+        if (jenis_kelamin && !chosen.jenis_kelamin) {
           await db.from('patients').update({ jenis_kelamin }).eq('id', patientId);
         }
-      } else {
-        const { data: newP, error: pErr } = await db
-          .from('patients')
-          .insert({ nama: nama_pasien.trim(), nik: nikClean, jenis_kelamin: jenis_kelamin || null, alamat: alamat?.trim() || null, tgl_lahir: tgl_lahir || null })
-          .select('id').single();
-        if (pErr || !newP) return NextResponse.json({ error: 'Gagal simpan pasien: ' + pErr?.message }, { status: 500 });
-        patientId = newP.id;
+        // NIK baru dari pasien yang tadinya belum punya: lengkapi, jangan timpa.
+        if (nikClean) {
+          await db.from('patients').update({ nik: nikClean }).eq('id', patientId).is('nik', null);
+        }
       }
-    } else {
+    }
+
+    // Prioritas 2: cocokkan lewat NIK.
+    if (!patientId && nikClean) {
+      const { data: existing } = await db
+        .from('patients').select('id, jenis_kelamin').eq('nik', nikClean).maybeSingle();
+      if (existing) {
+        patientId = existing.id;
+        // Hanya isi kalau masih kosong. Menimpa jenis_kelamin pasien lain akan
+        // mengubah hasil deteksi abnormal di lib/normal-ranges.ts.
+        if (jenis_kelamin && !existing.jenis_kelamin) {
+          await db.from('patients').update({ jenis_kelamin }).eq('id', patientId);
+        }
+      }
+    }
+
+    // Prioritas 3: pasien baru. Nama yang sama TIDAK digabung otomatis — di Sekadau
+    // satu nama bisa milik beberapa orang, jadi penggabungan harus dipilih petugas.
+    if (!patientId) {
       const { data: newP, error: pErr } = await db
         .from('patients')
-        .insert({ nama: nama_pasien.trim(), nik: null, jenis_kelamin: jenis_kelamin || null, alamat: alamat?.trim() || null, tgl_lahir: tgl_lahir || null })
+        .insert({ nama: nama_pasien.trim(), nik: nikClean, jenis_kelamin: jenis_kelamin || null, alamat: alamat?.trim() || null, tgl_lahir: tgl_lahir || null })
         .select('id').single();
-      if (pErr || !newP) return NextResponse.json({ error: 'Gagal simpan pasien: ' + pErr?.message }, { status: 500 });
+      if (pErr || !newP) {
+        console.error('patients insert error:', pErr);
+        return NextResponse.json({ error: 'Gagal simpan pasien' }, { status: 500 });
+      }
       patientId = newP.id;
     }
 
@@ -195,8 +219,16 @@ export async function POST(request: NextRequest) {
       .select('id').single();
 
     if (examErr || !exam) {
-      return NextResponse.json({ error: 'Gagal simpan pemeriksaan: ' + examErr?.message }, { status: 500 });
+      console.error('examinations insert error:', examErr);
+      return NextResponse.json({ error: 'Gagal simpan pemeriksaan' }, { status: 500 });
     }
+
+    await writeAudit(user.email, {
+      action: 'CREATE',
+      entity: 'examination',
+      entity_id: exam.id,
+      description: `Input pemeriksaan no_urut ${noUrut} untuk ${nama_pasien.trim()}`,
+    });
 
     return NextResponse.json({ success: true, no_urut: noUrut });
   } catch (err) {

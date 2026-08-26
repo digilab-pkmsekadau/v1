@@ -1,6 +1,7 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { writeAudit } from '@/lib/audit';
 import { ALL_PARAMS } from '@/lib/param-options';
 import { getAuthedUser } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
@@ -54,7 +55,8 @@ export async function PUT(
   { params }: RouteParams
 ) {
   try {
-    if (!(await getAuthedUser())) {
+    const user = await getAuthedUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const db = createServerClient();
@@ -82,6 +84,13 @@ export async function PUT(
       return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
     }
 
+    await writeAudit(user.email, {
+      action: 'UPDATE',
+      entity: 'examination',
+      entity_id: id,
+      description: `Ubah field: ${Object.keys(updateData).join(', ')}`,
+    });
+
     return NextResponse.json({ data });
   } catch (err) {
     console.error('examinations PUT error:', err);
@@ -95,7 +104,8 @@ export async function DELETE(
   { params }: RouteParams
 ) {
   try {
-    if (!(await getAuthedUser())) {
+    const user = await getAuthedUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const db = createServerClient();
@@ -104,6 +114,14 @@ export async function DELETE(
     if (!id) {
       return NextResponse.json({ error: 'ID diperlukan' }, { status: 400 });
     }
+
+    // Ambil no_urut sebelum hapus: setelah baris hilang, jejak audit tidak bisa
+    // lagi merujuk pemeriksaan mana yang dihapus selain lewat UUID.
+    const { data: before } = await db
+      .from('examinations')
+      .select('no_urut')
+      .eq('id', id)
+      .maybeSingle();
 
     const { error } = await db
       .from('examinations')
@@ -114,6 +132,13 @@ export async function DELETE(
       console.error('DB error:', error);
       return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
     }
+
+    await writeAudit(user.email, {
+      action: 'DELETE',
+      entity: 'examination',
+      entity_id: id,
+      description: `Hapus pemeriksaan no_urut ${before?.no_urut ?? '-'}`,
+    });
 
     return NextResponse.json({ success: true });
   } catch (err) {

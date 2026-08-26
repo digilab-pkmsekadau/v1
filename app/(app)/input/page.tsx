@@ -260,20 +260,28 @@ export default function InputPage() {
       const identityKeys: (keyof PatientFormData)[] = [
         'nama_pasien', 'nik', 'jenis_kelamin', 'alamat', 'tgl_lahir', 'tgl_permintaan', 'dokter', 'status_biaya',
       ];
+      // Hanya isi field yang masih kosong; jangan timpa data yang sudah diketik petugas.
       for (const key of identityKeys) {
-        if (typeof p[key] === 'string' && p[key].trim()) {
+        const current = patient[key];
+        const isEmpty = typeof current !== 'string' || !current.trim();
+        if (isEmpty && typeof p[key] === 'string' && p[key].trim()) {
           setValue(key, p[key] as PatientFormData[typeof key], { shouldValidate: true });
+          // setValue tidak lewat onChange, jadi tautan ke pasien terpilih harus
+          // dilepas manual — kalau tidak, hasil bisa masuk ke riwayat pasien lain.
+          if (key === 'nama_pasien' || key === 'nik') setMatchedPatientId(null);
         }
       }
 
+      // Merge param AI ke baris yang sudah ada; jangan buang param yang sudah diisi manual.
+      const existingKeys = new Set(params.map(x => x.paramKey));
       const aiParams: ParamItem[] = Array.isArray(data.params)
         ? data.params
-            .filter((x: { paramKey?: string; value?: string }) => x.paramKey && x.value)
+            .filter((x: { paramKey?: string; value?: string }) => x.paramKey && x.value && !existingKeys.has(x.paramKey))
             .map((x: { paramKey: string; value: string }) => ({ id: makeId(), paramKey: x.paramKey, value: x.value }))
         : [];
-      if (aiParams.length > 0) setParams(aiParams);
+      if (aiParams.length > 0) setParams(prev => [...prev, ...aiParams]);
 
-      toast.success(`AI mengisi ${aiParams.length} parameter`, {
+      toast.success(`AI menambah ${aiParams.length} parameter`, {
         description: 'Periksa & koreksi bila ada yang salah baca sebelum menyimpan.',
       });
       topRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -305,7 +313,11 @@ export default function InputPage() {
 
     setLoading(true);
     try {
-      const body: FormInputData = { ...data, params: filledParams } as FormInputData;
+      const body: FormInputData = {
+        ...data,
+        patient_id: matchedPatientId ?? undefined,
+        params: filledParams,
+      } as FormInputData;
       const res = await fetch('/api/examinations', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

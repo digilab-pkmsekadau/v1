@@ -36,11 +36,13 @@ export async function GET(_req: NextRequest, { params }: RouteParams) {
       .order('tgl_permintaan', { ascending: true });
 
     if (eErr) {
-      return NextResponse.json({ error: eErr.message }, { status: 500 });
+      console.error('examinations select error:', eErr);
+      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
     }
 
     return NextResponse.json({ patient, examinations: examinations ?? [] });
   } catch (err) {
+    console.error('patients GET error:', err);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

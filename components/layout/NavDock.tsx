@@ -1,6 +1,6 @@
 'use client';
 
-import { Home, Syringe, Settings, Users, ClipboardList } from 'lucide-react';
+import { Home, Syringe, Settings, Users, ClipboardList, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -11,6 +11,7 @@ const navItems = [
   { id: 'input',     label: 'Input',     icon: Syringe,       href: '/input' },
   { id: 'pasien',    label: 'Pasien',    icon: Users,         href: '/pasien' },
   { id: 'riwayat',   label: 'Riwayat',   icon: ClipboardList, href: '/riwayat' },
+  { id: 'statistik', label: 'Statistik', icon: BarChart3,      href: '/statistik' },
   { id: 'settings',  label: 'Setting',   icon: Settings,      href: '/settings' },
 ];
 

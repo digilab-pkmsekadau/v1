@@ -29,9 +29,11 @@ Aplikasi pencatatan dan pelaporan hasil laboratorium untuk Puskesmas Sekadau. Pe
    ```bash
    cp .env.example .env.local
    ```
-   Variabel wajib: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+   Variabel wajib: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`. `VISION_API_KEY` opsional — tanpa itu hanya fitur OCR foto hasil lab yang mati.
 3. Buat skema database dengan menjalankan `supabase_migration.sql` di SQL Editor Supabase.
-4. Jalankan dev server:
+4. Jalankan `supabase_rls_migration.sql` — mengaktifkan RLS dan memberi role `petugas` ke akun yang belum punya. **Wajib sebelum deploy**: kode menolak akun tanpa baris di `user_roles`, jadi tanpa langkah ini akun lama terkunci.
+5. Matikan **Enable sign-ups** di Supabase Dashboard → Authentication → Providers → Email. Anon key ada di browser, jadi signup terbuka berarti siapa pun bisa membuat akun. Tambah petugas lewat Invite user, lalu masukkan barisnya ke `user_roles`.
+6. Jalankan dev server:
    ```bash
    npm run dev
    ```

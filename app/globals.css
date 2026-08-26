@@ -1,42 +1,76 @@
 @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap');
 @import "tailwindcss";
 
-/* ═══════════════════════════════════════════════════════════════
-   DESIGN TOKENS
-   ═══════════════════════════════════════════════════════════════ */
+/* ===============================================================
+   DESIGN TOKENS  -  "Clean Light Futuristic"
+   Light-first palette. One primary brand accent (indigo) drives
+   buttons / active states / focus rings. Each lab category owns a
+   distinct signature hue so the dashboard reads as varied, not
+   mono-teal. Danger (rose-red) stays loud for abnormal values.
+   =============================================================== */
 :root {
-  --primary: #0f766e;
-  --primary-dark: #0d6960;
+  /* Primary brand accent - TEAL */
+  --primary: #14b8a6;
+  --primary-dark: #0d9488;
   --primary-light: #ccfbf1;
-  --bg-body: #f4f7fb;
+  --primary-rgb: 20, 184, 166;
+
+  /* Per-category signature hues
+     hematologi=rose | kimia=teal(brand) | imunologi=violet
+     mikrobiologi=amber | urinalisis=sky | tren=cyan */
+  --cat-hema: #e11d48;      --cat-hema-soft: #fff1f4;
+  --cat-kimia: #0d9488;     --cat-kimia-soft: #f0fdfa;
+  --cat-imuno: #7c3aed;     --cat-imuno-soft: #f5f0ff;
+  --cat-mikro: #d97706;     --cat-mikro-soft: #fff8ec;
+  --cat-urin: #0284c7;      --cat-urin-soft: #edf8ff;
+  --cat-trend: #0891b2;     --cat-trend-soft: #ecfdff;
+
+  /* Danger / abnormal - keep LOUD */
+  --danger: #dc2626;
+  --danger-soft: #fef2f2;
+
+  /* Surfaces & text */
+  --bg-body: #f6f8fc;
   --text-main: #1e293b;
   --text-muted: #64748b;
-  --border: #e2e8f0;
+  --border: #e6ebf3;
   --white: #ffffff;
-  --surface: rgba(255, 255, 255, 0.78);
-  --surface-hover: rgba(255, 255, 255, 0.92);
+  --surface: rgba(255, 255, 255, 0.82);
+  --surface-hover: rgba(255, 255, 255, 0.94);
 
-  /* Gradient tokens */
-  --grad-teal: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
-  --grad-blue: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+  /* Gradient tokens (per category + brand) */
+  --grad-primary: linear-gradient(135deg, #14b8a6 0%, #2dd4bf 100%);
+  --grad-hema: linear-gradient(135deg, #e11d48 0%, #f43f5e 100%);
+  --grad-kimia: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
+  --grad-imuno: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+  --grad-mikro: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+  --grad-urin: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+  --grad-trend: linear-gradient(135deg, #0891b2 0%, #22d3ee 100%);
   --grad-red: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
-  --grad-amber: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
-  --grad-violet: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
-  --grad-dark: linear-gradient(135deg, #0f172a 0%, #0f302b 50%, #0f172a 100%);
 
   /* Premium shadows */
-  --shadow-teal: 0 8px 28px -4px rgba(13, 148, 136, 0.30), 0 2px 8px -2px rgba(13, 148, 136, 0.15);
-  --shadow-blue: 0 8px 28px -4px rgba(37, 99, 235, 0.25), 0 2px 8px -2px rgba(37, 99, 235, 0.12);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 24px -8px rgba(0, 0, 0, 0.06);
-  --shadow-card-hover: 0 8px 40px -8px rgba(0, 0, 0, 0.12), 0 2px 8px -2px rgba(0, 0, 0, 0.06);
-  --shadow-nav: 0 -8px 32px rgba(0, 0, 0, 0.08);
-  --shadow-input-focus: 0 0 0 4px rgba(13, 148, 136, 0.08), 0 2px 8px rgba(13, 148, 136, 0.10);
+  --shadow-primary: 0 10px 30px -6px rgba(20, 184, 166, 0.32), 0 2px 8px -2px rgba(20, 184, 166, 0.16);
+  --shadow-cyan: 0 10px 30px -6px rgba(6, 182, 212, 0.28), 0 2px 8px -2px rgba(6, 182, 212, 0.14);
+  --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.04), 0 6px 26px -10px rgba(15, 23, 42, 0.08);
+  --shadow-card-hover: 0 12px 44px -10px rgba(15, 23, 42, 0.14), 0 3px 10px -3px rgba(15, 23, 42, 0.07);
+  --shadow-nav: 0 -8px 32px rgba(15, 23, 42, 0.08);
+  --shadow-input-focus: 0 0 0 4px rgba(20, 184, 166, 0.10), 0 2px 8px rgba(20, 184, 166, 0.12);
 }
 
-/* ═══════════════════════════════════════════════════════════════
+/* ===============================================================
    DARK MODE TOKENS
-   ═══════════════════════════════════════════════════════════════ */
+   =============================================================== */
 html.dark {
+  --primary-light: rgba(20, 184, 166, 0.18);
+
+  --cat-hema-soft: rgba(225, 29, 72, 0.14);
+  --cat-kimia-soft: rgba(20, 184, 166, 0.14);
+  --cat-imuno-soft: rgba(124, 58, 237, 0.16);
+  --cat-mikro-soft: rgba(217, 119, 6, 0.16);
+  --cat-urin-soft: rgba(2, 132, 199, 0.16);
+  --cat-trend-soft: rgba(8, 145, 178, 0.16);
+  --danger-soft: rgba(220, 38, 38, 0.14);
+
   --bg-body: #0b1120;
   --text-main: #e2e8f0;
   --text-muted: #94a3b8;
@@ -46,7 +80,7 @@ html.dark {
   --surface-hover: rgba(15, 23, 42, 0.88);
   --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2), 0 4px 24px -8px rgba(0, 0, 0, 0.4);
   --shadow-card-hover: 0 8px 40px -8px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-input-focus: 0 0 0 4px rgba(45, 212, 191, 0.08), 0 2px 8px rgba(45, 212, 191, 0.08);
+  --shadow-input-focus: 0 0 0 4px rgba(20, 184, 166, 0.14), 0 2px 8px rgba(20, 184, 166, 0.10);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -66,19 +100,19 @@ html.dark {
     transition: background-color 0.4s ease, color 0.3s ease;
   }
 
-  /* Gradient mesh background for app */
+  /* Gradient mesh background for app (light-first, subtle) */
   html:not(.dark) body {
     background:
-      radial-gradient(ellipse at 15% 10%, rgba(13, 148, 136, 0.04) 0%, transparent 50%),
-      radial-gradient(ellipse at 85% 85%, rgba(37, 99, 235, 0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, rgba(168, 85, 247, 0.015) 0%, transparent 50%),
+      radial-gradient(ellipse at 12% 8%, rgba(20, 184, 166, 0.05) 0%, transparent 52%),
+      radial-gradient(ellipse at 88% 92%, rgba(6, 182, 212, 0.045) 0%, transparent 52%),
+      radial-gradient(ellipse at 60% 40%, rgba(45, 212, 191, 0.025) 0%, transparent 50%),
       var(--bg-body);
   }
 
   html.dark body {
     background:
-      radial-gradient(ellipse at 15% 10%, rgba(13, 148, 136, 0.04) 0%, transparent 50%),
-      radial-gradient(ellipse at 85% 85%, rgba(37, 99, 235, 0.03) 0%, transparent 50%),
+      radial-gradient(ellipse at 12% 8%, rgba(20, 184, 166, 0.06) 0%, transparent 52%),
+      radial-gradient(ellipse at 88% 92%, rgba(6, 182, 212, 0.05) 0%, transparent 52%),
       #0b1120;
   }
 
@@ -102,6 +136,11 @@ html.dark {
    UTILITY CLASSES
    ═══════════════════════════════════════════════════════════════ */
 @layer utilities {
+
+  /* ─── Typography helpers ──────────────────────────────────── */
+  .font-display { font-family: var(--font-display), 'Plus Jakarta Sans', sans-serif; }
+  .font-mono-data { font-family: var(--font-mono), ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .label-caps { text-transform: uppercase; letter-spacing: 0.09em; font-weight: 500; }
 
   /* ─── Glass Panel ─────────────────────────────────────────── */
   .glass-panel {
@@ -135,42 +174,37 @@ html.dark {
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.3);
   }
 
-  /* ─── Gradient Stat Cards ────────────────────────────────── */
-  .card-stat-teal {
-    background: var(--grad-teal);
+  /* --- Gradient Stat Cards (shared base + per-hue variants) --- */
+  .card-stat {
     border-radius: 24px;
-    box-shadow: var(--shadow-teal);
     color: white;
     position: relative;
     overflow: hidden;
   }
 
-  .card-stat-teal::before {
+  .card-stat::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 50%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.16) 0%, transparent 55%);
     border-radius: inherit;
     pointer-events: none;
   }
 
-  .card-stat-blue {
-    background: var(--grad-blue);
-    border-radius: 24px;
-    box-shadow: var(--shadow-blue);
-    color: white;
-    position: relative;
-    overflow: hidden;
-  }
+  .card-stat-primary { background: var(--grad-primary); box-shadow: var(--shadow-primary); }
+  .card-stat-cyan    { background: var(--grad-trend);   box-shadow: var(--shadow-cyan); }
+  .card-stat-hema    { background: var(--grad-hema); }
+  .card-stat-imuno   { background: var(--grad-imuno); }
+  .card-stat-mikro   { background: var(--grad-mikro); }
+  .card-stat-urin    { background: var(--grad-urin); }
 
-  .card-stat-blue::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255,255,255,0.12) 0%, transparent 50%);
-    border-radius: inherit;
-    pointer-events: none;
-  }
+  /* Soft-tint category chip surfaces (reusable across pages) */
+  .cat-surface-hema  { background: var(--cat-hema-soft);  border-color: color-mix(in srgb, var(--cat-hema) 22%, transparent); }
+  .cat-surface-kimia { background: var(--cat-kimia-soft); border-color: color-mix(in srgb, var(--cat-kimia) 22%, transparent); }
+  .cat-surface-imuno { background: var(--cat-imuno-soft); border-color: color-mix(in srgb, var(--cat-imuno) 22%, transparent); }
+  .cat-surface-mikro { background: var(--cat-mikro-soft); border-color: color-mix(in srgb, var(--cat-mikro) 22%, transparent); }
+  .cat-surface-urin  { background: var(--cat-urin-soft);  border-color: color-mix(in srgb, var(--cat-urin) 22%, transparent); }
+  .cat-surface-danger{ background: var(--danger-soft);    border-color: color-mix(in srgb, var(--danger) 30%, transparent); }
 
   /* ─── Premium Input ──────────────────────────────────────── */
   .input-premium {
@@ -188,7 +222,7 @@ html.dark {
   }
 
   .input-premium:focus {
-    border-color: #0d9488;
+    border-color: var(--primary);
     box-shadow: var(--shadow-input-focus);
     background: white;
     transform: translateY(-1px);
@@ -303,8 +337,8 @@ html.dark {
 
   /* Pulse glow */
   @keyframes pulseGlow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.4); }
-    50% { box-shadow: 0 0 0 12px rgba(45, 212, 191, 0); }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(20, 184, 166, 0.35); }
+    50% { box-shadow: 0 0 0 12px rgba(20, 184, 166, 0); }
   }
 
   .animate-pulse-glow {
@@ -397,8 +431,8 @@ html.dark {
   .lab-bubble {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle at 35% 35%, rgba(45,212,191,0.45), rgba(14,165,233,0.15));
-    border: 1px solid rgba(45,212,191,0.3);
+    background: radial-gradient(circle at 35% 35%, rgba(99,102,241,0.35), rgba(34,211,238,0.12));
+    border: 1px solid rgba(99,102,241,0.28);
     animation: bubbleRise linear infinite;
     pointer-events: none;
   }
@@ -406,7 +440,7 @@ html.dark {
   .lab-particle {
     position: absolute;
     border-radius: 50%;
-    background: rgba(45,212,191,0.5);
+    background: rgba(99,102,241,0.45);
     animation: particleDrift linear infinite;
     pointer-events: none;
   }
@@ -415,7 +449,7 @@ html.dark {
     position: absolute;
     left: 0; right: 0;
     height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(45,212,191,0.6), transparent);
+    background: linear-gradient(90deg, transparent, rgba(99,102,241,0.55), transparent);
     animation: scanLine 4s ease-in-out infinite;
     pointer-events: none;
   }
@@ -423,9 +457,148 @@ html.dark {
   .lab-pulse-ring {
     position: absolute;
     border-radius: 50%;
-    border: 1.5px solid rgba(45,212,191,0.4);
+    border: 1.5px solid rgba(99,102,241,0.38);
     animation: pulseRing 2.5s ease-out infinite;
     pointer-events: none;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     CLAYMORPHISM + GLASSMORPHISM (bright blue) - reusable across pages
+     ═══════════════════════════════════════════════════════════ */
+
+  /* Soft teal/cyan clay/glass page background (soft radial glows, no swarm) */
+  .clay-bg {
+    background:
+      radial-gradient(ellipse at 18% 12%, rgba(20, 184, 166, 0.20) 0%, transparent 55%),
+      radial-gradient(ellipse at 82% 85%, rgba(6, 182, 212, 0.16) 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 50%, rgba(94, 234, 212, 0.10) 0%, transparent 60%),
+      linear-gradient(165deg, #e6fbf6 0%, #ccfbf1 45%, #f0fdfa 100%);
+  }
+
+  /* Puffy clay card: soft outer drop + inner highlight/shade */
+  .clay-card {
+    background: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    border-radius: 30px;
+    box-shadow:
+      0 20px 45px -12px rgba(13, 148, 136, 0.35),
+      inset 0 -4px 10px rgba(15, 23, 42, 0.06),
+      inset 0 2px 4px rgba(255, 255, 255, 0.9);
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.35s ease;
+  }
+
+  .clay-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 30px 60px -14px rgba(13, 148, 136, 0.42),
+      inset 0 -4px 10px rgba(15, 23, 42, 0.06),
+      inset 0 2px 4px rgba(255, 255, 255, 0.9);
+  }
+
+  /* Glass floating chip (translucent + blur) */
+  .clay-chip {
+    background: rgba(255, 255, 255, 0.55);
+    backdrop-filter: blur(14px) saturate(180%);
+    -webkit-backdrop-filter: blur(14px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    border-radius: 99px;
+    box-shadow: 0 8px 20px -8px rgba(13, 148, 136, 0.3);
+  }
+
+  /* 3D chunky/clay icon badge (puffy button look) */
+  .clay-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 16px;
+    background: linear-gradient(145deg, #ecfdf9 0%, #ccfbf1 100%);
+    box-shadow:
+      0 8px 16px -6px rgba(13, 148, 136, 0.35),
+      inset 0 -3px 6px rgba(13, 148, 136, 0.12),
+      inset 0 2px 3px rgba(255, 255, 255, 0.95);
+    color: #0d9488;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+  }
+
+  /* Vivid teal variant for the primary/header badge */
+  .clay-icon-brand {
+    background: linear-gradient(145deg, #2dd4bf 0%, #0d9488 100%);
+    color: #ffffff;
+    box-shadow:
+      0 10px 22px -6px rgba(13, 148, 136, 0.55),
+      inset 0 -3px 6px rgba(15, 23, 42, 0.18),
+      inset 0 2px 3px rgba(255, 255, 255, 0.55);
+  }
+
+  /* Small clay badge size variant */
+  .clay-icon-sm { border-radius: 12px; }
+
+  /* Per-category clay badge: reads --clay-a/--clay-b gradient + tinted shadow */
+  .clay-icon-cat {
+    background: linear-gradient(145deg, var(--clay-a) 0%, var(--clay-b) 100%);
+    color: #ffffff;
+    box-shadow:
+      0 9px 20px -6px color-mix(in srgb, var(--clay-b) 55%, transparent),
+      inset 0 -3px 6px rgba(15, 23, 42, 0.16),
+      inset 0 2px 3px rgba(255, 255, 255, 0.5);
+  }
+
+  /* Clay input field wrapper */
+  .clay-field {
+    border-radius: 20px;
+    background: #f0fdfa;
+    border: 1px solid rgba(153, 246, 228, 0.7);
+    box-shadow: inset 0 2px 5px rgba(13, 148, 136, 0.08);
+    transition: box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+  }
+
+  .clay-field:focus-within {
+    background: #ffffff;
+    border-color: #14b8a6;
+    box-shadow:
+      0 0 0 4px rgba(20, 184, 166, 0.16),
+      inset 0 2px 5px rgba(13, 148, 136, 0.06);
+  }
+
+  /* Puffy gradient-teal clay button */
+  .clay-btn {
+    border-radius: 20px;
+    background: linear-gradient(145deg, #2dd4bf 0%, #0d9488 100%);
+    color: #ffffff;
+    box-shadow:
+      0 14px 30px -8px rgba(13, 148, 136, 0.6),
+      inset 0 -3px 6px rgba(15, 23, 42, 0.2),
+      inset 0 2px 3px rgba(255, 255, 255, 0.45);
+    transition: transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.28s ease, opacity 0.2s ease;
+  }
+
+  .clay-btn:not(:disabled):hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 20px 40px -8px rgba(13, 148, 136, 0.68),
+      inset 0 -3px 6px rgba(15, 23, 42, 0.2),
+      inset 0 2px 3px rgba(255, 255, 255, 0.45);
+  }
+
+  .clay-btn:not(:disabled):active {
+    transform: translateY(-1px) scale(0.985);
+  }
+
+  /* Gentle clay float (mascot) + liquid shimmer */
+  @keyframes clayFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  .animate-clay-float {
+    animation: clayFloat 4.5s ease-in-out infinite;
+  }
+
+  @keyframes liquidShimmer {
+    0%, 100% { transform: translateX(-30%); opacity: 0.35; }
+    50% { transform: translateX(30%); opacity: 0.7; }
+  }
+  .animate-liquid-shimmer {
+    animation: liquidShimmer 3.5s ease-in-out infinite;
   }
 
   /* ═══════════════════════════════════════════════════════════
@@ -439,6 +612,9 @@ html.dark {
     }
     .lab-bubble, .lab-particle, .lab-scan, .lab-pulse-ring {
       display: none !important;
+    }
+    .animate-clay-float, .animate-liquid-shimmer {
+      animation: none !important;
     }
   }
 }

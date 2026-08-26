@@ -92,6 +92,9 @@ export interface FormInputData {
   dokter: string;
   petugas: string;
   status_biaya: StatusBiaya;
+  // Diisi hanya kalau petugas memilih pasien dari autocomplete. Tanpa ini pasien
+  // tanpa NIK selalu jadi baris baru, jadi pemeriksaan ulang terpisah dari riwayatnya.
+  patient_id?: string;
   // Dynamic parameter list
   params: ParamItem[];
 }

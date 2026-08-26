@@ -18,20 +18,28 @@ npx tsc --noEmit   # standalone typecheck
 
 There is **no test framework** — no unit/integration/e2e tests exist. Do not claim tests pass; verify changes with `npx tsc --noEmit` and `npm run build`.
 
-Required env (`.env.local`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`. `lib/validate-env.ts` runs at module load in `middleware.ts` and `app/layout.tsx` and **throws on the server** if the two `NEXT_PUBLIC_*` vars are missing, so a misconfigured deploy fails fast at startup.
+Required env (`.env.local`): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `VISION_API_KEY` (OCR foto hasil lab, provider Ollama Cloud `https://ollama.com/v1`, model `gemma4:31b`). `lib/validate-env.ts` runs at module load in `middleware.ts` and `app/layout.tsx` and **throws on the server** if the two `NEXT_PUBLIC_*` vars are missing, so a misconfigured deploy fails fast at startup. A missing `VISION_API_KEY` only disables OCR (503), it does not block startup.
 
 ## Architecture
 
 ### Two Supabase clients — know which one you're in
-- `lib/supabase.ts` → `createServerClient()` uses the **service-role key and bypasses Row Level Security**. It is used by every API route under `app/api/**` for DB access. Because RLS is bypassed, **authorization is enforced entirely in `middleware.ts`, not by the database.** Any new API route that mutates data is protected only by whatever middleware rule covers its path.
+- `lib/supabase-service.ts` → `createServerClient()` uses the **service-role key and bypasses Row Level Security**. It is used by every API route under `app/api/**` for DB access, and by `lib/require-auth.ts` to read `user_roles` (role lookup must not depend on RLS policy, or a real admin locks himself out).
 - `lib/supabase.ts` → `createSupabaseBrowserClient()` (anon key) is for client components (login).
-- `lib/supabase-server.ts` → cookie-based SSR client used to read the authenticated user inside route handlers / server components (e.g. admin check in `app/api/config/route.ts`, root redirect in `app/page.tsx`).
+- `lib/supabase-server.ts` → cookie-based SSR client used to read the authenticated user inside route handlers / server components (`getAuthedUser()` in `lib/require-auth.ts`, root redirect in `app/page.tsx`).
 
-### Auth & authorization live in `middleware.ts`
-- All routes are auth-gated except `PUBLIC_PATHS` (`/login`, `/api/auth`).
-- `ADMIN_ONLY_PATHS` (`/settings`, `/api/examinations/yearly`, `/api/backup`, `/api/audit`) require an `admin` row in the `user_roles` table (default-deny: role query error or non-admin → blocked).
-- Requests to `/api/*` get JSON `401`/`403`; page requests get redirects (`/login` or `/dashboard`). Preserve this split when adding guards.
-- There is leftover PIN-based auth (`lib/auth.ts`, `app/api/auth/verify-pin`) alongside Supabase Auth; Supabase Auth is the real path. Logout clears both.
+### Authorization: middleware + per-route guards (defense-in-depth)
+Because RLS is bypassed, the database enforces nothing. Two layers do:
+
+1. `middleware.ts` — every request except `PUBLIC_PATHS` (`/login`, `/api/auth/logout`) and root-level static assets (`PUBLIC_FILE` regex) must have a row in `user_roles` with role `admin` or `petugas`. **Having a Supabase account is not access** — signup is not the provisioning step. `ADMIN_ONLY_PATHS` (`/settings`, `/api/examinations/yearly`, `/api/backup`, `/api/audit`) additionally require `admin`.
+2. `lib/require-auth.ts` — every route handler under `app/api/**` calls `requireAuth()` (401 if not logged in, 403 if no role) or `requireAdmin()` (403 if not admin). Never rely on middleware alone; it has been bypassable before.
+
+Path matching uses `matchesPath()` (exact or `prefix + '/'`), never bare `startsWith` — `startsWith('/api/auth')` also matches `/api/authorize`. The `config.matcher` excludes by **path prefix** (`_next/`, `favicon.ico`), never by file extension: a pattern like `.*\.png$` also matches `/api/patients/<id>.png` and skips the whole gate.
+
+- Requests to `/api/*` get JSON `401`/`403`; page requests get redirects (`/login?error=no_access` or `/dashboard`). Preserve this split when adding guards.
+- Provisioning a new petugas: invite the user in Supabase Dashboard, then insert their row in `user_roles`. Public signup must stay disabled.
+
+### Audit log
+`lib/audit.ts` → `writeAudit(userEmail, entry)`. `user_email` is **always** taken from the server session (`getAuthedUser()`), never from the request body — `AuditEntry` has no such field. Mutating routes (`POST /api/examinations`, `PUT`/`DELETE /api/examinations/[id]`) write their own audit row; do not rely on the client calling `/api/audit`. `DELETE` reads `no_urut` before deleting, otherwise the trail is an unresolvable UUID. A failed audit insert is logged, never fatal.
 
 ### Data model: one wide `examinations` table
 Each lab parameter is its own text column on `examinations` (values stored as strings, often with a unit suffix like `"90 mg/dl"`). Patient identity lives in `patients`; `config` is a key/value table (`LIST_DOKTER`, `LIST_PETUGAS`, `logo_url`, `doctor_signature`, `tech_signature`, `print_template`).

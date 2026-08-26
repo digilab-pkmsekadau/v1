@@ -26,30 +26,40 @@ export async function GET(request: NextRequest) {
     const q = searchParams.get('q')?.trim() ?? '';
     const safeQ = sanitizeSearchTerm(q);
 
-    let query = db
-      .from('patients')
-      .select(`
-        id, nama, nik, jenis_kelamin, alamat, tgl_lahir, created_at,
-        examinations (status_biaya, tgl_permintaan, created_at)
-      `)
-      .limit(50);
+    const SELECT_COLS = `
+      id, nama, nik, jenis_kelamin, alamat, tgl_lahir, created_at,
+      examinations (status_biaya, tgl_permintaan, created_at)
+    `;
 
     if (q && !safeQ) {
-      return NextResponse.json({ data: [] });
+      return NextResponse.json({ data: [], total: 0, page: 1, pageSize: 25 });
     }
+
+    const pageSize = Math.min(Math.max(parseInt(searchParams.get('pageSize') ?? '25', 10) || 25, 5), 100);
+    const page = Math.max(parseInt(searchParams.get('page') ?? '1', 10) || 1, 1);
+    const from = (page - 1) * pageSize;
+
+    let listQuery = db
+      .from('patients')
+      .select(SELECT_COLS, { count: 'exact' });
 
     if (safeQ) {
-      query = query.or(`nama.ilike.%${safeQ}%,nik.ilike.%${safeQ}%`);
-    } else {
-      query = query.order('nama', { ascending: true });
+      listQuery = listQuery.or(`nama.ilike.%${safeQ}%,nik.ilike.%${safeQ}%`);
     }
 
-    const { data, error } = await query;
-    if (error) console.error('DB error:', error);
+    const { data, error, count } = await listQuery
+      .order('nama', { ascending: true })
+      .range(from, from + pageSize - 1);
+
+    if (error) {
+      console.error('DB error:', error);
       return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
+    }
+
+    const rows = (data ?? []) as unknown as Record<string, unknown>[];
 
     // Ambil status_biaya dari examination terbaru
-    const enriched: (Record<string, unknown> & { last_status_biaya: string | null; last_exam_count: number })[] = (data || []).map((p) => {
+    const enriched: (Record<string, unknown> & { last_status_biaya: string | null; last_exam_count: number })[] = rows.map((p) => {
       const exams = (p.examinations as Array<{ status_biaya?: string; tgl_permintaan?: string; created_at?: string }>) || [];
       const sorted = [...exams].sort((a, b) => {
         const da = new Date(a.tgl_permintaan || a.created_at || 0).getTime();
@@ -89,7 +99,13 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ data: enriched });
+    return NextResponse.json({
+      data: enriched,
+      total: count ?? enriched.length,
+      page,
+      pageSize,
+      totalPages: Math.max(Math.ceil((count ?? enriched.length) / pageSize), 1),
+    });
   } catch {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }

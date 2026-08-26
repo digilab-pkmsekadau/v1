@@ -2,7 +2,8 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
-import { requireAdmin, requireAuth } from '@/lib/require-auth';
+import { writeAudit } from '@/lib/audit';
+import { getAuthedUser, requireAdmin, requireAuth } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
 
 export const dynamic = 'force-dynamic';
@@ -12,7 +13,6 @@ const auditSchema = z.object({
   entity: z.string().min(1).max(100),
   entity_id: z.string().max(100).optional(),
   description: z.string().max(1000).optional(),
-  user_email: z.string().email().max(320).optional(),
 });
 
 // GET /api/audit — ambil log aktivitas terbaru (admin only)
@@ -53,21 +53,13 @@ export async function POST(request: NextRequest) {
     const denied = await requireAuth();
     if (denied) return denied;
 
-    const db = createServerClient();
     const parsed = auditSchema.safeParse(await request.json());
     if (!parsed.success) {
       return NextResponse.json({ error: 'Data tidak valid' }, { status: 400 });
     }
 
-    const { error } = await db.from('audit_log').insert(parsed.data);
-
-    if (error) {
-      if (error.code === '42P01') {
-        return NextResponse.json({ success: true, message: 'audit_log table not found, skipped' });
-      }
-      console.error('DB error:', error);
-      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
-    }
+    const user = await getAuthedUser();
+    await writeAudit(user?.email, parsed.data);
 
     return NextResponse.json({ success: true });
   } catch {

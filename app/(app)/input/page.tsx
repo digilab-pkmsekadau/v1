@@ -505,7 +505,7 @@ export default function InputPage() {
             <select value={patient.dokter}
               onChange={e => setField('dokter', e.target.value)}
               className="brutal-input">
-              <option value="">â€” Pilih Dokter â€”</option>
+              <option value="">— Pilih Dokter —</option>
               {dokters.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
           </div>
@@ -516,7 +516,7 @@ export default function InputPage() {
             <select value={patient.petugas}
               onChange={e => setField('petugas', e.target.value)}
               className="brutal-input">
-              <option value="">â€” Pilih Petugas â€”</option>
+              <option value="">— Pilih Petugas —</option>
               {petugasList.map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>

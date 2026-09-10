@@ -80,7 +80,7 @@ export default function StatistikPage() {
         </div>
       ) : (
         <>
-          {/* Bar Chart â€” Tren Bulanan */}
+          {/* Bar Chart — Tren Bulanan */}
           <div className="mb-3 flex items-center gap-2.5">
             <span className="clay-icon clay-icon-cat clay-icon-sm w-8 h-8" style={{ '--clay-a': '#22d3ee', '--clay-b': '#0891b2' } as CSSProperties}>
               <BarChart3 size={15} strokeWidth={2.3} className="text-white" />
@@ -130,7 +130,7 @@ export default function StatistikPage() {
             )}
           </div>
 
-          {/* Donut Chart â€” Distribusi per golongan pemeriksaan */}
+          {/* Donut Chart — Distribusi per golongan pemeriksaan */}
           <div className="mb-3 flex items-center gap-2.5">
             <span className="clay-icon clay-icon-cat clay-icon-sm w-8 h-8" style={{ '--clay-a': activeGroup.a, '--clay-b': activeGroup.b } as CSSProperties}>
               <PieChart size={15} strokeWidth={2.3} className="text-white" />

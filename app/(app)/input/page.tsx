@@ -15,10 +15,10 @@ import { isAbnormal, getNormalRangeText, isPositivePregnancy } from '@/lib/norma
 import { PARAM_OPTIONS, ALL_PARAMS, getParamInfo } from '@/lib/param-options';
 import type { FormInputData, ParamItem, StatusBiaya } from '@/types';
 
-// â”€â”€â”€ Daftar semua parameter lab (dikelompokkan) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Daftar semua parameter lab (dikelompokkan)
 // Konstanta dipindah ke `lib/param-options.ts`. Lihat impor di atas.
 
-// â”€â”€â”€ Searchable Parameter Dropdown â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+// Searchable Parameter Dropdown
 
 // Define Zod schema
 const patientSchema = z.object({
@@ -82,7 +82,7 @@ function SearchableParamSelect({
           ${open ? 'border-teal-400 ring-2 ring-teal-100' : 'border-slate-200 hover:border-slate-300'}
           ${selected ? 'text-slate-700 font-medium' : 'text-slate-400'}`}
       >
-        <span className="truncate">{selected ? selected.label : 'â€” Pilih Parameter â€”'}</span>
+        <span className="truncate">{selected ? selected.label : '— Pilih Parameter —'}</span>
         <ChevronDown size={14} className={`flex-shrink-0 text-slate-400 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
       </button>
 
@@ -102,7 +102,7 @@ function SearchableParamSelect({
               />
               {query && (
                 <button type="button" onClick={() => setQuery('')}
-                  className="text-slate-400 hover:text-slate-600 text-xs font-bold">âœ•</button>
+                  className="text-slate-400 hover:text-slate-600 text-xs font-bold">✕</button>
               )}
             </div>
           </div>
@@ -182,7 +182,7 @@ export default function InputPage() {
     setValue(field, value as any, { shouldValidate: true });
   };
 
-  // Saat user pilih pasien dari dropdown autocomplete â†’ auto-isi semua field identitas
+  // Saat user pilih pasien dari dropdown autocomplete → auto-isi semua field identitas
   const handleSelectPatient = (p: PatientSuggestion) => {
     setValue('nama_pasien', p.nama || '', { shouldValidate: true });
     setValue('nik', p.nik || '', { shouldValidate: true });
@@ -267,7 +267,7 @@ export default function InputPage() {
         if (isEmpty && typeof p[key] === 'string' && p[key].trim()) {
           setValue(key, p[key] as PatientFormData[typeof key], { shouldValidate: true });
           // setValue tidak lewat onChange, jadi tautan ke pasien terpilih harus
-          // dilepas manual â€” kalau tidak, hasil bisa masuk ke riwayat pasien lain.
+          // dilepas manual — kalau tidak, hasil bisa masuk ke riwayat pasien lain.
           if (key === 'nama_pasien' || key === 'nik') setMatchedPatientId(null);
         }
       }
@@ -326,7 +326,7 @@ export default function InputPage() {
       const responseData = await res.json();
       if (!res.ok) { toast.error(responseData.error || 'Gagal menyimpan data'); return; }
 
-      // â”€â”€ Cek nilai kritis setelah simpan â”€â”€
+      // Cek nilai kritis setelah simpan
       const abnormals = filledParams.filter(p => isAbnormal(p.paramKey, p.value, patient.jenis_kelamin));
       setSuccessNo(responseData.no_urut);
       handleReset();
@@ -337,7 +337,7 @@ export default function InputPage() {
           return `${info?.label ?? p.paramKey}: ${p.value}${info?.unit ? ' ' + info.unit : ''}`;
         });
         toast.warning(
-          `âš ï¸ NILAI KRITIS â€” ${patient.nama_pasien}\n${labels.join(', ')}`,
+          `⚠️ NILAI KRITIS — ${patient.nama_pasien}\n${labels.join(', ')}`,
           { duration: 8000, description: 'Segera laporkan ke dokter perujuk.' }
         );
       } else {
@@ -406,7 +406,7 @@ export default function InputPage() {
         </div>
       )}
 
-      {/* â”€â”€ IDENTITAS PASIEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* Identitas pasien */}
       <div className="brutal-card p-5 mb-4">
         <div className="flex items-center gap-3 mb-4">
           <div className="brutal-icon-sm bg-orange-500 border-black dark:border-white"
@@ -523,7 +523,7 @@ export default function InputPage() {
         </div>
       </div>
 
-      {/* â”€â”€ PARAMETER LAB (DYNAMIC) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* Parameter lab */}
       <div className="brutal-card p-5 mb-4">
         <div className="flex items-center gap-3 mb-4">
           <div className="brutal-icon-sm bg-orange-500 border-black dark:border-white"
@@ -590,7 +590,7 @@ export default function InputPage() {
                           onChange={e => updateParam(item.id, 'value', e.target.value)}
                           className={`input-premium ${abnormal ? '!border-red-300 dark:!border-red-800 !text-red-700 dark:!text-red-400 !bg-red-50 dark:!bg-red-950/30' : ''} ${positive ? '!border-emerald-300 dark:!border-emerald-800 !text-emerald-700 dark:!text-emerald-400 !bg-emerald-50 dark:!bg-emerald-950/30' : ''}`}
                         >
-                          <option value="">â€” Pilih â€”</option>
+                          <option value="">— Pilih —</option>
                           {info.opts.map(o => <option key={o} value={o}>{o}</option>)}
                         </select>
                       ) : (
@@ -608,7 +608,7 @@ export default function InputPage() {
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <AlertTriangle size={11} className="text-red-500 flex-shrink-0" />
                           <span className="text-[11px] font-semibold text-red-600">
-                            Nilai di luar batas normal â€” segera laporkan ke dokter
+                            Nilai di luar batas normal — segera laporkan ke dokter
                           </span>
                         </div>
                       )}
@@ -617,7 +617,7 @@ export default function InputPage() {
                         <div className="flex items-center gap-1.5 mt-0.5">
                           <CheckCircle2 size={11} className="text-emerald-500 flex-shrink-0" />
                           <span className="text-[11px] font-semibold text-emerald-600">
-                            Hasil positif â€” kehamilan terdeteksi
+                            Hasil positif — kehamilan terdeteksi
                           </span>
                         </div>
                       )}
@@ -640,7 +640,7 @@ export default function InputPage() {
         </button>
       </div>
 
-      {/* â”€â”€ ACTION BUTTONS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* Tombol aksi */}
       <div className="flex gap-3 pb-4">
         <button
           type="button"

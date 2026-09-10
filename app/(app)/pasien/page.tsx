@@ -149,7 +149,7 @@ export default function PasienPage() {
 
               >
                 {/* Avatar with unique gradient */}
-                <div className="w-11 h-11 rounded-xl border-2 border-black dark:border-white flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
+                <div className="relative overflow-hidden w-11 h-11 rounded-xl border-2 border-black dark:border-white flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                   style={{ background: getAvatarGradient(p.nama) }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />

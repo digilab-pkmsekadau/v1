@@ -33,7 +33,7 @@ interface Props {
 }
 
 /**
- * Autocomplete pasien â€” cari berdasarkan nama atau NIK.
+ * Autocomplete pasien — cari berdasarkan nama atau NIK.
  * Memunculkan dropdown saat user mengetik ≥ 2 karakter.
  */
 export default function PatientAutocomplete({
@@ -112,7 +112,7 @@ export default function PatientAutocomplete({
     else if (e.key === 'Escape') { setOpen(false); }
   };
 
-  // Format tanggal lahir â†’ "12 Mar 1990"
+  // Format tanggal lahir → "12 Mar 1990"
   const fmtDate = (s: string | null) => {
     if (!s) return '-';
     try {
@@ -145,7 +145,7 @@ export default function PatientAutocomplete({
         <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white dark:bg-zinc-900 border-2 border-black dark:border-white rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] overflow-hidden"
           style={{ maxHeight: 320 }}>
           <div className="px-3 py-2 text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest bg-gray-100 dark:bg-zinc-800 flex items-center gap-1.5 border-b-2 border-black dark:border-white">
-            <History size={11} /> Pasien Ditemukan â€” {items.length} hasil
+            <History size={11} /> Pasien Ditemukan — {items.length} hasil
           </div>
           <div className="overflow-y-auto" style={{ maxHeight: 280 }}>
             {items.map((p, idx) => (
@@ -159,7 +159,7 @@ export default function PatientAutocomplete({
                 <div className="flex items-center justify-between gap-2">
                   <div className="font-black text-black dark:text-white truncate">
                     {field === 'nik' && p.nik ? (
-                      <span><span className="text-teal-600 dark:text-teal-400">{p.nik}</span> Â· {p.nama}</span>
+                      <span><span className="text-teal-600 dark:text-teal-400">{p.nik}</span> · {p.nama}</span>
                     ) : (
                       p.nama
                     )}
@@ -171,20 +171,20 @@ export default function PatientAutocomplete({
                       </span>
                     )}
                     <span className="text-[10px] font-bold text-slate-400">
-                      {p.jenis_kelamin === 'L' ? 'â™‚ L' : p.jenis_kelamin === 'P' ? 'â™€ P' : '-'}
+                      {p.jenis_kelamin === 'L' ? '♂ L' : p.jenis_kelamin === 'P' ? '♀ P' : '-'}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                   {field !== 'nik' && p.nik && <span className="font-mono">{p.nik}</span>}
-                  {p.tgl_lahir && <span>Â· {fmtDate(p.tgl_lahir)}</span>}
-                  {p.alamat && <span className="truncate">Â· {p.alamat}</span>}
+                  {p.tgl_lahir && <span>· {fmtDate(p.tgl_lahir)}</span>}
+                  {p.alamat && <span className="truncate">· {p.alamat}</span>}
                 </div>
               </button>
             ))}
           </div>
           <div className="px-3 py-1.5 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border-t-2 border-black dark:border-white flex items-center justify-between font-bold">
-            <span>â†‘â†“ navigasi Â· Enter pilih Â· Esc tutup</span>
+            <span>↑↓ navigasi · Enter pilih · Esc tutup</span>
             <button type="button" onClick={() => setOpen(false)} className="hover:text-slate-600">
               <X size={12} />
             </button>

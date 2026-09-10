@@ -55,9 +55,6 @@ export default function PasienPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  // Reset ke halaman 1 setiap kata kunci berubah.
-  useEffect(() => { setPage(1); }, [query]);
-
   useEffect(() => {
     const q = query.trim();
     const shouldSearch = q.length >= 2;
@@ -88,30 +85,27 @@ export default function PasienPage() {
     <div className="px-4 py-5 animate-slide-up">
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
-        <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #0d9488, #14b8a6)' }}>
+        <div className="brutal-icon-lg bg-orange-500 border-black dark:border-white"
+          >
           <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
           <Users size={20} className="text-white relative z-10" />
         </div>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight">Data Pasien</h1>
-          <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">Cari & lihat riwayat pemeriksaan pasien</p>
+          <h1 className="text-2xl font-black text-black dark:text-white tracking-tight uppercase">Data Pasien</h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400 font-bold">Cari & lihat riwayat pemeriksaan pasien</p>
         </div>
       </div>
 
       {/* Search */}
-      <div className="glass-panel p-3 mb-5">
-        <div className="flex items-center gap-2.5 rounded-2xl px-4 py-3 transition-all duration-200 focus-within:shadow-md"
-          style={{
-            background: 'var(--surface)',
-            border: '1.5px solid var(--border)',
-          }}
+      <div className="bg-white dark:bg-zinc-900 border-2 border-black dark:border-white rounded-2xl p-3 mb-5" style={{ boxShadow: '3px 3px 0px 0px rgba(0,0,0,1)' }}>
+        <div className="flex items-center gap-2.5 rounded-xl px-4 py-3 border-2 border-black dark:border-white bg-white dark:bg-zinc-900"
+          
         >
           <Search size={16} className="text-slate-400 dark:text-slate-500 flex-shrink-0" />
           <input
             type="text"
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => { setQuery(e.target.value); setPage(1); }}
             placeholder="Cari nama atau NIK pasien..."
             className="flex-1 bg-transparent text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none"
             autoFocus
@@ -121,7 +115,7 @@ export default function PasienPage() {
       </div>
 
       {/* Patient List */}
-      <div className="glass-panel overflow-hidden">
+      <div className="bg-white dark:bg-zinc-900 border-2 border-black dark:border-white rounded-2xl overflow-hidden" style={{ boxShadow: '3px 3px 0px 0px rgba(0,0,0,1)' }}>
         {loading && patients.length === 0 ? (
           <div className="flex justify-center py-12">
             <Loader2 size={24} className="animate-spin text-teal-500" />
@@ -137,7 +131,7 @@ export default function PasienPage() {
             <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Coba gunakan kata kunci lain</p>
           </div>
         ) : (
-          <div className="divide-y divide-slate-50 dark:divide-slate-800/50">
+          <div>
             {patients.length > 0 && (
               <div className="px-4 py-2.5"
                 style={{ background: 'var(--surface)' }}
@@ -151,11 +145,11 @@ export default function PasienPage() {
               <button
                 key={p.id}
                 onClick={() => router.push(`/pasien/${p.id}`)}
-                className="animate-stagger w-full flex items-center gap-3 px-4 py-3.5 hover:bg-teal-50/30 dark:hover:bg-teal-950/20 transition-all duration-200 text-left group active:scale-[0.98]"
-                style={{ animationDelay: `${i * 30}ms` }}
+                className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-orange-50 dark:hover:bg-zinc-800 text-left group border-b-2 border-black dark:border-white last:border-b-0"
+
               >
                 {/* Avatar with unique gradient */}
-                <div className="w-11 h-11 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm relative overflow-hidden"
+                <div className="w-11 h-11 rounded-xl border-2 border-black dark:border-white flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                   style={{ background: getAvatarGradient(p.nama) }}
                 >
                   <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
@@ -181,7 +175,7 @@ export default function PasienPage() {
                     <div className="text-[11px] text-slate-400 dark:text-slate-500 truncate">{p.alamat}</div>
                   )}
                 </div>
-                <ChevronRight size={16} className="text-slate-300 dark:text-slate-600 flex-shrink-0 group-hover:text-teal-500 dark:group-hover:text-teal-400 group-hover:translate-x-1 transition-all duration-200" />
+                <ChevronRight size={16} className="text-slate-300 dark:text-slate-600 flex-shrink-0 group-hover:text-teal-500 dark:group-hover:text-teal-400 group-hover:translate-x-1" />
               </button>
             ))}
           </div>
@@ -193,10 +187,10 @@ export default function PasienPage() {
         <div className="mt-4 flex items-center justify-center gap-1.5 flex-wrap">
           <button
             onClick={() => setPage(p => Math.max(p - 1, 1))}
-            disabled={page === 1 || loading}
+            disabled={page === 1}
             aria-label="Halaman sebelumnya"
-            className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.03] active:scale-95"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-black uppercase border-2 border-black dark:border-white bg-white dark:bg-zinc-800 text-black dark:text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] disabled:opacity-40"
+            
           >
             <ChevronLeft size={14} /> Prev
           </button>
@@ -208,16 +202,14 @@ export default function PasienPage() {
               <button
                 key={n}
                 onClick={() => setPage(n)}
-                disabled={loading}
+                disabled={false}
                 aria-current={n === page ? 'page' : undefined}
-                className={`min-w-9 px-3 py-2 rounded-xl text-xs font-bold transition-all hover:scale-[1.03] active:scale-95 ${
+                className={`min-w-9 px-3 py-2 rounded-xl text-xs font-bold ${
                   n === page
                     ? 'text-white'
                     : 'text-slate-600 dark:text-slate-300'
                 }`}
-                style={n === page
-                  ? { background: 'linear-gradient(135deg, #2dd4bf, #0d9488)', boxShadow: '0 6px 18px -6px rgba(13,148,136,0.5)' }
-                  : { background: 'var(--surface)', border: '1px solid var(--border)' }}
+                style={n === page ? { background: '#f97316', borderColor: 'black' } : {}}
               >
                 {n}
               </button>
@@ -226,10 +218,10 @@ export default function PasienPage() {
 
           <button
             onClick={() => setPage(p => Math.min(p + 1, totalPages))}
-            disabled={page === totalPages || loading}
+            disabled={page === totalPages}
             aria-label="Halaman berikutnya"
-            className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all hover:scale-[1.03] active:scale-95"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            className="flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-black uppercase border-2 border-black dark:border-white bg-white dark:bg-zinc-800 text-black dark:text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] disabled:opacity-40"
+            
           >
             Next <ChevronRight size={14} />
           </button>
@@ -238,3 +230,4 @@ export default function PasienPage() {
     </div>
   );
 }
+

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Settings, Users, Stethoscope, Save, Loader2, Shield, Tag, Trash2, AlertTriangle, Download, DatabaseBackup, Upload, Image, FileText } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -11,8 +11,8 @@ function SaveButton({ keyName, label, value, saving, onSave }: { keyName: string
     <button
       onClick={() => onSave(keyName, value, label)}
       disabled={saving === keyName}
-      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] active:scale-95"
-      style={{ background: 'linear-gradient(135deg, #0d9488, #0f766e)', boxShadow: '0 4px 16px -4px rgba(13,148,136,0.35)' }}
+      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-orange-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 transition-all"
+      
     >
       {saving === keyName ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
       Simpan
@@ -147,29 +147,29 @@ export default function SettingsPage() {
   return (
     <div className="px-4 py-5 animate-slide-up">
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg relative overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, #0f766e, #0d9488)' }}>
+        <div className="brutal-icon-lg bg-orange-500 border-black dark:border-white"
+          >
           <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
           <Settings size={19} className="text-white relative z-10" />
         </div>
         <div>
-          <h1 className="text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight">Pengaturan</h1>
-          <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">Konfigurasi aplikasi</p>
+          <h1 className="text-2xl font-black text-black dark:text-white tracking-tight uppercase">Pengaturan</h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400 font-bold">Konfigurasi aplikasi</p>
         </div>
       </div>
 
 
 
-      {/* ── Daftar Dokter ─────────────────────────────────────── */}
-      <div className="glass-panel p-5 mb-4">
+      {/* â”€â”€ Daftar Dokter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <div className="brutal-card p-5 mb-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.12), rgba(59,130,246,0.08))' }}
+            <div className="brutal-icon-sm bg-indigo-400 border-black dark:border-white"
+              
             >
               <Stethoscope size={15} className="text-blue-600 dark:text-blue-400" />
             </div>
-            <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Daftar Dokter</h2>
+            <h2 className="text-sm font-black text-black dark:text-white uppercase">Daftar Dokter</h2>
           </div>
           <SaveButton keyName="LIST_DOKTER" label="Daftar Dokter" value={dokterList} saving={saving} onSave={handleSave} />
         </div>
@@ -180,22 +180,22 @@ export default function SettingsPage() {
             onChange={e => setDokterList(e.target.value)}
             rows={4}
             placeholder="dr. Nama Dokter 1, dr. Nama Dokter 2"
-            className="input-premium resize-none"
+            className="brutal-input resize-none"
           />
         </div>
         <TagPills text={dokterList} color="bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40" />
       </div>
 
-      {/* ── Daftar Petugas ────────────────────────────────────── */}
-      <div className="glass-panel p-5 mb-6">
+      {/* â”€â”€ Daftar Petugas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <div className="brutal-card p-5 mb-6">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.12), rgba(168,85,247,0.08))' }}
+            <div className="brutal-icon-sm bg-indigo-400 border-black dark:border-white"
+              
             >
               <Users size={15} className="text-purple-600 dark:text-purple-400" />
             </div>
-            <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Daftar Petugas</h2>
+            <h2 className="text-sm font-black text-black dark:text-white uppercase">Daftar Petugas</h2>
           </div>
           <SaveButton keyName="LIST_PETUGAS" label="Daftar Petugas" value={petugasList} saving={saving} onSave={handleSave} />
         </div>
@@ -206,46 +206,46 @@ export default function SettingsPage() {
             onChange={e => setPetugasList(e.target.value)}
             rows={3}
             placeholder="Nama Petugas 1, Nama Petugas 2"
-            className="input-premium resize-none"
+            className="brutal-input resize-none"
           />
         </div>
         <TagPills text={petugasList} color="bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-900/40" />
       </div>
 
-      {/* ── Audit Log ─────────────────────────────────────────── */}
-      <div className="glass-panel p-5 mb-4">
+      {/* â”€â”€ Audit Log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <div className="brutal-card p-5 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, rgba(124,58,237,0.12), rgba(147,51,234,0.08))' }}
+            <div className="brutal-icon-sm bg-indigo-400 border-black dark:border-white"
+              
             >
               <Shield size={15} className="text-purple-600 dark:text-purple-400" />
             </div>
             <div>
-              <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Audit Log</h2>
+              <h2 className="text-sm font-black text-black dark:text-white uppercase">Audit Log</h2>
               <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Riwayat perubahan data sistem</p>
             </div>
           </div>
           <a
             href="/settings/audit"
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all duration-200 hover:scale-[1.02] active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #7c3aed, #9333ea)', boxShadow: '0 4px 16px -4px rgba(124,58,237,0.35)' }}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black uppercase text-white border-2 border-black dark:border-white bg-indigo-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+            
           >
-            Lihat Log →
+            Lihat Log â†’
           </a>
         </div>
       </div>
-      {/* ── Backup Database ────────────────────────────────────── */}
-      <div className="glass-panel p-5 mb-4">
+      {/* â”€â”€ Backup Database â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <div className="brutal-card p-5 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-2xl flex items-center justify-center"
-              style={{ background: 'linear-gradient(135deg, rgba(5,150,105,0.14), rgba(16,185,129,0.08))' }}
+            <div className="brutal-icon-sm bg-indigo-400 border-black dark:border-white"
+              
             >
               <DatabaseBackup size={16} className="text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Backup Database</h2>
+              <h2 className="text-sm font-black text-black dark:text-white uppercase">Backup Database</h2>
               <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">
                 Unduh seluruh data pasien &amp; pemeriksaan (.JSON)
               </p>
@@ -254,8 +254,8 @@ export default function SettingsPage() {
           <button
             onClick={handleBackup}
             disabled={backingUp}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold text-white transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] active:scale-95 whitespace-nowrap"
-            style={{ background: 'linear-gradient(135deg, #059669, #10b981)', boxShadow: '0 4px 16px -4px rgba(5,150,105,0.35)' }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-emerald-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 transition-all whitespace-nowrap"
+            
           >
             {backingUp ? <Loader2 size={14} className="animate-spin" /> : <Download size={14} />}
             {backingUp ? 'Memproses...' : 'Unduh Backup'}
@@ -280,7 +280,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* ── Manajemen Data Tahunan ────────────────────────────── */}
+      {/* â”€â”€ Manajemen Data Tahunan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
       <div className="glass-panel p-5 mt-6 mb-6 border border-red-200/50 dark:border-red-900/30 overflow-hidden relative">
         <div className="absolute inset-0 bg-red-50/30 dark:bg-red-950/10 pointer-events-none" />
         <div className="relative z-10">
@@ -310,8 +310,8 @@ export default function SettingsPage() {
             <button
               onClick={handleDeleteYear}
               disabled={saving === 'delete_year'}
-              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-[11px] rounded-xl text-sm font-bold text-white transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] active:scale-95 whitespace-nowrap"
-              style={{ background: 'linear-gradient(135deg, #ef4444, #dc2626)', boxShadow: '0 4px 16px -4px rgba(239,68,68,0.35)' }}
+              className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-[11px] rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-rose-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 transition-all whitespace-nowrap"
+              
             >
               {saving === 'delete_year' ? <Loader2 size={15} className="animate-spin" /> : <Trash2 size={15} />}
               Hapus Data
@@ -320,16 +320,16 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* ── Kustomisasi Kop Surat ──────────────────────────────── */}
-      <div className="glass-panel p-5 mt-6 mb-6">
+      {/* â”€â”€ Kustomisasi Kop Surat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      <div className="brutal-card p-5 mt-6 mb-6">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-9 h-9 rounded-2xl flex items-center justify-center"
-            style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.14), rgba(234,179,8,0.08))' }}
+          <div className="brutal-icon-sm bg-indigo-400 border-black dark:border-white"
+            
           >
             <FileText size={16} className="text-amber-600 dark:text-amber-400" />
           </div>
           <div>
-            <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Kustomisasi Kop Surat</h2>
+            <h2 className="text-sm font-black text-black dark:text-white uppercase">Kustomisasi Kop Surat</h2>
             <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Konfigurasi tampilan cetak hasil lab</p>
           </div>
         </div>
@@ -353,7 +353,7 @@ export default function SettingsPage() {
                 value={logoUrl}
                 onChange={e => setLogoUrl(e.target.value)}
                 placeholder="URL gambar logo (http/https)"
-                className="input-premium mb-2"
+                className="brutal-input mb-2"
               />
               <div className="flex items-center gap-2">
                 <label className="cursor-pointer flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-400 transition-colors">
@@ -383,7 +383,7 @@ export default function SettingsPage() {
             value={doctorSignature}
             onChange={e => setDoctorSignature(e.target.value)}
             placeholder="Nama Dokter / Nomor SIP"
-            className="input-premium"
+            className="brutal-input"
           />
         </div>
 
@@ -397,7 +397,7 @@ export default function SettingsPage() {
             value={techSignature}
             onChange={e => setTechSignature(e.target.value)}
             placeholder="Nama Petugas"
-            className="input-premium"
+            className="brutal-input"
           />
         </div>
 
@@ -411,13 +411,13 @@ export default function SettingsPage() {
             onChange={e => setPrintTemplate(e.target.value)}
             rows={3}
             placeholder="Header khusus untuk cetak (opsional)"
-            className="input-premium resize-none"
+            className="brutal-input resize-none"
           />
           <button
             onClick={() => handleSave('print_template', printTemplate, 'Template Cetak')}
             disabled={saving === 'print_template'}
-            className="mt-2 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold text-white transition-all duration-200 disabled:opacity-50 hover:scale-[1.02] active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #f59e0b, #d97706)', boxShadow: '0 4px 16px -4px rgba(245,158,11,0.35)' }}
+            className="mt-2 flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black uppercase text-white border-2 border-black dark:border-white bg-amber-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 transition-all"
+            
           >
             {saving === 'print_template' ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
             Simpan Template
@@ -426,10 +426,11 @@ export default function SettingsPage() {
       </div>
 
       {/* Info */}
-      <div className="glass-panel p-4">
+      <div className="brutal-card p-4">
         <p className="text-xs text-slate-500 dark:text-slate-400 text-center font-semibold">DigiLab Puskesmas • Versi 1.0.0</p>
         <p className="text-[11px] text-slate-400 dark:text-slate-500 text-center mt-1">Powered by Next.js + Supabase</p>
       </div>
     </div>
   );
 }
+

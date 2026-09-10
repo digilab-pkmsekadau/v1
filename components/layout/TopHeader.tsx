@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { TestTubes, LogOut, Moon, Sun } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -39,34 +39,18 @@ export default function TopHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-40 transition-all duration-300"
-      style={{
-        background: isDark
-          ? 'rgba(11, 17, 32, 0.78)'
-          : 'rgba(255, 255, 255, 0.72)',
-        backdropFilter: 'blur(24px) saturate(180%)',
-        WebkitBackdropFilter: 'blur(24px) saturate(180%)',
-        borderBottom: isDark
-          ? '1px solid rgba(148, 163, 184, 0.06)'
-          : '1px solid rgba(255, 255, 255, 0.3)',
-        boxShadow: '0 1px 12px rgba(0, 0, 0, 0.04)',
-      }}
-    >
+    <header className="fixed top-0 left-0 right-0 z-40 bg-[#FAF9F6] dark:bg-zinc-950 border-b-2 border-black dark:border-white transition-colors duration-200">
       <div className="flex items-center justify-between px-4 h-16 max-w-2xl mx-auto">
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div
-            className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-lg relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #0f766e, #14b8a6)' }}
-          >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
-            <TestTubes size={19} className="text-white relative z-10" strokeWidth={2.3} />
+          <div className="w-10 h-10 rounded-xl bg-orange-500 border-2 border-black dark:border-white flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
+            <TestTubes size={19} className="text-white" strokeWidth={2.5} />
           </div>
           <div>
-            <div className="font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-teal-700 to-teal-500 dark:from-teal-400 dark:to-teal-300 text-base leading-tight tracking-tight">
+            <div className="font-black text-black dark:text-white text-base leading-tight tracking-tight">
               DigiLab
             </div>
-            <div className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold leading-tight tracking-wide">
+            <div className="text-[10px] text-gray-500 dark:text-gray-400 font-bold leading-tight tracking-wide uppercase">
               Puskesmas Sekadau
             </div>
           </div>
@@ -78,20 +62,12 @@ export default function TopHeader() {
           <button
             onClick={toggle}
             aria-label={isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
-            className="w-10 h-10 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            style={{
-              background: isDark
-                ? 'rgba(148, 163, 184, 0.08)'
-                : 'rgba(241, 245, 249, 0.8)',
-              border: isDark
-                ? '1px solid rgba(148, 163, 184, 0.1)'
-                : '1px solid rgba(226, 232, 240, 0.6)',
-            }}
+            className="w-10 h-10 rounded-xl border-2 border-black dark:border-white bg-white dark:bg-zinc-800 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
             title={isDark ? 'Light Mode' : 'Dark Mode'}
           >
             {isDark
-              ? <Sun size={17} className="text-amber-400" />
-              : <Moon size={17} className="text-slate-500" />
+              ? <Sun size={17} className="text-amber-400" strokeWidth={2.5} />
+              : <Moon size={17} className="text-black" strokeWidth={2.5} />
             }
           </button>
 
@@ -100,18 +76,10 @@ export default function TopHeader() {
             onClick={handleLogout}
             disabled={loggingOut}
             aria-label="Keluar dari aplikasi"
-            className="w-10 h-10 rounded-2xl flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105 active:scale-90 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-            style={{
-              background: isDark
-                ? 'rgba(220, 38, 38, 0.08)'
-                : 'rgba(254, 242, 242, 0.8)',
-              border: isDark
-                ? '1px solid rgba(220, 38, 38, 0.12)'
-                : '1px solid rgba(254, 202, 202, 0.5)',
-            }}
+            className="w-10 h-10 rounded-xl border-2 border-black dark:border-white bg-rose-400 dark:bg-rose-500 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer disabled:opacity-50"
             title="Keluar"
           >
-            <LogOut size={17} className="text-red-500" />
+            <LogOut size={17} className="text-black dark:text-white" strokeWidth={2.5} />
           </button>
         </div>
       </div>

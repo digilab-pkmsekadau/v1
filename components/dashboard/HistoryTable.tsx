@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Trash2, Search, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -57,11 +57,8 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
     <div>
       {/* Search */}
       <div className="p-3 border-b border-slate-100/80 dark:border-slate-800/50">
-        <div className="flex items-center gap-2 rounded-2xl px-3 py-2.5 transition-all duration-200 focus-within:shadow-sm"
-          style={{
-            background: 'var(--surface)',
-            border: '1.5px solid var(--border)',
-          }}
+        <div className="flex items-center gap-2 rounded-xl px-3 py-2.5 border-2 border-black dark:border-white bg-white dark:bg-zinc-900"
+          
         >
           <Search size={14} className="text-slate-400 dark:text-slate-500" aria-hidden="true" />
           <input
@@ -79,12 +76,12 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-slate-100/80 dark:border-slate-800/40"
-              style={{ background: 'var(--surface)' }}
+            <tr className="border-b-2 border-black dark:border-white"
+              
             >
-              <th className="text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">No</th>
-              <th className="text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Pasien</th>
-              <th className="text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Tgl</th>
+              <th className="text-left py-3.5 px-3 text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest">No</th>
+              <th className="text-left py-3.5 px-3 text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest">Pasien</th>
+              <th className="text-left py-3.5 px-3 text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest">Tgl</th>
               <th className="hidden md:table-cell text-left py-3.5 px-3 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Dokter</th>
               <th className="py-3.5 px-3 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest text-center">Aksi</th>
             </tr>
@@ -105,21 +102,21 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
               paginated.map((row, i) => (
                 <tr
                   key={row.exam_id}
-                  className="animate-stagger border-b border-slate-50 dark:border-slate-800/30 transition-all duration-200 hover:bg-teal-50/30 dark:hover:bg-teal-950/15 group"
+                  className="animate-stagger border-b-2 border-black dark:border-white transition-all duration-150 hover:bg-orange-50 dark:hover:bg-zinc-800 group"
                   style={{
                     background: i % 2 === 0 ? 'transparent' : 'rgba(148, 163, 184, 0.02)',
                     animationDelay: `${i * 30}ms`,
                   }}
                 >
                   <td className="py-3.5 px-3">
-                    <span className="inline-flex items-center justify-center w-8 h-6 rounded-lg text-[11px] font-bold text-teal-700 dark:text-teal-400"
-                      style={{ background: 'linear-gradient(135deg, rgba(13,148,136,0.08), rgba(20,184,166,0.05))' }}
+                    <span className="inline-flex items-center justify-center min-w-[44px] h-7 px-2 rounded-lg text-[11px] font-black text-white bg-orange-500 border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
+                      
                     >
                       {row.no}
                     </span>
                   </td>
                   <td className="py-3.5 px-3">
-                    <div className="font-bold text-slate-800 dark:text-slate-200 text-sm leading-tight">{row.nama}</div>
+                    <div className="font-black text-black dark:text-white text-sm leading-tight">{row.nama}</div>
                     <div className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{row.biaya}</div>
                   </td>
                   <td className="py-3.5 px-3 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap font-medium">{row.tgl}</td>
@@ -130,27 +127,21 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
                       <button
                         onClick={() => router.push(`/riwayat/${row.exam_id}`)}
                         aria-label={`Lihat detail pemeriksaan ${row.nama}`}
-                        className="w-9 h-9 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(13,148,136,0.08), rgba(20,184,166,0.05))',
-                          border: '1px solid rgba(13,148,136,0.12)',
-                        }}
+                        className="w-8 h-8 rounded-lg border-2 border-black dark:border-white flex items-center justify-center cursor-pointer transition-all duration-150 bg-indigo-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                        
                         title="Lihat detail"
                       >
-                        <Eye size={13} className="text-teal-600 dark:text-teal-400" />
+                        <Eye size={13} className="text-white" />
                       </button>
                       {/* Tombol Hapus */}
                       <button
                         onClick={() => onDelete(row.exam_id)}
                         aria-label={`Hapus pemeriksaan ${row.nama}`}
-                        className="w-9 h-9 rounded-xl flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-                        style={{
-                          background: 'linear-gradient(135deg, rgba(220,38,38,0.06), rgba(239,68,68,0.04))',
-                          border: '1px solid rgba(220,38,38,0.10)',
-                        }}
+                        className="w-8 h-8 rounded-lg border-2 border-black dark:border-white flex items-center justify-center cursor-pointer transition-all duration-150 bg-rose-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                        
                         title="Hapus"
                       >
-                        <Trash2 size={13} className="text-red-400 dark:text-red-500" />
+                        <Trash2 size={13} className="text-white" />
                       </button>
                     </div>
                   </td>
@@ -170,18 +161,18 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
               aria-label="Halaman sebelumnya"
-              className="w-9 h-9 rounded-xl flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all duration-200 hover:scale-105 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+              className="w-8 h-8 rounded-lg border-2 border-black dark:border-white flex items-center justify-center disabled:opacity-30 cursor-pointer transition-all duration-150 bg-white dark:bg-zinc-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+              
             >
               <ChevronLeft size={14} className="text-slate-500 dark:text-slate-400" />
             </button>
-            <span className="text-xs font-bold text-slate-600 dark:text-slate-300 min-w-[50px] text-center">{page} / {totalPages}</span>
+            <span className="text-xs font-black text-black dark:text-white min-w-[50px] text-center">{page} / {totalPages}</span>
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
               aria-label="Halaman selanjutnya"
-              className="w-9 h-9 rounded-xl flex items-center justify-center disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all duration-200 hover:scale-105 active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-              style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+              className="w-8 h-8 rounded-lg border-2 border-black dark:border-white flex items-center justify-center disabled:opacity-30 cursor-pointer transition-all duration-150 bg-white dark:bg-zinc-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+              
             >
               <ChevronRight size={14} className="text-slate-500 dark:text-slate-400" />
             </button>
@@ -191,3 +182,4 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
     </div>
   );
 }
+

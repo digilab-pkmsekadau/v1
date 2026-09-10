@@ -1,5 +1,5 @@
-import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, Noto_Sans, Sora, JetBrains_Mono } from 'next/font/google';
+﻿import type { Metadata } from 'next';
+import { Plus_Jakarta_Sans } from 'next/font/google';
 
 import './globals.css';
 import { Toaster } from '@/components/ui/sonner';
@@ -8,24 +8,6 @@ const plusJakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
   variable: '--font-sans',
   weight: ['300', '400', '500', '600', '700', '800'],
-});
-
-const notoSans = Noto_Sans({
-  subsets: ['latin'],
-  variable: '--font-noto-sans',
-  weight: ['300', '400', '500', '700'],
-});
-
-const sora = Sora({
-  subsets: ['latin'],
-  variable: '--font-display',
-  weight: ['600', '700'],
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-mono',
-  weight: ['500', '600'],
 });
 
 export const metadata: Metadata = {
@@ -45,13 +27,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id">
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-        <meta name="theme-color" content="#0891b2" />
+        <meta name="theme-color" content="#f97316" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={`${plusJakarta.variable} ${notoSans.variable} ${sora.variable} ${jetbrainsMono.variable} font-sans antialiased text-slate-900 bg-cyan-50 dark:bg-slate-950 dark:text-slate-100 selection:bg-cyan-200 dark:selection:bg-cyan-900 motion-safe:transition-colors motion-safe:duration-200`}>
+      <body className={`${plusJakarta.variable} font-sans antialiased bg-[#FAF9F6] dark:bg-zinc-950 text-black dark:text-zinc-100 selection:bg-orange-200 dark:selection:bg-orange-900`}>
         {children}
         <Toaster position="top-center" richColors />
       </body>

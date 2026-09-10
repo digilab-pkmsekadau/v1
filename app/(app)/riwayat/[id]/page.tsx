@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import {
   ArrowLeft, Printer, Pencil, Save, X, AlertTriangle,
@@ -51,7 +51,7 @@ function LabValue({
     if (param?.type === 'select' && param.opts) {
       return (
         <select value={value} onChange={e => onChange(e.target.value)}
-          className="w-full border border-slate-200 rounded-xl px-2 py-1.5 text-sm bg-white focus:outline-none focus:border-teal-400">
+          className="w-full border-2 border-black dark:border-white rounded-lg px-2 py-1.5 text-sm bg-white dark:bg-zinc-800 focus:outline-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:focus:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
           <option value="">— Pilih —</option>
           {param.opts.map(o => <option key={o} value={o}>{o}</option>)}
         </select>
@@ -63,7 +63,7 @@ function LabValue({
         inputMode={param?.type === 'number' ? 'decimal' : 'text'}
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="w-full border border-slate-200 rounded-xl px-2 py-1.5 text-sm bg-white focus:outline-none focus:border-teal-400"
+        className="w-full border-2 border-black dark:border-white rounded-lg px-2 py-1.5 text-sm bg-white dark:bg-zinc-800 focus:outline-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:focus:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
       />
     );
   }
@@ -296,31 +296,31 @@ export default function RiwayatDetailPage() {
         {/* Header / Toolbar */}
         <div className="flex items-center justify-between mb-5 print:hidden">
           <button onClick={() => router.back()}
-            className="flex items-center gap-1.5 text-slate-500 hover:text-teal-600 transition-colors text-sm font-semibold">
+            className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors text-sm font-black uppercase">
             <ArrowLeft size={16} /> Kembali
           </button>
           <div className="flex items-center gap-2">
             {!editMode ? (
               <>
                 <button onClick={handlePrint}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors">
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-black uppercase border-2 border-black dark:border-white bg-white dark:bg-zinc-800 text-black dark:text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
                   <Printer size={14} /> Print
                 </button>
                 <button onClick={startEdit}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-white transition-colors"
-                  style={{ background: 'linear-gradient(135deg,#0d9488,#0f766e)' }}>
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-orange-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                  >
                   <Pencil size={14} /> Edit
                 </button>
               </>
             ) : (
               <>
                 <button onClick={() => setEditMode(false)} disabled={saving}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold bg-slate-100 hover:bg-slate-200 text-slate-600">
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-black uppercase border-2 border-black dark:border-white bg-white dark:bg-zinc-800 text-black dark:text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none">
                   <X size={14} /> Batal
                 </button>
                 <button onClick={handleSave} disabled={saving}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold text-white"
-                  style={{ background: 'linear-gradient(135deg,#0d9488,#0f766e)' }}>
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-emerald-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                  >
                   {saving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
                   Simpan
                 </button>
@@ -332,10 +332,10 @@ export default function RiwayatDetailPage() {
         {/* Judul print */}
         <div className="mb-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-extrabold text-slate-800">
+            <h1 className="text-lg font-black text-black dark:text-white uppercase">
               Detail Pemeriksaan
             </h1>
-            <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-teal-100 text-teal-700">
+            <span className="px-2 py-0.5 rounded-full text-xs font-black bg-orange-500 text-white border-2 border-black dark:border-white">
               {data.no_urut}
             </span>
           </div>
@@ -348,40 +348,40 @@ export default function RiwayatDetailPage() {
         </div>
 
         {/* Info Pasien */}
-        <div className="glass-panel p-4 mb-4 mt-3">
+        <div className="brutal-card p-4 mb-4 mt-3">
           <div className="flex items-center gap-2 mb-3">
             <User size={15} className="text-teal-600" />
-            <span className="font-extrabold text-sm text-slate-700">Data Pasien</span>
+            <span className="font-black text-sm text-black dark:text-white uppercase">Data Pasien</span>
           </div>
           <div className="grid grid-cols-2 gap-y-2 gap-x-3 text-sm">
             <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase">Nama</div>
+              <div className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase">Nama</div>
               <div className="font-semibold text-slate-800">{data.patients?.nama ?? '—'}</div>
             </div>
             <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase">NIK</div>
+              <div className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase">NIK</div>
               <div className="text-slate-600">{data.patients?.nik || '—'}</div>
             </div>
             <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase">Jenis Kelamin</div>
+              <div className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase">Jenis Kelamin</div>
               <div className="text-slate-600">{data.patients?.jenis_kelamin === 'L' ? 'Laki-Laki' : data.patients?.jenis_kelamin === 'P' ? 'Perempuan' : '—'}</div>
             </div>
             <div className="col-span-2">
-              <div className="text-[10px] font-bold text-slate-400 uppercase">Alamat</div>
+              <div className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase">Alamat</div>
               <div className="text-slate-600">{data.patients?.alamat || '—'}</div>
             </div>
             <div>
-              <div className="text-[10px] font-bold text-slate-400 uppercase">Tgl Lahir</div>
+              <div className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase">Tgl Lahir</div>
               <div className="text-slate-600">{data.patients?.tgl_lahir || '—'}</div>
             </div>
           </div>
         </div>
 
         {/* Info Kunjungan */}
-        <div className="glass-panel p-4 mb-4">
+        <div className="brutal-card p-4 mb-4">
           <div className="flex items-center gap-2 mb-3">
             <Calendar size={15} className="text-blue-600" />
-            <span className="font-extrabold text-sm text-slate-700">Info Kunjungan</span>
+            <span className="font-black text-sm text-black dark:text-white uppercase">Info Kunjungan</span>
           </div>
           <div className="grid grid-cols-2 gap-y-2 gap-x-3 text-sm">
             {[
@@ -391,17 +391,17 @@ export default function RiwayatDetailPage() {
               { label: 'Petugas', key: 'petugas', type: 'text' },
             ].map(field => (
               <div key={field.key}>
-                <div className="text-[10px] font-bold text-slate-400 uppercase">{field.label}</div>
+                <div className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase">{field.label}</div>
                 {editMode ? (
                   field.type === 'select' ? (
                     <select value={editData[field.key] ?? ''} onChange={e => setEditData(d => ({ ...d, [field.key]: e.target.value }))}
-                      className="w-full border border-slate-200 rounded-xl px-2 py-1.5 text-sm bg-white focus:outline-none focus:border-teal-400">
+                      className="w-full border-2 border-black dark:border-white rounded-lg px-2 py-1.5 text-sm bg-white dark:bg-zinc-800 focus:outline-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:focus:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
                       {(field.opts || []).map(o => <option key={o} value={o}>{o}</option>)}
                     </select>
                   ) : (
                     <input type={field.type} value={editData[field.key] ?? ''}
                       onChange={e => setEditData(d => ({ ...d, [field.key]: e.target.value }))}
-                      className="w-full border border-slate-200 rounded-xl px-2 py-1.5 text-sm bg-white focus:outline-none focus:border-teal-400"
+                      className="w-full border-2 border-black dark:border-white rounded-lg px-2 py-1.5 text-sm bg-white dark:bg-zinc-800 focus:outline-none focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:focus:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                     />
                   )
                 ) : (
@@ -414,15 +414,15 @@ export default function RiwayatDetailPage() {
 
         {/* Hasil Lab per Kategori */}
         {filledGroups.length === 0 && !editMode ? (
-          <div className="glass-panel p-6 text-center text-slate-400 text-sm">
+          <div className="brutal-card p-6 text-center text-gray-500 dark:text-gray-400 text-sm font-bold">
             Belum ada hasil pemeriksaan lab yang diinput.
           </div>
         ) : (
           filledGroups.map(group => (
-            <div key={group.group} className="glass-panel p-4 mb-4">
+            <div key={group.group} className="brutal-card p-4 mb-4">
               <div className="flex items-center gap-2 mb-3">
                 <Stethoscope size={15} className="text-purple-600" />
-                <span className="font-extrabold text-sm text-slate-700">{group.group}</span>
+                <span className="font-black text-sm text-black dark:text-white uppercase">{group.group}</span>
               </div>
               <div className="grid grid-cols-2 gap-y-3 gap-x-3">
                 {group.params.map(param => (
@@ -446,8 +446,8 @@ export default function RiwayatDetailPage() {
         )}
 
         {/* Footer */}
-        <div className="glass-panel p-3 text-center print:block">
-          <div className="flex items-center justify-center gap-3 text-xs text-slate-400">
+        <div className="brutal-card p-3 text-center print:block">
+          <div className="flex items-center justify-center gap-3 text-xs text-gray-500 dark:text-gray-400 font-bold">
             <CreditCard size={12} /> {data.status_biaya}
             <span>•</span>
             <span>Petugas: {data.petugas || '—'}</span>

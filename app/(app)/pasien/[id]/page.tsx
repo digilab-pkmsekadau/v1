@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { ArrowLeft, Loader2, User, Calendar, QrCode, TrendingUp, ClipboardList, Eye } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -122,20 +122,20 @@ export default function PasienDetailPage() {
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
         <button onClick={() => router.back()}
-          className="w-9 h-9 rounded-xl bg-slate-100 flex items-center justify-center hover:bg-slate-200 transition-colors">
+          className="w-9 h-9 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-800 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
           <ArrowLeft size={16} className="text-slate-600" />
         </button>
         <div className="flex-1">
-          <h1 className="text-lg font-extrabold text-slate-800 leading-tight">{patient.nama}</h1>
+          <h1 className="text-lg font-black text-black dark:text-white leading-tight uppercase">{patient.nama}</h1>
           <p className="text-xs text-slate-400">{exams.length} kali pemeriksaan</p>
         </div>
       </div>
 
       {/* Patient Info Card */}
-      <div className="glass-panel p-4 mb-4">
+      <div className="brutal-card p-4 mb-4">
         <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-100 to-teal-200 flex items-center justify-center flex-shrink-0">
-            <span className="text-teal-700 font-extrabold text-lg">
+          <div className="w-12 h-12 rounded-xl bg-orange-500 border-2 border-black dark:border-white flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
+            <span className="text-white font-black text-lg">
               {patient.nama.charAt(0).toUpperCase()}
             </span>
           </div>
@@ -187,7 +187,7 @@ export default function PasienDetailPage() {
 
       {/* === TAB: RIWAYAT === */}
       {tab === 'riwayat' && (
-        <div className="glass-panel overflow-hidden">
+        <div className="brutal-card overflow-hidden">
           {exams.length === 0 ? (
             <div className="py-10 text-center text-slate-400 text-sm">
               Belum ada riwayat pemeriksaan
@@ -199,10 +199,10 @@ export default function PasienDetailPage() {
                   typeof v === 'string' && isAbnormal(k, v)
                 );
                 return (
-                  <div key={exam.id} className="flex items-center gap-3 px-4 py-3.5 hover:bg-teal-50/40 transition-colors">
+                  <div key={exam.id} className="flex items-center gap-3 px-4 py-3.5 hover:bg-orange-50 dark:hover:bg-zinc-800 transition-colors border-b-2 border-black dark:border-white last:border-b-0">
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-extrabold text-teal-700">{exam.no_urut}</span>
+                        <span className="text-xs font-black text-orange-600 dark:text-orange-400">{exam.no_urut}</span>
                         <span className="text-xs text-slate-400">
                           {new Date(exam.tgl_permintaan).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
                         </span>
@@ -216,7 +216,7 @@ export default function PasienDetailPage() {
                     </div>
                     <button
                       onClick={() => router.push(`/riwayat/${exam.id}`)}
-                      className="w-8 h-8 rounded-xl bg-teal-50 border border-teal-100 flex items-center justify-center hover:bg-teal-100 transition-colors"
+                      className="w-8 h-8 rounded-lg bg-indigo-400 border-2 border-black dark:border-white flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
                     >
                       <Eye size={13} className="text-teal-600" />
                     </button>
@@ -232,13 +232,13 @@ export default function PasienDetailPage() {
       {tab === 'trend' && (
         <div className="space-y-4">
           {availableParams.length === 0 ? (
-            <div className="glass-panel py-10 text-center text-slate-400 text-sm">
+            <div className="brutal-card py-10 text-center text-gray-500 dark:text-gray-400 text-sm font-bold">
               Tidak ada data numerik untuk digrafik
             </div>
           ) : (
             <>
               {/* Param selector */}
-              <div className="glass-panel p-3">
+              <div className="brutal-card p-3">
                 <p className="text-[11px] font-bold text-slate-500 uppercase tracking-widest mb-2">
                   Pilih Parameter
                 </p>
@@ -263,7 +263,7 @@ export default function PasienDetailPage() {
               </div>
 
               {/* Chart */}
-              <div className="glass-panel p-4">
+              <div className="brutal-card p-4">
                 {exams.length < 2 ? (
                   <div className="py-8 text-center text-slate-400 text-sm">
                     Perlu minimal 2 kali pemeriksaan untuk melihat tren
@@ -308,7 +308,7 @@ export default function PasienDetailPage() {
 
       {/* === TAB: QR CODE === */}
       {tab === 'qr' && (
-        <div className="glass-panel p-6 flex flex-col items-center gap-4">
+        <div className="brutal-card p-6 flex flex-col items-center gap-4">
           <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 qr-container">
             <QRCodeSVG
               value={qrUrl || `patient:${id}`}
@@ -337,8 +337,8 @@ export default function PasienDetailPage() {
               a.click();
               URL.revokeObjectURL(url);
             }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold text-white transition-all active:scale-95"
-            style={{ background: 'linear-gradient(135deg, #0d9488, #0f766e)' }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-orange-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
+            
           >
             <QrCode size={14} />
             Download QR Code

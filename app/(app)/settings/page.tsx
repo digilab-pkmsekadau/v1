@@ -160,7 +160,7 @@ export default function SettingsPage() {
 
 
 
-      {/* â”€â”€ Daftar Dokter â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* Daftar dokter */}
       <div className="brutal-card p-5 mb-4">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
@@ -186,7 +186,7 @@ export default function SettingsPage() {
         <TagPills text={dokterList} color="bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/40" />
       </div>
 
-      {/* â”€â”€ Daftar Petugas â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* Daftar petugas */}
       <div className="brutal-card p-5 mb-6">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
@@ -212,7 +212,7 @@ export default function SettingsPage() {
         <TagPills text={petugasList} color="bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-400 border border-purple-100 dark:border-purple-900/40" />
       </div>
 
-      {/* â”€â”€ Audit Log â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* Audit log */}
       <div className="brutal-card p-5 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -231,11 +231,11 @@ export default function SettingsPage() {
             className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-black uppercase text-white border-2 border-black dark:border-white bg-indigo-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
             
           >
-            Lihat Log â†’
+            Lihat Log →
           </a>
         </div>
       </div>
-      {/* â”€â”€ Backup Database â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* Backup database */}
       <div className="brutal-card p-5 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -280,7 +280,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* â”€â”€ Manajemen Data Tahunan â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* Manajemen data tahunan */}
       <div className="glass-panel p-5 mt-6 mb-6 border border-red-200/50 dark:border-red-900/30 overflow-hidden relative">
         <div className="absolute inset-0 bg-red-50/30 dark:bg-red-950/10 pointer-events-none" />
         <div className="relative z-10">
@@ -320,7 +320,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* â”€â”€ Kustomisasi Kop Surat â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */}
+      {/* Kustomisasi kop surat */}
       <div className="brutal-card p-5 mt-6 mb-6">
         <div className="flex items-center gap-3 mb-4">
           <div className="brutal-icon-sm bg-indigo-400 border-black dark:border-white"

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Loader2, History, X } from 'lucide-react';
 import { useEffect, useRef, useState, useCallback } from 'react';
@@ -33,7 +33,7 @@ interface Props {
 }
 
 /**
- * Autocomplete pasien — cari berdasarkan nama atau NIK.
+ * Autocomplete pasien â€” cari berdasarkan nama atau NIK.
  * Memunculkan dropdown saat user mengetik ≥ 2 karakter.
  */
 export default function PatientAutocomplete({
@@ -112,7 +112,7 @@ export default function PatientAutocomplete({
     else if (e.key === 'Escape') { setOpen(false); }
   };
 
-  // Format tanggal lahir → "12 Mar 1990"
+  // Format tanggal lahir â†’ "12 Mar 1990"
   const fmtDate = (s: string | null) => {
     if (!s) return '-';
     try {
@@ -142,10 +142,10 @@ export default function PatientAutocomplete({
       </div>
 
       {open && items.length > 0 && (
-        <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl overflow-hidden"
+        <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white dark:bg-zinc-900 border-2 border-black dark:border-white rounded-xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] dark:shadow-[4px_4px_0px_0px_rgba(255,255,255,1)] overflow-hidden"
           style={{ maxHeight: 320 }}>
-          <div className="px-3 py-2 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-800/50 flex items-center gap-1.5 border-b border-slate-100 dark:border-slate-800">
-            <History size={11} /> Pasien Ditemukan — {items.length} hasil
+          <div className="px-3 py-2 text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest bg-gray-100 dark:bg-zinc-800 flex items-center gap-1.5 border-b-2 border-black dark:border-white">
+            <History size={11} /> Pasien Ditemukan â€” {items.length} hasil
           </div>
           <div className="overflow-y-auto" style={{ maxHeight: 280 }}>
             {items.map((p, idx) => (
@@ -154,40 +154,37 @@ export default function PatientAutocomplete({
                 type="button"
                 onClick={() => choose(p)}
                 onMouseEnter={() => setHighlight(idx)}
-                className={`w-full text-left px-3 py-2.5 text-sm transition-colors border-b border-slate-50 dark:border-slate-800/50 last:border-0
-                  ${idx === highlight
-                    ? 'bg-teal-50 dark:bg-teal-950/30'
-                    : 'hover:bg-slate-50 dark:hover:bg-slate-800/30'}`}
+                className={`w-full text-left px-3 py-2.5 text-sm transition-colors border-b-2 border-black dark:border-white last:border-0 ${idx === highlight ? 'bg-orange-100 dark:bg-zinc-800' : 'hover:bg-gray-50 dark:hover:bg-zinc-800'}`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <div className="font-bold text-slate-700 dark:text-slate-200 truncate">
+                  <div className="font-black text-black dark:text-white truncate">
                     {field === 'nik' && p.nik ? (
-                      <span><span className="text-teal-600 dark:text-teal-400">{p.nik}</span> · {p.nama}</span>
+                      <span><span className="text-teal-600 dark:text-teal-400">{p.nik}</span> Â· {p.nama}</span>
                     ) : (
                       p.nama
                     )}
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     {p.last_exam_count && p.last_exam_count > 0 && (
-                      <span className="text-[9px] font-bold bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-300 px-1.5 py-0.5 rounded-full">
+                      <span className="text-[9px] font-black bg-orange-500 text-white px-1.5 py-0.5 rounded-full border border-black dark:border-white">
                         {p.last_exam_count}x
                       </span>
                     )}
                     <span className="text-[10px] font-bold text-slate-400">
-                      {p.jenis_kelamin === 'L' ? '♂ L' : p.jenis_kelamin === 'P' ? '♀ P' : '-'}
+                      {p.jenis_kelamin === 'L' ? 'â™‚ L' : p.jenis_kelamin === 'P' ? 'â™€ P' : '-'}
                     </span>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
                   {field !== 'nik' && p.nik && <span className="font-mono">{p.nik}</span>}
-                  {p.tgl_lahir && <span>· {fmtDate(p.tgl_lahir)}</span>}
-                  {p.alamat && <span className="truncate">· {p.alamat}</span>}
+                  {p.tgl_lahir && <span>Â· {fmtDate(p.tgl_lahir)}</span>}
+                  {p.alamat && <span className="truncate">Â· {p.alamat}</span>}
                 </div>
               </button>
             ))}
           </div>
-          <div className="px-3 py-1.5 text-[10px] text-slate-400 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-            <span>↑↓ navigasi · Enter pilih · Esc tutup</span>
+          <div className="px-3 py-1.5 text-[10px] text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-zinc-800 border-t-2 border-black dark:border-white flex items-center justify-between font-bold">
+            <span>â†‘â†“ navigasi Â· Enter pilih Â· Esc tutup</span>
             <button type="button" onClick={() => setOpen(false)} className="hover:text-slate-600">
               <X size={12} />
             </button>
@@ -197,3 +194,4 @@ export default function PatientAutocomplete({
     </div>
   );
 }
+

@@ -156,44 +156,44 @@ export default function RiwayatPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-11 h-11 rounded-2xl flex items-center justify-center shadow-lg relative overflow-hidden"
-            style={{ background: 'linear-gradient(135deg, #0d9488, #0f766e)' }}>
+          <div className="brutal-icon-lg bg-orange-500 border-black dark:border-white"
+            >
             <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
             <ClipboardList size={20} className="text-white relative z-10" />
           </div>
           <div>
-            <h1 className="text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight">Riwayat & Rekap</h1>
-            <p className="text-xs text-slate-400 dark:text-slate-500 font-medium">Kelola riwayat pemeriksaan dan ekspor laporan</p>
+            <h1 className="text-2xl font-black text-black dark:text-white tracking-tight uppercase">Riwayat & Rekap</h1>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-bold">Kelola riwayat pemeriksaan dan ekspor laporan</p>
           </div>
         </div>
         <button
           onClick={fetchHistory}
-          className="w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 active:scale-90"
-          style={{ background: 'var(--surface)', border: '1px solid var(--border)', boxShadow: 'var(--shadow-card)' }}
+          className="w-11 h-11 rounded-xl border-2 border-black dark:border-white bg-white dark:bg-zinc-800 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
+          
         >
           <RefreshCw size={16} className={`text-teal-600 dark:text-teal-400 ${loading ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
       {/* Filter Bulan — mengontrol tabel riwayat di bawah */}
-      <div className="glass-panel p-5 mb-5">
+      <div className="brutal-card p-5 mb-5">
         <div className="flex items-center gap-2 mb-4">
           <CalendarDays size={14} className="text-teal-600 dark:text-teal-400" />
-          <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Filter Bulan</h2>
+          <h2 className="text-sm font-black text-black dark:text-white uppercase">Filter Bulan</h2>
         </div>
         <input
           type="month"
           value={filterMonth}
           onChange={e => setFilterMonth(e.target.value)}
-          className="input-premium w-full"
+          className="brutal-input w-full"
         />
       </div>
 
       {/* Rekap Bulanan — dengan Preview */}
-      <div className="glass-panel p-5 mb-5">
+      <div className="brutal-card p-5 mb-5">
         <div className="flex items-center gap-2 mb-4">
           <FileSpreadsheet size={14} className="text-teal-600 dark:text-teal-400" />
-          <h2 className="text-sm font-extrabold text-slate-700 dark:text-slate-200">Rekap Semua Parameter (Excel)</h2>
+          <h2 className="text-sm font-black text-black dark:text-white uppercase">Rekap Semua Parameter (Excel)</h2>
         </div>
 
         {/* Pilih bulan */}
@@ -201,17 +201,13 @@ export default function RiwayatPage() {
           <input
             type="month" value={monthlyMonth}
             onChange={e => setMonthlyMonth(e.target.value)}
-            className="input-premium flex-1"
+            className="brutal-input flex-1"
           />
           <button
             onClick={handlePreviewMonthly}
             disabled={loadingPreview}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all duration-200 disabled:opacity-50 whitespace-nowrap hover:scale-[1.02] active:scale-95"
-            style={{
-              background: 'var(--surface)',
-              border: '1px solid var(--border)',
-              color: 'var(--text-muted)',
-            }}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase border-2 border-black dark:border-white bg-white dark:bg-zinc-800 text-black dark:text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 transition-all"
+            
           >
             {loadingPreview
               ? <RefreshCw size={14} className="animate-spin" />
@@ -230,10 +226,10 @@ export default function RiwayatPage() {
               style={{ borderColor: 'var(--border)', background: 'linear-gradient(135deg, rgba(13,148,136,0.05), rgba(20,184,166,0.03))' }}
             >
               <div>
-                <div className="text-sm font-extrabold text-slate-700 dark:text-slate-200">
+                <div className="text-sm font-black text-black dark:text-white uppercase">
                   {formatMonthLabel(monthlyPreview.month ?? monthlyMonth)}
                 </div>
-                <div className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                <div className="text-xs text-gray-500 dark:text-gray-400 font-bold">
                   {monthlyPreview.startDate} s/d {monthlyPreview.endDate}
                 </div>
               </div>
@@ -271,11 +267,8 @@ export default function RiwayatPage() {
               <button
                 onClick={handleMonthlyExport}
                 disabled={exportingMonthly}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all duration-200 disabled:opacity-50 hover:scale-[1.01] active:scale-95"
-                style={{
-                  background: 'linear-gradient(135deg, #0d9488, #0f766e)',
-                  boxShadow: '0 6px 24px -4px rgba(13,148,136,0.3)',
-                }}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-orange-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none disabled:opacity-50 transition-all"
+                
               >
                 {exportingMonthly
                   ? <RefreshCw size={15} className="animate-spin" />
@@ -291,11 +284,8 @@ export default function RiwayatPage() {
           <button
             onClick={handleMonthlyExport}
             disabled={exportingMonthly}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-bold text-white transition-all duration-200 disabled:opacity-50 hover:scale-[1.01] active:scale-95"
-            style={{
-              background: 'linear-gradient(135deg, #0d9488, #0f766e)',
-              boxShadow: '0 6px 24px -4px rgba(13,148,136,0.3)',
-            }}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-orange-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none disabled:opacity-50 transition-all"
+            
           >
             {exportingMonthly
               ? <RefreshCw size={15} className="animate-spin" />
@@ -317,19 +307,18 @@ export default function RiwayatPage() {
 
       {/* History Table */}
       <div className="mb-3 flex items-center gap-2">
-        <div className="section-badge" style={{ background: 'rgba(100,116,139,0.06)', color: '#475569' }}>
+        <div className="brutal-badge">
           <Activity size={13} />
           <span>Riwayat Pemeriksaan</span>
         </div>
         {!loading && history.length > 0 && (
-          <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500">
-            {history.length} data
-          </span>
+          <span className="brutal-badge !py-0.5 !px-2.5 !normal-case !tracking-normal !font-bold text-black dark:text-white">{history.length} data</span>
         )}
       </div>
-      <div className="glass-panel overflow-hidden mb-6">
+      <div className="brutal-card overflow-hidden mb-6">
         <HistoryTable data={history} loading={loading} onDelete={handleDelete} />
       </div>
     </div>
   );
 }
+

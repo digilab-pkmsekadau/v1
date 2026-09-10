@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { AlertTriangle, Trash2, LogOut, X } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -49,16 +49,16 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
 
   const variantStyles = {
     danger: {
-      icon: 'bg-red-100 text-red-600',
-      button: 'bg-red-600 hover:bg-red-700 text-white',
+      icon: 'bg-rose-400 border-2 border-black text-black',
+      button: 'bg-rose-500 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
     },
     warning: {
-      icon: 'bg-amber-100 text-amber-600',
-      button: 'bg-amber-500 hover:bg-amber-600 text-white',
+      icon: 'bg-amber-400 border-2 border-black text-black',
+      button: 'bg-amber-500 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
     },
     info: {
-      icon: 'bg-teal-100 text-teal-600',
-      button: 'bg-teal-600 hover:bg-teal-700 text-white',
+      icon: 'bg-orange-400 border-2 border-black text-black',
+      button: 'bg-orange-500 border-2 border-black text-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
     },
   };
 
@@ -86,28 +86,28 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
           onClick={handleCancel}
         >
           <div
-            className="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl w-full max-w-sm p-6 animate-slide-up"
+            className="bg-white dark:bg-zinc-900 rounded-2xl border-2 border-black dark:border-white shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] dark:shadow-[6px_6px_0px_0px_rgba(255,255,255,1)] w-full max-w-sm p-6 animate-slide-up"
             onClick={e => e.stopPropagation()}
           >
             {/* Close button */}
             <button
               onClick={handleCancel}
-              className="absolute top-4 right-4 w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+              className="absolute top-4 right-4 w-8 h-8 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-800 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
               style={{ position: 'relative', float: 'right', marginBottom: -8 }}
             >
               <X size={14} className="text-slate-500" />
             </button>
 
             {/* Icon */}
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-4 ${styles.icon}`}>
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] ${styles.icon}`}>
               <IconComponent size={22} />
             </div>
 
             {/* Title */}
-            <h3 className="text-base font-extrabold text-slate-800 dark:text-slate-100 mb-1.5 text-center">
+            <h3 className="text-base font-black text-black dark:text-white mb-1.5 text-center uppercase">
               {dialog.title}
             </h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed text-center">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-6 leading-relaxed text-center font-medium">
               {dialog.message}
             </p>
 
@@ -122,7 +122,7 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
                   value={verifyInput}
                   onChange={(e) => setVerifyInput(e.target.value)}
                   placeholder={`Ketik ${dialog.verificationText}`}
-                  className="w-full text-center font-bold px-3 py-2.5 rounded-xl border border-slate-200 focus:border-red-400 focus:ring-2 focus:ring-red-100 outline-none transition-all"
+                  className="w-full text-center font-bold px-3 py-2.5 rounded-xl border-2 border-black dark:border-white bg-white dark:bg-zinc-800 focus:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] outline-none transition-all"
                   autoFocus
                 />
               </div>
@@ -132,14 +132,14 @@ export function ConfirmProvider({ children }: { children: ReactNode }) {
             <div className="flex gap-3">
               <button
                 onClick={handleCancel}
-                className="flex-1 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                className="flex-1 py-2.5 rounded-xl border-2 border-black dark:border-white text-sm font-black uppercase text-black dark:text-white bg-white dark:bg-zinc-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
               >
                 {dialog.cancelLabel ?? 'Batal'}
               </button>
               <button
                 onClick={handleConfirm}
                 disabled={!isVerified}
-                className={`flex-1 py-2.5 rounded-2xl text-sm font-bold transition-all disabled:opacity-50 disabled:scale-100 active:scale-95 ${styles.button}`}
+                className={`flex-1 py-2.5 rounded-xl text-sm font-black uppercase transition-all disabled:opacity-50 ${styles.button}`}
               >
                 {dialog.confirmLabel ?? 'Ya, Lanjutkan'}
               </button>
@@ -156,3 +156,4 @@ export function useConfirm() {
   if (!ctx) throw new Error('useConfirm must be used within ConfirmProvider');
   return ctx.confirm;
 }
+

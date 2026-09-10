@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Shield, Loader2, AlertCircle, CheckCircle, Trash2, Edit, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -14,9 +14,9 @@ interface AuditEntry {
 }
 
 const actionConfig = {
-  CREATE: { icon: Plus,       color: 'text-teal-600',  bg: 'bg-teal-50',  border: 'border-teal-100',  label: 'Dibuat' },
-  UPDATE: { icon: Edit,       color: 'text-blue-600',  bg: 'bg-blue-50',  border: 'border-blue-100',  label: 'Diubah' },
-  DELETE: { icon: Trash2,     color: 'text-red-600',   bg: 'bg-red-50',   border: 'border-red-100',   label: 'Dihapus' },
+  CREATE: { icon: Plus, color: 'text-black', bg: 'bg-emerald-400', border: 'border-black', label: 'Dibuat' },
+  UPDATE: { icon: Edit, color: 'text-black', bg: 'bg-indigo-400', border: 'border-black', label: 'Diubah' },
+  DELETE: { icon: Trash2, color: 'text-black', bg: 'bg-rose-400', border: 'border-black', label: 'Dihapus' },
 };
 
 function timeAgo(date: string) {
@@ -53,19 +53,19 @@ export default function AuditLogPage() {
     <div className="px-4 py-5 animate-slide-up">
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
-        <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
-          style={{ background: 'linear-gradient(135deg, #7c3aed, #9333ea)' }}>
+        <div className="brutal-icon-lg bg-indigo-400 border-black dark:border-white"
+          >
           <Shield size={20} className="text-white" />
         </div>
         <div>
-          <h1 className="text-xl font-extrabold text-slate-800">Audit Log</h1>
-          <p className="text-xs text-slate-400 font-medium">Riwayat perubahan data sistem</p>
+          <h1 className="text-xl font-black text-black dark:text-white uppercase">Audit Log</h1>
+          <p className="text-xs text-gray-500 dark:text-gray-400 font-bold">Riwayat perubahan data sistem</p>
         </div>
       </div>
 
       {/* Setup notice */}
       {!tableExists && !loading && (
-        <div className="glass-panel p-4 mb-4 border-l-4 border-amber-400 bg-amber-50">
+        <div className="brutal-card p-4 mb-4 border-l-4 border-amber-400 bg-amber-50 dark:bg-amber-950/20">
           <div className="flex gap-2">
             <AlertCircle size={16} className="text-amber-600 flex-shrink-0 mt-0.5" />
             <div>
@@ -96,15 +96,15 @@ CREATE POLICY "Allow all" ON audit_log USING (true) WITH CHECK (true);`}
           <Loader2 size={24} className="animate-spin text-purple-500" />
         </div>
       ) : logs.length === 0 ? (
-        <div className="glass-panel py-10 text-center">
+        <div className="brutal-card py-10 text-center">
           <CheckCircle size={32} className="mx-auto text-slate-200 mb-2" />
           <p className="text-sm font-bold text-slate-400">Belum ada aktivitas tercatat</p>
           <p className="text-xs text-slate-300 mt-1">Log akan muncul di sini setelah ada perubahan data</p>
         </div>
       ) : (
-        <div className="glass-panel overflow-hidden">
-          <div className="px-4 py-2 bg-slate-50 border-b border-slate-100">
-            <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest">
+        <div className="brutal-card overflow-hidden">
+          <div className="px-4 py-2 bg-gray-100 dark:bg-zinc-800 border-b-2 border-black dark:border-white">
+            <span className="text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest">
               {logs.length} aktivitas tercatat
             </span>
           </div>
@@ -113,8 +113,8 @@ CREATE POLICY "Allow all" ON audit_log USING (true) WITH CHECK (true);`}
               const cfg = actionConfig[log.action] ?? actionConfig.UPDATE;
               const Icon = cfg.icon;
               return (
-                <div key={log.id} className="flex items-start gap-3 px-4 py-3">
-                  <div className={`w-8 h-8 rounded-xl border ${cfg.bg} ${cfg.border} flex items-center justify-center flex-shrink-0 mt-0.5`}>
+                <div key={log.id} className="flex items-start gap-3 px-4 py-3 border-b-2 border-black dark:border-white last:border-b-0">
+                  <div className={`w-8 h-8 rounded-lg border-2 ${cfg.bg} ${cfg.border} flex items-center justify-center flex-shrink-0 mt-0.5 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
                     <Icon size={13} className={cfg.color} />
                   </div>
                   <div className="flex-1 min-w-0">

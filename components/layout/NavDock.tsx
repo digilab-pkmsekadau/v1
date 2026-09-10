@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { Home, Syringe, Settings, Users, ClipboardList, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
@@ -19,13 +19,9 @@ export default function NavDock() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-zinc-900 border-t-3 border-black dark:border-white">
       <div
-        className={cn(
-          'flex items-center justify-around px-1 pt-1.5',
-          'border-t border-white/20 dark:border-white/5',
-          'nav-dock-glass'
-        )}
+        className="flex items-center justify-around px-1 pt-2"
         style={{
           paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))',
         }}
@@ -40,51 +36,31 @@ export default function NavDock() {
               aria-label={label}
               aria-current={isActive ? 'page' : undefined}
               className={cn(
-                'relative flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-2xl cursor-pointer transition-all duration-300 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-500 focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-                'active:scale-90',
+                'relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl cursor-pointer transition-all duration-150 group',
+                'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
                 isActive
-                  ? 'text-teal-600 dark:text-teal-400'
-                  : 'text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                  ? 'bg-orange-500 border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]'
+                  : 'border-2 border-transparent hover:border-black dark:hover:border-white hover:bg-gray-100 dark:hover:bg-zinc-800'
               )}
             >
-              {/* Animated pill background for active */}
-              <span
-                className={cn(
-                  'absolute inset-0 rounded-2xl transition-all duration-300 ease-out',
-                  isActive
-                    ? 'bg-teal-50 dark:bg-teal-950/50 scale-100 opacity-100'
-                    : 'bg-transparent scale-75 opacity-0 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/40 group-hover:scale-100 group-hover:opacity-100'
-                )}
-              />
-
               <Icon
-                size={21}
-                strokeWidth={isActive ? 2.4 : 1.7}
+                size={20}
+                strokeWidth={isActive ? 2.5 : 2}
                 className={cn(
-                  'relative z-10 transition-all duration-300',
+                  'transition-colors',
                   isActive
-                    ? 'text-teal-600 dark:text-teal-400 -translate-y-0.5 drop-shadow-sm'
-                    : 'text-slate-400 dark:text-slate-500 group-hover:-translate-y-0.5'
+                    ? 'text-white'
+                    : 'text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white'
                 )}
               />
               <span className={cn(
-                'relative z-10 text-[10px] font-semibold tracking-wide transition-all duration-300',
+                'text-[10px] font-bold uppercase tracking-wide transition-colors',
                 isActive
-                  ? 'text-teal-700 dark:text-teal-400 font-bold'
-                  : 'text-slate-500 dark:text-slate-400'
+                  ? 'text-white'
+                  : 'text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white'
               )}>
                 {label}
               </span>
-
-              {/* Active glow dot */}
-              <span
-                className={cn(
-                  'absolute -bottom-0 left-1/2 -translate-x-1/2 rounded-full transition-all duration-500',
-                  isActive
-                    ? 'w-5 h-1 bg-gradient-to-r from-teal-400 to-teal-500 dark:from-teal-400 dark:to-teal-300 scale-100 opacity-100 blur-[1px]'
-                    : 'w-1 h-1 bg-transparent scale-0 opacity-0'
-                )}
-              />
             </Link>
           );
         })}

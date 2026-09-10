@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { BarChart3, PieChart, Loader2 } from 'lucide-react';
 import { useEffect, useState, type CSSProperties } from 'react';
@@ -70,8 +70,8 @@ export default function StatistikPage() {
   return (
     <div className="px-4 py-5 animate-slide-up">
       <div className="mb-5">
-        <h1 className="font-display text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight">Statistik</h1>
-        <p className="text-xs text-slate-400 dark:text-slate-500 font-medium mt-1">Tren dan distribusi pemeriksaan lab</p>
+        <h1 className="font-black text-2xl text-black dark:text-white tracking-tight uppercase">Statistik</h1>
+        <p className="text-xs text-gray-500 dark:text-gray-400 font-bold mt-1">Tren dan distribusi pemeriksaan lab</p>
       </div>
 
       {loading ? (
@@ -80,14 +80,14 @@ export default function StatistikPage() {
         </div>
       ) : (
         <>
-          {/* Bar Chart — Tren Bulanan */}
+          {/* Bar Chart â€” Tren Bulanan */}
           <div className="mb-3 flex items-center gap-2.5">
             <span className="clay-icon clay-icon-cat clay-icon-sm w-8 h-8" style={{ '--clay-a': '#22d3ee', '--clay-b': '#0891b2' } as CSSProperties}>
               <BarChart3 size={15} strokeWidth={2.3} className="text-white" />
             </span>
-            <span className="font-display text-sm font-bold tracking-wide text-slate-700 dark:text-slate-200">Tren Bulanan</span>
+            <span className="font-black text-sm tracking-wide text-black dark:text-white uppercase">Tren Bulanan</span>
           </div>
-          <div className="glass-panel p-5 mb-6">
+          <div className="brutal-card p-5 mb-6">
             {monthlyData.length === 0 ? (
               <div className="py-12 text-center text-slate-400 text-sm">Tidak ada data</div>
             ) : (
@@ -116,10 +116,11 @@ export default function StatistikPage() {
                     <Tooltip
                       cursor={{ fill: 'rgba(20,184,166,0.06)' }}
                       contentStyle={{
-                        borderRadius: 14,
-                        border: '1px solid #e2e8f0',
+                        borderRadius: 12,
+                        border: '2px solid black',
                         fontSize: 12,
-                        boxShadow: '0 8px 24px -8px rgba(0,0,0,0.12)',
+                        fontWeight: 700,
+                        boxShadow: '3px 3px 0px 0px rgba(0,0,0,1)',
                       }}
                     />
                     <Bar dataKey="count" fill="url(#barTeal)" radius={[8, 8, 0, 0]} maxBarSize={42} />
@@ -129,20 +130,20 @@ export default function StatistikPage() {
             )}
           </div>
 
-          {/* Donut Chart — Distribusi per golongan pemeriksaan */}
+          {/* Donut Chart â€” Distribusi per golongan pemeriksaan */}
           <div className="mb-3 flex items-center gap-2.5">
             <span className="clay-icon clay-icon-cat clay-icon-sm w-8 h-8" style={{ '--clay-a': activeGroup.a, '--clay-b': activeGroup.b } as CSSProperties}>
               <PieChart size={15} strokeWidth={2.3} className="text-white" />
             </span>
-            <span className="font-display text-sm font-bold tracking-wide text-slate-700 dark:text-slate-200">Distribusi Pemeriksaan</span>
+            <span className="font-black text-sm tracking-wide text-black dark:text-white uppercase">Distribusi Pemeriksaan</span>
           </div>
-          <div className="glass-panel p-5 mb-6">
+          <div className="brutal-card p-5 mb-6">
             <label htmlFor="golongan" className="label-caps text-slate-500 dark:text-slate-400 mb-2 block">Golongan Pemeriksaan</label>
             <select
               id="golongan"
               value={group}
               onChange={e => setGroup(e.target.value as GroupKey)}
-              className="input-premium w-full mb-4"
+              className="brutal-input w-full mb-4"
             >
               {GROUPS.map(g => (
                 <option key={g.key} value={g.key}>{g.label}</option>
@@ -172,10 +173,11 @@ export default function StatistikPage() {
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        borderRadius: 14,
-                        border: '1px solid #e2e8f0',
+                        borderRadius: 12,
+                        border: '2px solid black',
                         fontSize: 12,
-                        boxShadow: '0 8px 24px -8px rgba(0,0,0,0.12)',
+                        fontWeight: 700,
+                        boxShadow: '3px 3px 0px 0px rgba(0,0,0,1)',
                       }}
                     />
                     <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
@@ -194,3 +196,5 @@ export default function StatistikPage() {
     </div>
   );
 }
+
+

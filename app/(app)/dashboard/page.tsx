@@ -11,7 +11,7 @@ import type { DashboardStats } from '@/types';
 import type { ExportRow } from '@/types';
 
 const SkeletonCard = () => (
-  <div className="flex-1 min-w-[45%] rounded-xl border-2 border-black dark:border-white p-4 bg-white dark:bg-zinc-900">
+  <div className="brutal-card flex-1 min-w-[45%] p-4">
     <div className="skeleton h-3 w-24 mb-3 rounded" />
     <div className="skeleton h-8 w-16 mb-2 rounded" />
     <div className="skeleton h-7 w-20 rounded-full" />
@@ -42,14 +42,14 @@ function DownloadMenu({
       <button
         onClick={() => setOpenMenu(isOpen ? null : menuKey)}
         aria-label={`Unduh data ${paramName}`}
-        className="w-8 h-8 rounded-lg border-2 border-black dark:border-white bg-orange-500 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
+        className="brutal-icon-sm bg-orange-500 border-black dark:border-white hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px]"
       >
         <Download size={13} strokeWidth={2.5} className="text-white" />
       </button>
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpenMenu(null)} />
-          <div className="absolute right-0 top-full mt-2 z-50 rounded-xl border-2 border-black dark:border-white overflow-hidden min-w-[190px] bg-white dark:bg-zinc-900 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]"
+          <div className="brutal-card absolute right-0 top-full mt-2 z-50 overflow-hidden min-w-[190px]"
           >
             <div className="px-3 py-2.5 border-b-2 border-black dark:border-white bg-gray-50 dark:bg-zinc-800">
               <div className="text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest">
@@ -136,7 +136,7 @@ export default function DashboardPage() {
         <button
           onClick={fetchDashboard}
           aria-label="Muat ulang data dashboard"
-          className="w-11 h-11 rounded-xl border-2 border-black dark:border-white bg-orange-500 flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all cursor-pointer"
+          className="brutal-icon-lg bg-orange-500 border-black dark:border-white hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[3px] active:translate-y-[3px]"
         >
           <RefreshCw size={18} strokeWidth={2.5} className={`text-white ${loading ? 'animate-spin' : ''}`} />
         </button>
@@ -230,7 +230,7 @@ export default function DashboardPage() {
                 <button
                   onClick={() => handleDownload(label, 'all_filled')}
                   aria-label={`Unduh data ${label}`}
-                  className="flex items-center justify-center gap-1 py-1.5 px-3 rounded-lg text-[11px] font-black text-white cursor-pointer transition-all bg-orange-500 border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+                  className="brutal-btn-primary flex items-center justify-center gap-1 py-1.5 px-3 rounded-lg text-[11px] font-black text-white cursor-pointer hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px]"
                 >
                   <Download size={11} /> Unduh
                 </button>

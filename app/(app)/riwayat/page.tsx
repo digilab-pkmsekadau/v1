@@ -158,7 +158,6 @@ export default function RiwayatPage() {
         <div className="flex items-center gap-3">
           <div className="brutal-icon-lg bg-orange-500 border-black dark:border-white"
             >
-            <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
             <ClipboardList size={20} className="text-white relative z-10" />
           </div>
           <div>
@@ -218,12 +217,10 @@ export default function RiwayatPage() {
 
         {/* Preview card — muncul setelah klik Preview */}
         {showPreview && monthlyPreview && (
-          <div className="animate-stagger rounded-2xl border overflow-hidden mb-3"
-            style={{ borderColor: 'var(--border)', background: 'var(--surface)' }}
+          <div className="animate-stagger rounded-2xl border-2 border-black dark:border-white overflow-hidden mb-3 bg-white dark:bg-zinc-900 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]"
           >
             {/* Summary header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b"
-              style={{ borderColor: 'var(--border)', background: 'linear-gradient(135deg, rgba(13,148,136,0.05), rgba(20,184,166,0.03))' }}
+            <div className="flex items-center justify-between px-4 py-3 border-b-2 border-black dark:border-white bg-teal-50 dark:bg-teal-950/20"
             >
               <div>
                 <div className="text-sm font-black text-black dark:text-white uppercase">
@@ -251,8 +248,7 @@ export default function RiwayatPage() {
               <div className="flex flex-wrap gap-1.5">
                 {Object.entries(monthlyPreview.paramCounts).map(([param, count]) => (
                   <div key={param}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold"
-                    style={{ background: 'rgba(13,148,136,0.08)', color: '#0f766e' }}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold border-2 border-teal-600 dark:border-teal-400 bg-teal-50 dark:bg-teal-950/40 text-teal-700 dark:text-teal-400"
                   >
                     <CheckCircle2 size={10} />
                     {param}

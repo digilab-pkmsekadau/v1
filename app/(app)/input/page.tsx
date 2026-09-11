@@ -78,41 +78,39 @@ function SearchableParamSelect({
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center justify-between gap-2 border rounded-xl px-3 py-2 text-sm bg-white transition-colors text-left
-          ${open ? 'border-teal-400 ring-2 ring-teal-100' : 'border-slate-200 hover:border-slate-300'}
-          ${selected ? 'text-slate-700 font-medium' : 'text-slate-400'}`}
+        className={`brutal-input w-full flex items-center justify-between gap-2 text-left ${open ? '!border-orange-500 !shadow-[0_0_0_3px_rgba(249,115,22,0.2)]' : ''} ${selected ? 'text-black dark:text-white font-bold' : 'text-gray-400'}`}
       >
         <span className="truncate">{selected ? selected.label : '— Pilih Parameter —'}</span>
         <ChevronDown size={14} className={`flex-shrink-0 text-slate-400 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
       </button>
 
       {open && (
-        <div className="absolute z-50 left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-2xl shadow-xl overflow-hidden"
+        <div className="brutal-card absolute z-50 left-0 right-0 top-full mt-1 overflow-hidden"
           style={{ maxHeight: 320 }}>
-          <div className="p-2 border-b border-slate-100 bg-white">
-            <div className="flex items-center gap-2 bg-slate-50 rounded-xl px-3 py-2">
-              <Search size={13} className="text-slate-400 flex-shrink-0" />
+          <div className="p-2 border-b-2 border-black dark:border-white bg-gray-50 dark:bg-zinc-800">
+            <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 rounded-lg px-3 py-2 border-2 border-black dark:border-white">
+              <Search size={13} className="text-gray-400 flex-shrink-0" />
               <input
                 ref={inputRef}
                 type="text"
                 value={query}
                 onChange={e => setQuery(e.target.value)}
                 placeholder="Cari parameter..."
-                className="flex-1 bg-transparent text-sm text-slate-700 outline-none placeholder-slate-400"
+                className="flex-1 bg-transparent text-sm text-black dark:text-white font-bold outline-none placeholder-gray-400"
               />
               {query && (
                 <button type="button" onClick={() => setQuery('')}
-                  className="text-slate-400 hover:text-slate-600 text-xs font-bold">✕</button>
+                  className="text-gray-400 hover:text-black dark:hover:text-white text-xs font-black">✕</button>
               )}
             </div>
           </div>
           <div className="overflow-y-auto" style={{ maxHeight: 252 }}>
             {filtered.length === 0 ? (
-              <p className="text-center text-xs text-slate-400 py-6">Tidak ditemukan</p>
+              <p className="text-center text-xs text-gray-400 font-bold py-6 uppercase tracking-wider">Tidak ditemukan</p>
             ) : (
               filtered.map(group => (
                 <div key={group.group}>
-                  <div className="px-3 py-1.5 text-[10px] font-extrabold text-slate-400 uppercase tracking-widest bg-slate-50">
+                  <div className="px-3 py-1.5 text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest bg-gray-100 dark:bg-zinc-800 border-b-2 border-black dark:border-white">
                     {group.group}
                   </div>
                   {group.params.map(param => (
@@ -120,13 +118,13 @@ function SearchableParamSelect({
                       key={param.key}
                       type="button"
                       onClick={() => { onChange(param.key); setOpen(false); }}
-                      className={`w-full text-left px-4 py-2.5 text-sm transition-colors
+                      className={`w-full text-left px-4 py-2.5 text-sm font-bold transition-colors border-b border-gray-200 dark:border-zinc-700 last:border-b-0
                         ${param.key === value
-                          ? 'bg-teal-50 text-teal-700 font-semibold'
-                          : 'text-slate-700 hover:bg-slate-50'}`}
+                          ? 'bg-orange-500 text-white'
+                          : 'text-black dark:text-white hover:bg-orange-100 dark:hover:bg-zinc-800'}`}
                     >
                       {param.label}
-                      {param.unit && <span className="text-slate-400 text-xs ml-1">({param.unit})</span>}
+                      {param.unit && <span className="text-gray-400 dark:text-gray-500 text-xs ml-1">({param.unit})</span>}
                     </button>
                   ))}
                 </div>
@@ -385,7 +383,7 @@ export default function InputPage() {
         type="button"
         onClick={() => fileRef.current?.click()}
         disabled={ocrLoading}
-        className="mb-4 w-full flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-black dark:border-white text-sm font-black text-black dark:text-white disabled:opacity-60 transition-all bg-indigo-400 hover:bg-indigo-300 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+        className="brutal-btn mb-4 w-full py-3 text-sm bg-indigo-400 hover:bg-indigo-300 disabled:opacity-60"
         
       >
         {ocrLoading
@@ -395,7 +393,7 @@ export default function InputPage() {
 
       {/* Success banner */}
       {successNo && (
-        <div className="mb-4 p-4 rounded-xl border-2 border-black dark:border-white flex items-center gap-3 animate-stagger bg-emerald-400 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)]"
+        <div className="brutal-card mb-4 p-4 flex items-center gap-3 animate-stagger bg-emerald-400"
           
         >
           <CheckCircle size={20} className="text-teal-600 dark:text-teal-400 shrink-0" />
@@ -550,7 +548,7 @@ export default function InputPage() {
           {params.map((item) => {
             const info = getParamInfo(item.paramKey);
             return (
-              <div key={item.id} className="animate-stagger border-2 border-black dark:border-white rounded-xl p-3.5 transition-all duration-150 bg-white dark:bg-zinc-900" >
+              <div key={item.id} className="brutal-card animate-stagger p-3.5 transition-all duration-150" >
                 {/* Row header: dropdown pilih param + tombol hapus */}
                 <div className="flex items-center gap-2 mb-2">
                   <SearchableParamSelect
@@ -646,7 +644,7 @@ export default function InputPage() {
           type="button"
           onClick={handleReset}
           disabled={loading}
-          className="flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-black text-sm uppercase transition-all duration-150 disabled:opacity-50 border-2 border-black dark:border-white bg-white dark:bg-zinc-800 text-black dark:text-white shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+          className="brutal-btn flex-1 py-3.5 disabled:opacity-50"
           
         >
           <RotateCcw size={16} />
@@ -656,7 +654,7 @@ export default function InputPage() {
           type="button"
           onClick={handleSubmit(onSubmitForm)}
           disabled={loading}
-          className="flex-[2] flex items-center justify-center gap-2 py-3.5 rounded-xl font-black text-sm uppercase text-white transition-all duration-150 disabled:opacity-50 border-2 border-black dark:border-white bg-orange-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none"
+          className="brutal-btn brutal-btn-primary flex-[2] py-3.5 disabled:bg-gray-300 disabled:text-gray-800 disabled:cursor-not-allowed disabled:border-gray-800"
           
         >
           {loading ? (

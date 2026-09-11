@@ -149,7 +149,6 @@ export default function SettingsPage() {
       <div className="flex items-center gap-3 mb-6">
         <div className="brutal-icon-lg bg-orange-500 border-black dark:border-white"
           >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
           <Settings size={19} className="text-white relative z-10" />
         </div>
         <div>
@@ -270,8 +269,7 @@ export default function SettingsPage() {
             { label: 'Konfigurasi', desc: 'Daftar Dokter & Petugas' },
           ].map(item => (
             <div key={item.label}
-              className="p-3 rounded-xl text-center"
-              style={{ background: 'linear-gradient(135deg, rgba(5,150,105,0.06), rgba(16,185,129,0.03))', border: '1px solid rgba(5,150,105,0.12)' }}
+              className="p-3 rounded-xl text-center border-2 border-emerald-600 dark:border-emerald-400 bg-emerald-50 dark:bg-emerald-950/40"
             >
               <div className="text-[11px] font-extrabold text-emerald-700 dark:text-emerald-400">{item.label}</div>
               <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{item.desc}</div>
@@ -281,8 +279,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Manajemen data tahunan */}
-      <div className="glass-panel p-5 mt-6 mb-6 border border-red-200/50 dark:border-red-900/30 overflow-hidden relative">
-        <div className="absolute inset-0 bg-red-50/30 dark:bg-red-950/10 pointer-events-none" />
+      <div className="brutal-card p-5 mt-6 mb-6 relative border-2 border-red-600 dark:border-red-500 bg-red-50 dark:bg-red-950/20">
         <div className="relative z-10">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-9 h-9 rounded-2xl flex items-center justify-center bg-red-100 dark:bg-red-900/30 border border-red-200 dark:border-red-800">
@@ -335,7 +332,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Logo Puskesmas */}
-        <div className="mb-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700/50">
+        <div className="mb-4 p-4 rounded-xl border-2 border-black dark:border-white bg-white dark:bg-zinc-900">
           <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 block">
             Logo Puskesmas
           </label>

@@ -82,9 +82,9 @@ export default function StatistikPage() {
         <>
           {/* Bar Chart — Tren Bulanan */}
           <div className="mb-3 flex items-center gap-2.5">
-            <span className="clay-icon clay-icon-cat clay-icon-sm w-8 h-8" style={{ '--clay-a': '#22d3ee', '--clay-b': '#0891b2' } as CSSProperties}>
-              <BarChart3 size={15} strokeWidth={2.3} className="text-white" />
-            </span>
+            <div className="brutal-icon-sm bg-cyan-400 border-black dark:border-white">
+              <BarChart3 size={15} strokeWidth={2.3} className="text-cyan-700 dark:text-cyan-300" />
+            </div>
             <span className="font-black text-sm tracking-wide text-black dark:text-white uppercase">Tren Bulanan</span>
           </div>
           <div className="brutal-card p-5 mb-6">
@@ -132,9 +132,9 @@ export default function StatistikPage() {
 
           {/* Donut Chart — Distribusi per golongan pemeriksaan */}
           <div className="mb-3 flex items-center gap-2.5">
-            <span className="clay-icon clay-icon-cat clay-icon-sm w-8 h-8" style={{ '--clay-a': activeGroup.a, '--clay-b': activeGroup.b } as CSSProperties}>
+            <div className="brutal-icon-sm border-black dark:border-white" style={{ background: activeGroup.a }}>
               <PieChart size={15} strokeWidth={2.3} className="text-white" />
-            </span>
+            </div>
             <span className="font-black text-sm tracking-wide text-black dark:text-white uppercase">Distribusi Pemeriksaan</span>
           </div>
           <div className="brutal-card p-5 mb-6">

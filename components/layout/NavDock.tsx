@@ -19,7 +19,7 @@ export default function NavDock() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-zinc-900 border-t-3 border-black dark:border-white">
+    <nav className="nav-dock-glass fixed bottom-0 left-0 right-0 z-50">
       <div
         className="flex items-center justify-around px-1 pt-2"
         style={{

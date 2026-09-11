@@ -43,7 +43,7 @@ export default function TopHeader() {
       <div className="flex items-center justify-between px-4 h-16 max-w-2xl mx-auto">
         {/* Brand */}
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-orange-500 border-2 border-black dark:border-white flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
+          <div className="brutal-icon bg-orange-500 border-black dark:border-white">
             <TestTubes size={19} className="text-white" strokeWidth={2.5} />
           </div>
           <div>
@@ -62,7 +62,7 @@ export default function TopHeader() {
           <button
             onClick={toggle}
             aria-label={isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'}
-            className="w-10 h-10 rounded-xl border-2 border-black dark:border-white bg-white dark:bg-zinc-800 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer"
+            className="brutal-icon bg-white dark:bg-zinc-800 border-black dark:border-white hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px]"
             title={isDark ? 'Light Mode' : 'Dark Mode'}
           >
             {isDark
@@ -76,7 +76,7 @@ export default function TopHeader() {
             onClick={handleLogout}
             disabled={loggingOut}
             aria-label="Keluar dari aplikasi"
-            className="w-10 h-10 rounded-xl border-2 border-black dark:border-white bg-rose-400 dark:bg-rose-500 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] dark:hover:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all cursor-pointer disabled:opacity-50"
+            className="brutal-icon bg-rose-400 dark:bg-rose-500 border-black dark:border-white hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50"
             title="Keluar"
           >
             <LogOut size={17} className="text-black dark:text-white" strokeWidth={2.5} />

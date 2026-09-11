@@ -87,7 +87,6 @@ export default function PasienPage() {
       <div className="flex items-center gap-3 mb-5">
         <div className="brutal-icon-lg bg-orange-500 border-black dark:border-white"
           >
-          <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
           <Users size={20} className="text-white relative z-10" />
         </div>
         <div>
@@ -133,9 +132,7 @@ export default function PasienPage() {
         ) : (
           <div>
             {patients.length > 0 && (
-              <div className="px-4 py-2.5"
-                style={{ background: 'var(--surface)' }}
-              >
+              <div className="px-4 py-2.5 bg-slate-100 dark:bg-zinc-900 border-b-2 border-black dark:border-white">
                 <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
                   {total} pasien terdaftar — halaman {page} dari {totalPages}
                 </span>
@@ -152,7 +149,6 @@ export default function PasienPage() {
                 <div className="relative overflow-hidden w-11 h-11 rounded-xl border-2 border-black dark:border-white flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                   style={{ background: getAvatarGradient(p.nama) }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-br from-white/15 to-transparent" />
                   <span className="text-white font-extrabold text-sm relative z-10">
                     {p.nama.charAt(0).toUpperCase()}
                   </span>
@@ -204,12 +200,11 @@ export default function PasienPage() {
                 onClick={() => setPage(n)}
                 disabled={false}
                 aria-current={n === page ? 'page' : undefined}
-                className={`min-w-9 px-3 py-2 rounded-xl text-xs font-bold ${
+                className={`min-w-9 px-3 py-2 rounded-xl text-xs font-bold border-2 border-black dark:border-white transition-all ${
                   n === page
-                    ? 'text-white'
-                    : 'text-slate-600 dark:text-slate-300'
+                    ? 'text-white bg-orange-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]'
+                    : 'text-slate-600 dark:text-slate-300 bg-white dark:bg-zinc-800 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]'
                 }`}
-                style={n === page ? { background: '#f97316', borderColor: 'black' } : {}}
               >
                 {n}
               </button>

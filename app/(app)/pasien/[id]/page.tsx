@@ -117,8 +117,8 @@ export default function PasienDetailPage() {
     <div className="px-4 py-5 animate-slide-up">
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
-        <button onClick={() => router.back()}
-          className="w-9 h-9 rounded-lg border-2 border-black dark:border-white bg-white dark:bg-zinc-800 flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all">
+        <button type="button" onClick={() => router.back()} aria-label="Kembali ke daftar pasien"
+          className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-black bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none dark:border-white dark:bg-zinc-800 dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
           <ArrowLeft size={16} className="text-slate-600" />
         </button>
         <div className="flex-1">
@@ -211,8 +211,10 @@ export default function PasienDetailPage() {
                       <div className="text-[11px] text-slate-400">{exam.dokter} • {exam.status_biaya}</div>
                     </div>
                     <button
+                      type="button"
                       onClick={() => router.push(`/riwayat/${exam.id}`)}
-                      className="w-8 h-8 rounded-lg bg-indigo-400 border-2 border-black dark:border-white flex items-center justify-center shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none transition-all"
+                      aria-label={`Lihat detail pemeriksaan ${exam.no_urut}`}
+                      className="flex h-11 w-11 items-center justify-center rounded-lg border-2 border-black bg-indigo-400 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none dark:border-white dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                     >
                       <Eye size={13} className="text-teal-600" />
                     </button>

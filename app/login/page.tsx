@@ -1,11 +1,56 @@
 ﻿'use client';
 
-import { Activity, Eye, EyeOff, Mail, Lock, Loader2, LogIn } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, Loader2, LogIn } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { createSupabaseBrowserClient } from '@/lib/supabase';
+
+function LabLogoMorph() {
+  return (
+    <svg
+      className="lab-logo-mark h-14 w-14 lg:h-24 lg:w-24"
+      viewBox="0 0 120 120"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        className="lab-logo-activity"
+        pathLength="1"
+        d="M12 61h21l8-17 12 34 11-24 7 7h18"
+      />
+
+      <path
+        className="lab-logo-pipette"
+        pathLength="1"
+        d="m27 28 11-11 27 27-11 11zm7-7 27 27M54 55l17 17M68 75l6-6"
+      />
+
+      <path
+        className="lab-logo-drop"
+        d="M75 72c0 0-7 9-7 14a7 7 0 0 0 14 0c0-5-7-14-7-14Z"
+      />
+
+      <path
+        className="lab-logo-tube"
+        pathLength="1"
+        d="M42 46h40M48 46v37c0 9 6 14 14 14s14-5 14-14V46"
+      />
+      <path
+        className="lab-logo-liquid"
+        d="M50 77c7-5 17 5 24 0v7c0 7-5 11-12 11s-12-4-12-11Z"
+      />
+
+      <path
+        className="lab-logo-graph"
+        pathLength="1"
+        d="M17 91V72l18-9 15 8 17-27 15 10 21-27"
+      />
+      <path className="lab-logo-graph-dot" d="M97 27h6v6" />
+    </svg>
+  );
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -66,7 +111,7 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="mb-6 lg:mb-8 flex items-center justify-center">
             <div className="w-24 h-24 lg:w-40 lg:h-40 rounded-3xl bg-white border-4 border-black flex items-center justify-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <Activity size={48} className="text-orange-500 lg:w-20 lg:h-20" strokeWidth={2.5} />
+              <LabLogoMorph />
             </div>
           </div>
 

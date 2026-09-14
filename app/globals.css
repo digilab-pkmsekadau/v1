@@ -353,3 +353,149 @@ html.dark {
     }
   }
 }
+
+/* Login logo: satu cerita, lalu berhenti sebagai grafik netral. */
+.lab-logo-mark {
+  overflow: visible;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  animation: labLogoHitch 6.4s steps(1, end) 1 forwards;
+}
+
+.lab-logo-activity,
+.lab-logo-pipette,
+.lab-logo-tube,
+.lab-logo-graph {
+  fill: none;
+  stroke-width: 6;
+}
+
+.lab-logo-activity {
+  stroke: var(--accent-primary);
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: labActivity 6.4s ease-out 1 forwards;
+}
+
+.lab-logo-pipette {
+  stroke: #000;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: labPipette 6.4s ease-out 1 forwards;
+}
+
+.lab-logo-drop {
+  fill: var(--accent-secondary);
+  stroke: #000;
+  stroke-width: 4;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: labDrop 6.4s cubic-bezier(.2, .9, .35, 1.15) 1 forwards;
+}
+
+.lab-logo-tube {
+  stroke: #000;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: labTube 6.4s ease-out 1 forwards;
+}
+
+.lab-logo-liquid {
+  fill: var(--accent-secondary);
+  stroke: #000;
+  stroke-width: 4;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: labLiquid 6.4s cubic-bezier(.2, .8, .25, 1) 1 forwards;
+}
+
+.lab-logo-graph {
+  stroke: var(--accent-info);
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: labGraph 6.4s cubic-bezier(.25, .75, .25, 1) 1 forwards;
+}
+
+.lab-logo-graph-dot {
+  fill: none;
+  stroke: var(--accent-info);
+  stroke-width: 6;
+  stroke-linecap: square;
+  stroke-linejoin: miter;
+  animation: labGraphDot 6.4s steps(1, end) 1 forwards;
+}
+
+@keyframes labLogoHitch {
+  0%, 14%, 31%, 48%, 65%, 82%, 100% { transform: translate(0, 0); }
+  15%, 49%, 83% { transform: translate(-2px, -2px); }
+  16%, 50%, 84% { transform: translate(2px, 1px); }
+  17%, 51%, 85% { transform: translate(0, 0); }
+}
+
+@keyframes labActivity {
+  0% { stroke-dashoffset: 1; transform: scale(1); visibility: visible; }
+  7% { stroke-dashoffset: 0; transform: scale(1); }
+  11% { transform: scale(1.1); }
+  14% { transform: scale(1); }
+  18% { stroke-dashoffset: 0; visibility: visible; }
+  18.01%, 100% { stroke-dashoffset: 1; visibility: hidden; }
+}
+
+@keyframes labPipette {
+  0%, 17% { stroke-dashoffset: 1; visibility: hidden; }
+  17.01% { stroke-dashoffset: 1; visibility: visible; }
+  31%, 42% { stroke-dashoffset: 0; visibility: visible; }
+  42.01%, 100% { stroke-dashoffset: 1; visibility: hidden; }
+}
+
+@keyframes labDrop {
+  0%, 32% { transform: translateY(-11px) scale(.4); visibility: hidden; }
+  33% { transform: translateY(-11px) scale(.4); visibility: visible; }
+  38% { transform: translateY(0) scale(1); visibility: visible; }
+  46% { transform: translateY(10px) scale(.82); visibility: visible; }
+  47%, 100% { visibility: hidden; }
+}
+
+@keyframes labTube {
+  0%, 39% { stroke-dashoffset: 1; visibility: hidden; }
+  40% { stroke-dashoffset: 1; visibility: visible; }
+  50%, 69% { stroke-dashoffset: 0; visibility: visible; }
+  70%, 100% { stroke-dashoffset: 1; visibility: hidden; }
+}
+
+@keyframes labLiquid {
+  0%, 48% { transform: scaleY(.08); visibility: hidden; }
+  49% { transform: scaleY(.08); visibility: visible; }
+  61% { transform: scaleY(1); visibility: visible; }
+  68% { transform: translateY(-4px) scaleY(.65) scaleX(1.45); visibility: visible; }
+  70%, 100% { transform: translateY(-8px) scaleY(.08) scaleX(2.4); visibility: hidden; }
+}
+
+@keyframes labGraph {
+  0%, 66% { stroke-dashoffset: 1; visibility: hidden; }
+  67% { stroke-dashoffset: 1; visibility: visible; }
+  84%, 100% { stroke-dashoffset: 0; visibility: visible; }
+}
+
+@keyframes labGraphDot {
+  0%, 83% { visibility: hidden; }
+  84%, 100% { visibility: visible; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab-logo-activity,
+  .lab-logo-pipette,
+  .lab-logo-drop,
+  .lab-logo-tube,
+  .lab-logo-liquid {
+    visibility: hidden;
+  }
+
+  .lab-logo-graph,
+  .lab-logo-graph-dot {
+    visibility: visible;
+    stroke-dashoffset: 0;
+  }
+}

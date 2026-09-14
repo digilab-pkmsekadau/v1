@@ -74,7 +74,7 @@ function SearchableParamSelect({
   const selected = ALL_PARAMS.find(p => p.key === value);
 
   return (
-    <div ref={ref} className="relative flex-1">
+    <div ref={ref} className="relative min-w-0 flex-1">
       <button
         type="button"
         onClick={() => setOpen(o => !o)}
@@ -85,8 +85,8 @@ function SearchableParamSelect({
       </button>
 
       {open && (
-        <div className="brutal-card absolute z-50 left-0 right-0 top-full mt-1 overflow-hidden"
-          style={{ maxHeight: 320 }}>
+        <div className="brutal-card relative z-40 mt-2 max-h-[40dvh] overflow-hidden sm:absolute sm:left-0 sm:right-0 sm:top-full sm:mt-1 sm:max-h-96"
+        >
           <div className="p-2 border-b-2 border-black dark:border-white bg-gray-50 dark:bg-zinc-800">
             <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 rounded-lg px-3 py-2 border-2 border-black dark:border-white">
               <Search size={13} className="text-gray-400 flex-shrink-0" />
@@ -104,7 +104,7 @@ function SearchableParamSelect({
               )}
             </div>
           </div>
-          <div className="overflow-y-auto" style={{ maxHeight: 252 }}>
+          <div className="max-h-[calc(40dvh-3.75rem)] overflow-y-auto overscroll-contain sm:max-h-[20.25rem]">
             {filtered.length === 0 ? (
               <p className="text-center text-xs text-gray-400 font-bold py-6 uppercase tracking-wider">Tidak ditemukan</p>
             ) : (
@@ -354,7 +354,7 @@ export default function InputPage() {
   const progressPct = Math.round(((filledRequired + filledCount) / (totalFields + Math.max(params.length, 1))) * 100);
 
   return (
-    <div className="px-4 py-5 animate-slide-up" ref={topRef}>
+    <div className="px-3 py-4 sm:px-4 sm:py-5 animate-slide-up" ref={topRef}>
       <div className="mb-5">
         <h1 className="text-2xl font-black text-black dark:text-white tracking-tight uppercase">Input Pemeriksaan</h1>
         <p className="text-xs text-gray-500 dark:text-gray-400 font-bold mt-1">Isi identitas pasien lalu tambahkan parameter pemeriksaan</p>
@@ -405,7 +405,7 @@ export default function InputPage() {
       )}
 
       {/* Identitas pasien */}
-      <div className="brutal-card p-5 mb-4">
+      <div className="brutal-card p-4 sm:p-5 mb-4">
         <div className="flex items-center gap-3 mb-4">
           <div className="brutal-icon-sm bg-orange-500 border-black dark:border-white"
             
@@ -480,7 +480,7 @@ export default function InputPage() {
           </div>
 
           {/* Tgl Permintaan + Status Biaya */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="flex flex-col gap-1">
               <label className={`text-[11px] font-bold uppercase tracking-widest flex justify-between ${errors.tgl_permintaan ? "text-red-500" : "text-slate-400 dark:text-slate-500"}`}><span>Tgl Permintaan *</span>{errors.tgl_permintaan && <span className="text-[10px] text-red-500 normal-case tracking-normal">{errors.tgl_permintaan.message}</span>}</label>
               <input type="date" value={patient.tgl_permintaan}
@@ -522,7 +522,7 @@ export default function InputPage() {
       </div>
 
       {/* Parameter lab */}
-      <div className="brutal-card p-5 mb-4">
+      <div className="brutal-card p-4 sm:p-5 mb-4">
         <div className="flex items-center gap-3 mb-4">
           <div className="brutal-icon-sm bg-orange-500 border-black dark:border-white"
             
@@ -548,9 +548,9 @@ export default function InputPage() {
           {params.map((item) => {
             const info = getParamInfo(item.paramKey);
             return (
-              <div key={item.id} className="brutal-card animate-stagger p-3.5 transition-all duration-150" >
+              <div key={item.id} className="brutal-card animate-stagger p-3 sm:p-3.5 transition-all duration-150" >
                 {/* Row header: dropdown pilih param + tombol hapus */}
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-start gap-2 mb-2">
                   <SearchableParamSelect
                     value={item.paramKey}
                     onChange={key => updateParam(item.id, 'paramKey', key)}
@@ -559,7 +559,7 @@ export default function InputPage() {
                   <button
                     type="button"
                     onClick={() => removeParam(item.id)}
-                    className="w-8 h-8 flex items-center justify-center rounded-xl text-red-400 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/40 hover:text-red-600 dark:hover:text-red-400 transition-all duration-200 flex-shrink-0 active:scale-90"
+                    className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black text-red-500 dark:border-white dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 active:scale-95"
                   >
                     <Trash2 size={15} />
                   </button>
@@ -631,7 +631,7 @@ export default function InputPage() {
         <button
           type="button"
           onClick={addParam}
-          className="w-full mt-3 flex items-center justify-center gap-2 py-3.5 rounded-xl border-2 border-dashed border-black dark:border-white text-black dark:text-white text-sm font-black uppercase hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all duration-150"
+          className="w-full min-h-12 mt-3 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-black dark:border-white text-black dark:text-white text-sm font-black uppercase hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-150"
         >
           <Plus size={16} />
           TAMBAH PARAMETER
@@ -639,12 +639,12 @@ export default function InputPage() {
       </div>
 
       {/* Tombol aksi */}
-      <div className="flex gap-3 pb-4">
+      <div className="flex flex-col gap-2 pb-[calc(1rem+env(safe-area-inset-bottom))] sm:flex-row sm:gap-3 sm:pb-4">
         <button
           type="button"
           onClick={handleReset}
           disabled={loading}
-          className="brutal-btn flex-1 py-3.5 disabled:opacity-50"
+          className="brutal-btn min-h-12 w-full py-3 sm:flex-1 disabled:opacity-50"
           
         >
           <RotateCcw size={16} />
@@ -654,7 +654,7 @@ export default function InputPage() {
           type="button"
           onClick={handleSubmit(onSubmitForm)}
           disabled={loading}
-          className="brutal-btn brutal-btn-primary flex-[2] py-3.5 disabled:bg-gray-300 disabled:text-gray-800 disabled:cursor-not-allowed disabled:border-gray-800"
+          className="brutal-btn brutal-btn-primary min-h-12 w-full py-3 sm:flex-[2] disabled:bg-gray-300 disabled:text-gray-800 disabled:cursor-not-allowed disabled:border-gray-800"
           
         >
           {loading ? (

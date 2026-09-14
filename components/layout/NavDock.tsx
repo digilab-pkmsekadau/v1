@@ -21,7 +21,7 @@ export default function NavDock() {
   return (
     <nav className="nav-dock-glass fixed bottom-0 left-0 right-0 z-50">
       <div
-        className="flex items-center justify-around px-1 pt-2"
+        className="grid grid-cols-6 items-end gap-0 px-1 pt-1.5"
         style={{
           paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom, 0px))',
         }}
@@ -36,7 +36,7 @@ export default function NavDock() {
               aria-label={label}
               aria-current={isActive ? 'page' : undefined}
               className={cn(
-                'relative flex flex-col items-center gap-1 px-3 py-2 rounded-xl cursor-pointer transition-all duration-150 group',
+                'group relative flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 py-1.5 cursor-pointer transition-all duration-150 sm:px-2 sm:py-2',
                 'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
                 isActive
                   ? 'bg-orange-500 border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]'
@@ -54,7 +54,7 @@ export default function NavDock() {
                 )}
               />
               <span className={cn(
-                'text-[10px] font-bold uppercase tracking-wide transition-colors',
+                'w-full truncate text-center text-[7px] font-bold uppercase tracking-normal transition-colors min-[400px]:text-[8px] sm:text-[10px] sm:tracking-wide',
                 isActive
                   ? 'text-white'
                   : 'text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white'

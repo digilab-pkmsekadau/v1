@@ -40,17 +40,17 @@ export default function TopHeader() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-40 bg-[#FAF9F6] dark:bg-zinc-950 border-b-2 border-black dark:border-white transition-colors duration-200">
-      <div className="flex items-center justify-between px-4 h-16 max-w-2xl mx-auto">
+      <div className="flex items-center justify-between gap-3 px-3 h-16 max-w-2xl mx-auto sm:px-4">
         {/* Brand */}
-        <div className="flex items-center gap-3">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
           <div className="brutal-icon bg-orange-500 border-black dark:border-white">
             <TestTubes size={19} className="text-white" strokeWidth={2.5} />
           </div>
-          <div>
-            <div className="font-black text-black dark:text-white text-base leading-tight tracking-tight">
+          <div className="min-w-0">
+            <div className="truncate font-black text-black dark:text-white text-base leading-tight tracking-tight">
               DigiLab
             </div>
-            <div className="text-[10px] text-gray-500 dark:text-gray-400 font-bold leading-tight tracking-wide uppercase">
+            <div className="truncate text-[9px] text-gray-500 dark:text-gray-400 font-bold leading-tight tracking-wide uppercase sm:text-[10px]">
               Puskesmas Sekadau
             </div>
           </div>

@@ -11,6 +11,7 @@ import {
 import { toast } from 'sonner';
 
 import { isAbnormal } from '@/lib/normal-ranges';
+import { ALL_PARAMS } from '@/lib/param-options';
 
 // QR Code - lazy loaded (client only)
 const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => m.QRCodeSVG), { ssr: false });
@@ -29,17 +30,18 @@ const TREND_PARAMS: { key: string; label: string; color: string }[] = [
   { key: 'wbc',         label: 'WBC',         color: '#0891b2' },
   { key: 'plt',         label: 'PLT',         color: '#65a30d' },
 ];
+const LAB_PARAM_KEYS = new Set(ALL_PARAMS.map(param => param.key));
 
 interface Patient {
   id: string; nama: string; nik?: string;
-  alamat?: string; tgl_lahir?: string;
+  alamat?: string; tgl_lahir?: string; jenis_kelamin?: string;
 }
 interface Examination { [key: string]: string | undefined; tgl_permintaan: string; id: string; no_urut: string; }
 
 function parseNum(val?: string): number | null {
   if (!val) return null;
-  const n = parseFloat(val);
-  return isNaN(n) ? null : n;
+  const n = Number.parseFloat(val.replace(',', '.'));
+  return Number.isNaN(n) ? null : n;
 }
 
 export default function PasienDetailPage() {
@@ -69,14 +71,14 @@ export default function PasienDetailPage() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   // Build chart data — hanya param numerik yang ada nilainya
-  const availableParams = TREND_PARAMS.filter(p => {
-    return exams.some(e => {
-      const val = e[p.key] as string;
-      if (!val) return false;
-      const n = parseFloat(val);
-      return !isNaN(n) && val !== '';
-    });
-  });
+  const availableParams = TREND_PARAMS.filter(p =>
+    exams.some(e => parseNum(e[p.key] as string) !== null)
+  );
+  const availableKeys = availableParams.map(param => param.key);
+  const selectedAvailable = selectedParams.filter(key => availableKeys.includes(key));
+  const displayedParams = selectedAvailable.length > 0
+    ? selectedAvailable
+    : availableKeys.slice(0, 2);
 
   const chartData = exams.map(e => {
     const row: Record<string, string | number> = {
@@ -189,8 +191,8 @@ export default function PasienDetailPage() {
           ) : (
             <div className="divide-y divide-slate-50">
               {[...exams].reverse().map(exam => {
-                const abnormals = Object.entries(exam).filter(([k, v]) =>
-                  typeof v === 'string' && isAbnormal(k, v)
+                const abnormals = Object.entries(exam).filter(([key, value]) =>
+                  LAB_PARAM_KEYS.has(key) && typeof value === 'string' && isAbnormal(key, value, patient.jenis_kelamin)
                 );
                 return (
                   <div key={exam.id} className="flex items-center gap-3 px-4 py-3.5 hover:bg-orange-50 dark:hover:bg-zinc-800 transition-colors border-b-2 border-black dark:border-white last:border-b-0">
@@ -244,11 +246,11 @@ export default function PasienDetailPage() {
                         prev.includes(p.key) ? prev.filter(x => x !== p.key) : [...prev, p.key]
                       )}
                       className={`px-2.5 py-1 rounded-xl text-xs font-bold transition-all border ${
-                        selectedParams.includes(p.key)
+                        displayedParams.includes(p.key)
                           ? 'text-white border-transparent'
                           : 'border-slate-200 text-slate-500 bg-white'
                       }`}
-                      style={selectedParams.includes(p.key) ? { background: p.color, borderColor: p.color } : {}}
+                      style={displayedParams.includes(p.key) ? { background: p.color, borderColor: p.color } : {}}
                     >
                       {p.label}
                     </button>
@@ -262,10 +264,6 @@ export default function PasienDetailPage() {
                   <div className="py-8 text-center text-slate-400 text-sm">
                     Perlu minimal 2 kali pemeriksaan untuk melihat tren
                   </div>
-                ) : selectedParams.length === 0 ? (
-                  <div className="py-8 text-center text-slate-400 text-sm">
-                    Pilih minimal 1 parameter di atas
-                  </div>
                 ) : (
                   <>
                     <p className="text-xs font-bold text-slate-600 mb-3">Tren Nilai Lab</p>
@@ -278,7 +276,7 @@ export default function PasienDetailPage() {
                           contentStyle={{ borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 11 }}
                         />
                         <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-                        {TREND_PARAMS.filter(p => selectedParams.includes(p.key)).map(p => (
+                        {TREND_PARAMS.filter(p => displayedParams.includes(p.key)).map(p => (
                           <Line
                             key={p.key}
                             type="monotone"

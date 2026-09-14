@@ -15,7 +15,7 @@ import { isAbnormal } from '@/lib/normal-ranges';
 // QR Code - lazy loaded (client only)
 const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => m.QRCodeSVG), { ssr: false });
 
-// Parameter numerik yang bisa digrafik (termasuk LDL, HDL, NAPZA)
+// Parameter numerik berbasis kolom examinations yang bisa digrafik.
 const TREND_PARAMS: { key: string; label: string; color: string }[] = [
   { key: 'gds',         label: 'GDS',         color: '#0d9488' },
   { key: 'gdp',         label: 'GDP',         color: '#2563eb' },
@@ -28,10 +28,6 @@ const TREND_PARAMS: { key: string; label: string; color: string }[] = [
   { key: 'hgb',         label: 'HGB',         color: '#db2777' },
   { key: 'wbc',         label: 'WBC',         color: '#0891b2' },
   { key: 'plt',         label: 'PLT',         color: '#65a30d' },
-  { key: 'sgot',        label: 'SGOT',        color: '#9333ea' },
-  { key: 'sgpt',        label: 'SGPT',        color: '#ea580c' },
-  { key: 'ureum',       label: 'Ureum',       color: '#0284c7' },
-  { key: 'napza',       label: 'NAPZA',       color: '#6366f1' },
 ];
 
 interface Patient {
@@ -74,7 +70,6 @@ export default function PasienDetailPage() {
 
   // Build chart data — hanya param numerik yang ada nilainya
   const availableParams = TREND_PARAMS.filter(p => {
-    if (p.key === 'napza') return false; // Skip categorical field
     return exams.some(e => {
       const val = e[p.key] as string;
       if (!val) return false;
@@ -88,7 +83,6 @@ export default function PasienDetailPage() {
       tgl: new Date(e.tgl_permintaan).toLocaleDateString('id-ID', { day: '2-digit', month: 'short' }),
     };
     TREND_PARAMS.forEach(p => {
-      if (p.key === 'napza') return; // NAPZA is categorical, skip charting
       const n = parseNum(e[p.key] as string);
       if (n !== null) row[p.key] = n;
     });

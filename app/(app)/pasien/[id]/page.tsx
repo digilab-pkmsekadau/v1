@@ -72,7 +72,7 @@ export default function PasienDetailPage() {
 
   // Build chart data — hanya param numerik yang ada nilainya
   const availableParams = TREND_PARAMS.filter(p =>
-    exams.some(e => parseNum(e[p.key] as string) !== null)
+    exams.filter(e => parseNum(e[p.key] as string) !== null).length >= 2
   );
   const availableKeys = availableParams.map(param => param.key);
   const selectedAvailable = selectedParams.filter(key => availableKeys.includes(key));

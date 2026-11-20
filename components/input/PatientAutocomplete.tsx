@@ -174,7 +174,7 @@ export default function PatientAutocomplete({
                   </div>
                   <div className="flex items-center gap-1.5 flex-shrink-0">
                     {p.last_exam_count && p.last_exam_count > 0 && (
-                      <span className="text-[9px] font-black bg-orange-500 text-white px-1.5 py-0.5 rounded-full border border-black dark:border-white">
+                      <span className="text-[9px] font-black bg-teal-700 text-white px-1.5 py-0.5 rounded-full border border-black dark:border-white">
                         {p.last_exam_count}x
                       </span>
                     )}

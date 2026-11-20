@@ -7,47 +7,19 @@ import { toast } from 'sonner';
 
 import { createSupabaseBrowserClient } from '@/lib/supabase';
 
-function LabLogoMorph() {
+function LabMark() {
+  // Logo statis: tabung + grafik tren naik. Tanpa animasi (MOTION 1, R-19).
   return (
     <svg
-      className="lab-logo-mark h-14 w-14 lg:h-24 lg:w-24"
+      className="h-14 w-14 lg:h-20 lg:w-20"
       viewBox="0 0 120 120"
       fill="none"
       aria-hidden="true"
     >
-      <path
-        className="lab-logo-activity"
-        pathLength="1"
-        d="M12 61h21l8-17 12 34 11-24 7 7h18"
-      />
-
-      <path
-        className="lab-logo-pipette"
-        pathLength="1"
-        d="m27 28 11-11 27 27-11 11zm7-7 27 27M54 55l17 17M68 75l6-6"
-      />
-
-      <path
-        className="lab-logo-drop"
-        d="M75 72c0 0-7 9-7 14a7 7 0 0 0 14 0c0-5-7-14-7-14Z"
-      />
-
-      <path
-        className="lab-logo-tube"
-        pathLength="1"
-        d="M42 46h40M48 46v37c0 9 6 14 14 14s14-5 14-14V46"
-      />
-      <path
-        className="lab-logo-liquid"
-        d="M50 77c7-5 17 5 24 0v7c0 7-5 11-12 11s-12-4-12-11Z"
-      />
-
-      <path
-        className="lab-logo-graph"
-        pathLength="1"
-        d="M17 91V72l18-9 15 8 17-27 15 10 21-27"
-      />
-      <path className="lab-logo-graph-dot" d="M97 27h6v6" />
+      <rect x="30" y="14" width="26" height="92" rx="10" stroke="#0f172a" strokeWidth="6" />
+      <rect x="36" y="52" width="14" height="48" rx="5" fill="#0d9488" stroke="none" />
+      <polyline points="66,84 82,64 94,70 108,44" stroke="#f97316" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="108" cy="44" r="5" fill="#f97316" stroke="none" />
     </svg>
   );
 }
@@ -98,33 +70,22 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-[#FAF9F6] dark:bg-zinc-950">
 
-      {/* ── LEFT: brand panel ─────────────────────── */}
-      <div className="relative overflow-hidden flex flex-col items-center justify-center text-center px-6 py-10 lg:w-[52%] lg:py-16 lg:px-12 bg-orange-500 border-b-4 lg:border-b-0 lg:border-r-4 border-black dark:border-white">
-        {/* Decorative shapes */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-          <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full border-4 border-white/20" />
-          <div className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full border-4 border-white/15" />
-          <div className="absolute top-1/3 left-1/4 w-32 h-32 rounded-full border-4 border-white/10" />
-        </div>
-
-        <div className="relative z-10 flex flex-col items-center">
-          {/* Logo */}
+      {/* Panel identitas: teal klinis, tanpa dekorasi mengambang */}
+      <div className="flex flex-col items-center justify-center text-center px-6 py-10 lg:w-[52%] lg:py-16 lg:px-12 bg-teal-700 border-b-4 lg:border-b-0 lg:border-r-4 border-black dark:border-white">
+        <div className="flex flex-col items-center">
           <div className="mb-6 lg:mb-8 flex items-center justify-center">
-            <div className="w-24 h-24 lg:w-40 lg:h-40 rounded-3xl bg-white border-4 border-black flex items-center justify-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-              <LabLogoMorph />
+            <div className="w-24 h-24 lg:w-36 lg:h-36 rounded-3xl bg-white border-4 border-black flex items-center justify-center shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+              <LabMark />
             </div>
           </div>
 
-          {/* Wordmark */}
           <h1 className="text-4xl lg:text-6xl font-black tracking-tight text-white uppercase mb-2">DigiLab</h1>
           <p className="text-white/90 text-sm lg:text-lg font-bold uppercase tracking-widest">Sistem Informasi Laboratorium</p>
           <p className="text-white/70 text-xs font-bold tracking-widest uppercase mt-2">Puskesmas Sekadau</p>
-          
-          <div className="hidden lg:block mt-8 max-w-xs">
-            <p className="text-white/80 text-sm leading-relaxed font-medium">
-              Pencatatan &amp; pelaporan hasil laboratorium yang cepat, akurat, dan terpercaya.
-            </p>
-          </div>
+
+          <p className="hidden lg:block mt-8 max-w-xs text-white/80 text-sm leading-relaxed font-medium">
+            Catat hasil lab, pantau tren pasien, dan unduh rekap. Satu alur, tanpa kertas tercecer.
+          </p>
         </div>
       </div>
 
@@ -135,9 +96,7 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="brutal-card w-full p-6 flex flex-col gap-4">
 
             <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="brutal-icon-sm bg-orange-500 border-black dark:border-white">
-                <Lock size={16} strokeWidth={2.5} className="text-white" />
-              </span>
+              <Lock size={16} strokeWidth={2.5} className="text-teal-700 dark:text-teal-400" aria-hidden="true" />
               <span className="text-gray-600 dark:text-gray-300 text-sm font-black tracking-widest uppercase">Masuk Sistem</span>
             </div>
 
@@ -145,9 +104,7 @@ export default function LoginPage() {
             <div className="flex flex-col gap-1.5">
               <label htmlFor="email" className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Email</label>
               <div className="flex items-center gap-2">
-                <span className="brutal-icon-sm bg-amber-400 border-black dark:border-white flex-shrink-0">
-                  <Mail size={14} strokeWidth={2.5} className="text-black" />
-                </span>
+                <Mail size={14} strokeWidth={2.5} className="text-teal-700 dark:text-teal-400 flex-shrink-0" aria-hidden="true" />
                 <input
                   id="email"
                   type="email"
@@ -165,15 +122,13 @@ export default function LoginPage() {
             <div className="flex flex-col gap-1.5">
               <label htmlFor="password" className="text-xs font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Password</label>
               <div className="flex items-center gap-2">
-                <span className="brutal-icon-sm bg-indigo-400 border-black dark:border-white flex-shrink-0">
-                  <Lock size={14} strokeWidth={2.5} className="text-black" />
-                </span>
+                <Lock size={14} strokeWidth={2.5} className="text-teal-700 dark:text-teal-400 flex-shrink-0" aria-hidden="true" />
                 <input
                   id="password"
                   type={showPass ? 'text' : 'password'}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="••••••••"
+                  placeholder="Kata sandi"
                   autoComplete="current-password"
                   disabled={loading}
                   className="brutal-input flex-1"
@@ -182,7 +137,7 @@ export default function LoginPage() {
                   type="button"
                   onClick={() => setShowPass(!showPass)}
                   aria-label={showPass ? 'Sembunyikan password' : 'Tampilkan password'}
-                  className="brutal-icon-sm bg-gray-200 dark:bg-zinc-700 border-black dark:border-white flex-shrink-0 cursor-pointer hover:bg-gray-300 dark:hover:bg-zinc-600"
+                  aria-pressed={showPass}
                 >
                   {showPass ? <EyeOff size={14} className="text-black dark:text-white" /> : <Eye size={14} className="text-black dark:text-white" />}
                 </button>
@@ -211,8 +166,8 @@ export default function LoginPage() {
             <p className="text-gray-500 dark:text-gray-400 text-xs font-bold">
               DigiLab Puskesmas Sekadau © {new Date().getFullYear()}
             </p>
-            <p className="text-gray-400 dark:text-gray-500 text-[10px] leading-relaxed max-w-xs mx-auto font-medium">
-              DigiLab dikembangkan oleh <span className="text-gray-600 dark:text-gray-300 font-bold">Banu Prasetya</span> bersama Analis Laboratorium Kesehatan Puskesmas Sekadau
+            <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed max-w-xs mx-auto font-medium">
+              Aplikasi internal Puskesmas Sekadau. Akun dibuat oleh admin, bukan pendaftaran mandiri.
             </p>
           </div>
         </div>

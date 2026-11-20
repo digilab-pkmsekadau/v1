@@ -11,7 +11,7 @@ function SaveButton({ keyName, label, value, saving, onSave }: { keyName: string
     <button
       onClick={() => onSave(keyName, value, label)}
       disabled={saving === keyName}
-      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-orange-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 transition-all"
+      className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase text-slate-900 border-2 border-black dark:border-white bg-orange-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] active:translate-x-[2px] active:translate-y-[2px] active:shadow-none disabled:opacity-50 transition-all"
       
     >
       {saving === keyName ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
@@ -204,7 +204,7 @@ export default function SettingsPage() {
   return (
     <div className="px-4 py-5 animate-slide-up">
       <div className="flex items-center gap-3 mb-6">
-        <div className="brutal-icon-lg bg-orange-500 border-black dark:border-white"
+        <div className="brutal-icon-lg bg-teal-700 border-black dark:border-white"
           >
           <Settings size={19} className="text-white relative z-10" />
         </div>

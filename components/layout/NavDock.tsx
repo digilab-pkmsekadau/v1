@@ -38,8 +38,8 @@ export default function NavDock() {
               className={cn(
                 'group relative flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-xl px-0.5 py-1.5 cursor-pointer transition-all duration-150 sm:px-2 sm:py-2',
                 'active:translate-x-[2px] active:translate-y-[2px] active:shadow-none',
-                isActive
-                  ? 'bg-orange-500 border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]'
+              isActive
+                  ? 'bg-teal-600 border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]'
                   : 'border-2 border-transparent hover:border-black dark:hover:border-white hover:bg-gray-100 dark:hover:bg-zinc-800'
               )}
             >
@@ -54,7 +54,7 @@ export default function NavDock() {
                 )}
               />
               <span className={cn(
-                'w-full truncate text-center text-[7px] font-bold uppercase tracking-normal transition-colors min-[400px]:text-[8px] sm:text-[10px] sm:tracking-wide',
+                'w-full truncate text-center text-[10px] font-bold uppercase tracking-normal transition-colors sm:text-[10px] sm:tracking-wide',
                 isActive
                   ? 'text-white'
                   : 'text-gray-500 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white'

@@ -42,7 +42,7 @@ function DownloadMenu({
       <button
         onClick={() => setOpenMenu(isOpen ? null : menuKey)}
         aria-label={`Unduh data ${paramName}`}
-        className="brutal-icon-sm bg-orange-500 border-black dark:border-white hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px]"
+        className="brutal-icon-sm bg-teal-700 border-black dark:border-white hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px]"
       >
         <Download size={13} strokeWidth={2.5} className="text-white" />
       </button>
@@ -136,7 +136,7 @@ export default function DashboardPage() {
         <button
           onClick={fetchDashboard}
           aria-label="Muat ulang data dashboard"
-          className="brutal-icon-lg bg-orange-500 border-black dark:border-white hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[3px] active:translate-y-[3px]"
+          className="brutal-icon-lg bg-teal-700 border-black dark:border-white hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[3px] active:translate-y-[3px]"
         >
           <RefreshCw size={18} strokeWidth={2.5} className={`text-white ${loading ? 'animate-spin' : ''}`} />
         </button>
@@ -174,40 +174,40 @@ export default function DashboardPage() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 mb-6">
-        <div className="brutal-card p-4 bg-orange-500! border-black dark:border-white">
+        <div className="brutal-card p-4 bg-teal-700! border-black dark:border-white">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-9 h-9 rounded-lg bg-white/20 border-2 border-white flex items-center justify-center">
               <TestTube size={17} className="text-white" strokeWidth={2.5} />
             </div>
-            <span className="label-caps text-[10px] text-white/80 font-black">Hari Ini</span>
+            <span className="label-caps text-[10px] text-white font-black">Hari Ini</span>
           </div>
           <div className="font-mono-data text-4xl font-black text-white tracking-tight">
             {loading ? <div className="skeleton h-10 w-16 rounded" /> : (
               <span className="counter-animate">{stats?.today ?? 0}</span>
             )}
           </div>
-          <div className="text-xs text-white/70 mt-1 font-bold">Pasien diperiksa</div>
+          <div className="text-xs text-white mt-1 font-bold">Pasien diperiksa</div>
         </div>
 
-        <div className="brutal-card p-4 bg-emerald-500! border-black dark:border-white">
+        <div className="brutal-card p-4 bg-white! dark:bg-zinc-900! border-black dark:border-white">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-white/20 border-2 border-white flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-teal-700 border-2 border-black dark:border-white flex items-center justify-center">
               <TrendingUp size={17} className="text-white" strokeWidth={2.5} />
             </div>
-            <span className="label-caps text-[10px] text-white/80 font-black">Periode</span>
+            <span className="label-caps text-[10px] text-teal-800 dark:text-teal-300 font-black">Periode</span>
           </div>
-          <div className="font-mono-data text-4xl font-black text-white tracking-tight">
+          <div className="font-mono-data text-4xl font-black text-teal-800 dark:text-teal-300 tracking-tight">
             {loading ? <div className="skeleton h-10 w-16 rounded" /> : (
               <span className="counter-animate">{stats?.filtered ?? 0}</span>
             )}
           </div>
-          <div className="text-xs text-white/70 mt-1 font-bold">Total pemeriksaan</div>
+          <div className="text-xs text-slate-600 dark:text-slate-300 mt-1 font-bold">Total pemeriksaan</div>
         </div>
       </div>
 
       {/* Chemistry Stats */}
       <div className="section-header">
-        <span className="brutal-icon-sm bg-orange-500 border-black dark:border-white">
+        <span className="brutal-icon-sm bg-teal-700 border-black dark:border-white">
           <FlaskConical size={15} strokeWidth={2.5} className="text-white" />
         </span>
         <span className="section-title text-black dark:text-white">Kimia Klinik</span>
@@ -222,11 +222,11 @@ export default function DashboardPage() {
                 className="cat-surface-kimia animate-stagger flex-1 min-w-[calc(50%-6px)] rounded-xl border-2 p-3.5 flex flex-col gap-1.5 hover:-translate-y-0.5 transition-all duration-150 cursor-default"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
-                <div className="label-caps text-[10px] font-black leading-tight text-orange-700 dark:text-orange-400">{label}</div>
-                <div className="font-mono-data text-2xl font-black tracking-tight text-orange-600 dark:text-orange-400">
+                <div className="label-caps text-[10px] font-black leading-tight text-teal-700 dark:text-teal-400">{label}</div>
+                <div className="font-mono-data text-2xl font-black tracking-tight text-teal-600 dark:text-teal-400">
                   <span className="counter-animate">{count}</span>
                 </div>
-                <div className="label-caps text-[10px] text-orange-500 dark:text-orange-300">pasien</div>
+                <div className="label-caps text-[10px] text-teal-500 dark:text-teal-300">terisi</div>
                 <button
                   onClick={() => handleDownload(label, 'all_filled')}
                   aria-label={`Unduh data ${label}`}
@@ -390,7 +390,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-sm font-black leading-tight">
                   <span className="text-sky-600 dark:text-sky-400"><span className="font-mono-data">{obj.pos + obj.neg}</span> Terisi</span>
-                  <span className="text-gray-400 dark:text-gray-500 text-xs"> / <span className="font-mono-data">{obj.pos}</span> Pos</span>
+                  <span className="text-gray-400 dark:text-gray-500 text-xs"> / <span className="font-mono-data">{obj.pos}</span> Abnormal</span>
                 </div>
               </div>
             ))

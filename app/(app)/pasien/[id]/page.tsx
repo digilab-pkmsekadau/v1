@@ -146,7 +146,7 @@ export default function PasienDetailPage() {
       {/* Patient Info Card */}
       <div className="brutal-card p-4 mb-4">
         <div className="flex items-start gap-3">
-          <div className="w-12 h-12 rounded-xl bg-orange-500 border-2 border-black dark:border-white flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
+          <div className="w-12 h-12 rounded-xl bg-teal-600 border-2 border-black dark:border-white flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]">
             <span className="text-white font-black text-lg">
               {patient.nama.charAt(0).toUpperCase()}
             </span>
@@ -362,7 +362,7 @@ export default function PasienDetailPage() {
               a.remove();
               URL.revokeObjectURL(url);
             }}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-orange-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase text-slate-900 border-2 border-black dark:border-white bg-orange-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"
             
           >
             <QrCode size={14} />

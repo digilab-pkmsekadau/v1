@@ -156,7 +156,7 @@ export default function RiwayatPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="brutal-icon-lg bg-orange-500 border-black dark:border-white"
+          <div className="brutal-icon-lg bg-teal-700 border-black dark:border-white"
             >
             <ClipboardList size={20} className="text-white relative z-10" />
           </div>
@@ -263,7 +263,7 @@ export default function RiwayatPage() {
               <button
                 onClick={handleMonthlyExport}
                 disabled={exportingMonthly}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-orange-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none disabled:opacity-50 transition-all"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black uppercase text-slate-900 border-2 border-black dark:border-white bg-orange-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none disabled:opacity-50 transition-all"
                 
               >
                 {exportingMonthly
@@ -280,7 +280,7 @@ export default function RiwayatPage() {
           <button
             onClick={handleMonthlyExport}
             disabled={exportingMonthly}
-            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-orange-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none disabled:opacity-50 transition-all"
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-xl text-sm font-black uppercase text-slate-900 border-2 border-black dark:border-white bg-orange-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none disabled:opacity-50 transition-all"
             
           >
             {exportingMonthly

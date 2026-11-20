@@ -85,7 +85,7 @@ export default function PasienPage() {
     <div className="px-4 py-5 animate-slide-up">
       {/* Header */}
       <div className="flex items-center gap-3 mb-5">
-        <div className="brutal-icon-lg bg-orange-500 border-black dark:border-white"
+        <div className="brutal-icon-lg bg-teal-700 border-black dark:border-white"
           >
           <Users size={20} className="text-white relative z-10" />
         </div>
@@ -202,7 +202,7 @@ export default function PasienPage() {
                 aria-current={n === page ? 'page' : undefined}
                 className={`min-w-9 px-3 py-2 rounded-xl text-xs font-bold border-2 border-black dark:border-white transition-all ${
                   n === page
-                    ? 'text-white bg-orange-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]'
+                    ? 'text-white bg-teal-600 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]'
                     : 'text-slate-600 dark:text-slate-300 bg-white dark:bg-zinc-800 shadow-[1px_1px_0px_0px_rgba(0,0,0,1)] dark:shadow-[1px_1px_0px_0px_rgba(255,255,255,1)]'
                 }`}
               >

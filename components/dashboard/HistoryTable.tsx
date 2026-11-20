@@ -109,7 +109,7 @@ export default function HistoryTable({ data, loading, onDelete }: Props) {
                   }}
                 >
                   <td className="py-3.5 px-3">
-                    <span className="inline-flex items-center justify-center min-w-[44px] h-7 px-2 rounded-lg text-[11px] font-black text-white bg-orange-500 border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
+                    <span className="inline-flex items-center justify-center min-w-[44px] h-7 px-2 rounded-lg text-[11px] font-black text-white bg-teal-600 border-2 border-black dark:border-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] dark:shadow-[2px_2px_0px_0px_rgba(255,255,255,1)]"
                       
                     >
                       {row.no}

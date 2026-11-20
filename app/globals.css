@@ -2,8 +2,8 @@
 @import "tailwindcss";
 
 /* ===============================================================
-   NEO-BRUTALISM THEME - Orvaki Style
-   Bold borders, hard shadows, playful colors, high contrast
+   TEMA DIGILAB — klinik tepercaya, energi hanya di momen kunci
+   Primer teal (kepercayaan klinis), aksen oranye (tindakan/perhatian)
    =============================================================== */
 :root {
   color-scheme: light dark;
@@ -11,12 +11,14 @@
   --bg-body: #FAF9F6;
   --bg-card: #ffffff;
   --surface: #f4f4f5;
-  --text-main: #000000;
-  --text-muted: #666666;
-  --border-color: #000000;
-  
-  /* Accent colors */
-  --accent-primary: #f97316;      /* orange-500 */
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --border-color: #0f172a;
+
+  /* Accent colors: primer teal, oranye hanya momen kunci */
+  --accent-primary: #0d9488;      /* teal-600 */
+  --accent-primary-dark: #0f766e; /* teal-700, hover */
+  --accent-action: #f97316;       /* orange-500, CTA simpan/perhatian */
   --accent-secondary: #fbbf24;    /* amber-400 */
   --accent-success: #34d399;      /* emerald-400 */
   --accent-info: #818cf8;         /* indigo-400 */
@@ -24,11 +26,11 @@
   
   /* Category colors (lab) */
   --cat-hema: #fb7185;      --cat-hema-soft: #ffe4e6;
-  --cat-kimia: #f97316;     --cat-kimia-soft: #ffedd5;
+  --cat-kimia: #0d9488;     --cat-kimia-soft: #ccfbf1;
   --cat-imuno: #818cf8;     --cat-imuno-soft: #e0e7ff;
-  --cat-mikro: #fbbf24;     --cat-mikro-soft: #fef3c7;
-  --cat-urin: #38bdf8;      --cat-urin-soft: #e0f2fe;
-  --cat-trend: #34d399;     --cat-trend-soft: #d1fae5;
+  --cat-mikro: #d97706;     --cat-mikro-soft: #fef3c7;
+  --cat-urin: #0284c7;      --cat-urin-soft: #e0f2fe;
+  --cat-trend: #059669;     --cat-trend-soft: #d1fae5;
   
   /* Danger */
   --danger: #dc2626;
@@ -77,8 +79,15 @@ html.dark {
    BASE STYLES
    ═══════════════════════════════════════════════════════════════ */
 @layer base {
-  * {
-    box-sizing: border-box;
+  button:not(:disabled), [role="button"]:not([aria-disabled="true"]), select, summary, label[for] {
+    cursor: pointer;
+  }
+  button:disabled {
+    cursor: not-allowed;
+  }
+  :focus-visible {
+    outline: 3px solid var(--accent-primary);
+    outline-offset: 2px;
   }
   html {
     scrollbar-width: thin;
@@ -167,17 +176,19 @@ html.dark {
   }
   
   .brutal-btn-primary {
-    background: var(--accent-primary);
+    background: var(--accent-primary-dark);
     color: white;
   }
-  
+
   .brutal-btn-primary:hover {
-    background: #ea580c;
+    filter: brightness(0.9);
   }
-  
-  .brutal-btn-secondary {
-    background: var(--accent-secondary);
-    color: black;
+
+  /* Aksen oranye: hanya momen kunci (simpan/kirim/perhatian). Teks hitam
+     agar kontras lolos AA (hitam di oranye 6.4, putih cuma 2.8). */
+  .brutal-btn-action {
+    background: var(--accent-action);
+    color: #0f172a;
   }
   
   /* ─── Brutal Input ───────────────────────────────────────── */

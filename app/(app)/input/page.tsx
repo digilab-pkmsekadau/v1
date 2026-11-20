@@ -118,8 +118,8 @@ function SearchableParamSelect({
                       onClick={() => { onChange(param.key); setOpen(false); }}
                       className={`w-full text-left px-4 py-2.5 text-sm font-bold transition-colors border-b border-gray-200 dark:border-zinc-700 last:border-b-0
                         ${param.key === value
-                          ? 'bg-orange-500 text-white'
-                          : 'text-black dark:text-white hover:bg-orange-100 dark:hover:bg-zinc-800'}`}
+                          ? 'bg-teal-700 text-white'
+                          : 'text-black dark:text-white hover:bg-teal-50 dark:hover:bg-zinc-800'}`}
                     >
                       {param.label}
                       {param.unit && <span className="text-gray-400 dark:text-gray-500 text-xs ml-1">({param.unit})</span>}
@@ -405,10 +405,10 @@ export default function InputPage() {
       {/* Identitas pasien */}
       <div className="brutal-card p-4 sm:p-5 mb-4">
         <div className="flex items-center gap-3 mb-4">
-          <div className="brutal-icon-sm bg-orange-500 border-black dark:border-white"
+          <div className="brutal-icon-sm bg-teal-700 border-black dark:border-white"
             
           >
-            <User size={16} className="text-teal-600 dark:text-teal-400" />
+            <User size={16} className="text-white" />
           </div>
           <span className="font-black text-sm text-black dark:text-white uppercase">Identitas Pasien</span>
         </div>
@@ -527,10 +527,10 @@ export default function InputPage() {
       {/* Parameter lab */}
       <div className="brutal-card p-4 sm:p-5 mb-4">
         <div className="flex items-center gap-3 mb-4">
-          <div className="brutal-icon-sm bg-orange-500 border-black dark:border-white"
+          <div className="brutal-icon-sm bg-teal-700 border-black dark:border-white"
             
           >
-            <Stethoscope size={16} className="text-blue-600 dark:text-blue-400" />
+            <Stethoscope size={16} className="text-white" />
           </div>
           <span className="font-black text-sm text-black dark:text-white uppercase">Parameter Lab</span>
           {params.length > 0 && (
@@ -657,7 +657,7 @@ export default function InputPage() {
           type="button"
           onClick={handleSubmit(onSubmitForm)}
           disabled={loading}
-          className="brutal-btn brutal-btn-primary min-h-12 w-full py-3 sm:flex-[2] disabled:bg-gray-300 disabled:text-gray-800 disabled:cursor-not-allowed disabled:border-gray-800"
+          className="brutal-btn brutal-btn-action min-h-12 w-full py-3 sm:flex-[2] disabled:bg-gray-300 disabled:text-gray-800 disabled:cursor-not-allowed disabled:border-gray-800"
           
         >
           {loading ? (

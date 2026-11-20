@@ -211,6 +211,8 @@ export async function POST(request: NextRequest) {
         }
         lastNo = `P-${String(maxNum).padStart(2, '0')}`;
       }
+      noUrut = generateNoUrut(lastNo);
+      lastNo = noUrut;
       const { data, error: examErr } = await db
         .from('examinations')
         .insert({

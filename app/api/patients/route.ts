@@ -27,7 +27,42 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q')?.trim() ?? '';
     const safeQ = sanitizeSearchTerm(q);
+    const dupCheck = searchParams.get('duplicates') === '1';
 
+    // Mode cek duplikat: nama mirip + tgl_lahir sama persis.
+    // Dipakai form input sebelum simpan. Ringan: max 5 kandidat.
+    if (dupCheck) {
+      const nama = sanitizeSearchTerm(searchParams.get('nama') ?? '');
+      const tgl = (searchParams.get('tgl_lahir') ?? '').trim();
+      if (!nama || !/^\d{4}-\d{2}-\d{2}$/.test(tgl)) {
+        return NextResponse.json({ data: [] });
+      }
+      const firstWord = nama.split(' ')[0];
+      const { data: cands, error: cErr } = await db
+        .from('patients')
+        .select('id, nama, nik, jenis_kelamin, alamat, tgl_lahir, created_at')
+        .eq('tgl_lahir', tgl)
+        .ilike('nama', `%${firstWord}%`)
+        .limit(6);
+      if (cErr) {
+        console.error('duplicates lookup error:', cErr);
+        return NextResponse.json({ error: 'Server error' }, { status: 500 });
+      }
+      const ids = (cands ?? []).map(c => (c as { id: string }).id);
+      let counts: Record<string, number> = {};
+      if (ids.length > 0) {
+        const { data: exams } = await db.from('examinations').select('patient_id').in('patient_id', ids);
+        for (const e of (exams ?? []) as { patient_id: string }[]) {
+          counts[e.patient_id] = (counts[e.patient_id] ?? 0) + 1;
+        }
+      }
+      return NextResponse.json({
+        data: (cands ?? []).slice(0, 5).map(c => {
+          const row = c as Record<string, unknown>;
+          return { ...row, last_exam_count: counts[String(row.id)] ?? 0 };
+        }),
+      });
+    }
     const SELECT_COLS = `
       id, nama, nik, jenis_kelamin, alamat, tgl_lahir, created_at,
       examinations (status_biaya, tgl_permintaan, created_at)

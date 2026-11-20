@@ -53,9 +53,35 @@ export default function InputPage() {
   const [loading, setLoading] = useState(false);
   const [successNo, setSuccessNo] = useState<string | null>(null);
   const [matchedPatientId, setMatchedPatientId] = useState<string | null>(null);
+  const [duplicates, setDuplicates] = useState<PatientSuggestion[]>([]);
+  const [dupDismissed, setDupDismissed] = useState(false);
   const [ocrLoading, setOcrLoading] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
+  // Cek duplikat: nama mirip + tgl_lahir sama. Jalan saat ketikan berhenti 500ms,
+  // hanya bila belum menaut ke pasien (matchedPatientId kosong) dan NIK kosong
+  // (NIK terisi = sudah pasti orangnya via Prioritas 2, tak perlu tanya).
+  useEffect(() => {
+    setDupDismissed(false);
+    const nama = (patient.nama_pasien ?? '').trim();
+    const tgl = (patient.tgl_lahir ?? '').trim();
+    const nik = (patient.nik ?? '').trim();
+    if (matchedPatientId || nik || nama.length < 3 || !/^\d{4}-\d{2}-\d{2}$/.test(tgl)) {
+      setDuplicates([]);
+      return;
+    }
+    const t = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/patients?duplicates=1&nama=${encodeURIComponent(nama)}&tgl_lahir=${tgl}`);
+        if (!res.ok) return;
+        const json = await res.json();
+        setDuplicates((json.data ?? []).filter((d: PatientSuggestion) => d.id !== matchedPatientId));
+      } catch { /* abaikan, simpan tetap jalan */ }
+    }, 500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [patient.nama_pasien, patient.tgl_lahir, patient.nik, matchedPatientId]);
 
   useEffect(() => {
     setValue('tgl_permintaan', getTodayWIB());
@@ -183,6 +209,8 @@ export default function InputPage() {
     setValues({});
     setSuccessNo(null);
     setMatchedPatientId(null);
+    setDuplicates([]);
+    setDupDismissed(false);
     topRef.current?.scrollIntoView({ behavior: 'smooth' });
     toast.info('Form direset');
   };
@@ -287,6 +315,45 @@ export default function InputPage() {
           <div>
             <div className="text-sm font-bold text-teal-800 dark:text-teal-300">Data tersimpan!</div>
             <div className="text-xs text-teal-600 dark:text-teal-400">No Urut: <span className="font-extrabold">{successNo}</span></div>
+          </div>
+        </div>
+      )}
+      {/* Peringatan duplikat: nama mirip + tgl lahir sama. Petugas pilih gabung atau baru. */}
+      {!dupDismissed && duplicates.length > 0 && !matchedPatientId && (
+        <div className="brutal-card mb-4 p-4 border-amber-500 bg-amber-50 dark:bg-amber-950/30" role="alert">
+          <div className="flex items-center gap-2 mb-1">
+            <AlertTriangle size={16} className="text-amber-600 flex-shrink-0" aria-hidden="true" />
+            <p className="text-sm font-black text-amber-800 dark:text-amber-300">Mungkin pasien ini sudah terdaftar</p>
+          </div>
+          <p className="text-xs text-amber-700 dark:text-amber-400 font-medium mb-3">
+            Nama mirip dan tanggal lahir sama. Gabung ke riwayat lama bila orang yang sama, atau abaikan bila orang berbeda.
+          </p>
+          <div className="flex flex-col gap-2">
+            {duplicates.map(d => (
+              <div key={d.id} className="flex items-center gap-2 rounded-xl border-2 border-amber-300 dark:border-amber-700 bg-white dark:bg-zinc-900 px-3 py-2">
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-black text-slate-800 dark:text-slate-100 truncate">{d.nama}</div>
+                  <div className="text-[11px] text-slate-500">
+                    {d.tgl_lahir ? new Date(d.tgl_lahir).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                    {typeof d.last_exam_count === 'number' && d.last_exam_count > 0 ? ` • ${d.last_exam_count}x periksa` : ' • belum pernah periksa'}
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => { handleSelectPatient(d); setDuplicates([]); }}
+                  className="flex-shrink-0 px-3 py-2 rounded-lg text-xs font-black uppercase text-white bg-teal-700 border-2 border-black dark:border-white"
+                >
+                  Gabung
+                </button>
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => setDupDismissed(true)}
+              className="text-xs font-bold text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 underline underline-offset-2 self-start"
+            >
+              Bukan mereka — ini pasien baru
+            </button>
           </div>
         </div>
       )}

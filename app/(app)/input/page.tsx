@@ -137,13 +137,9 @@ function SearchableParamSelect({
 
 const makeId = () => Math.random().toString(36).slice(2);
 
-const initialPatient = {
-  nama_pasien: '', nik: '', jenis_kelamin: '', alamat: '', tgl_lahir: '', tgl_permintaan: '',
-  dokter: '', petugas: '', status_biaya: 'Umum' as StatusBiaya,
-};
 
 export default function InputPage() {
-  const { register, handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<PatientFormData>({
+  const { handleSubmit, setValue, watch, reset, formState: { errors } } = useForm<PatientFormData>({
     resolver: zodResolver(patientSchema),
     defaultValues: {
       nama_pasien: '', nik: '', jenis_kelamin: '', alamat: '', tgl_lahir: '', tgl_permintaan: '',
@@ -171,10 +167,11 @@ export default function InputPage() {
         setPetugasList(data.petugas || []);
       })
       .catch(() => toast.error('Gagal memuat data dokter/petugas'));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const setField = (field: keyof PatientFormData, value: string) => {
-    setValue(field, value as any, { shouldValidate: true });
+    setValue(field, value as unknown as PatientFormData[typeof field], { shouldValidate: true });
   };
 
   // Saat user pilih pasien dari dropdown autocomplete → auto-isi semua field identitas

@@ -138,11 +138,11 @@ export default function PasienPage() {
                 </span>
               </div>
             )}
-            {patients.map((p, i) => (
+            {patients.map((p) => (
               <button
                 key={p.id}
                 onClick={() => router.push(`/pasien/${p.id}`)}
-                className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-orange-50 dark:hover:bg-zinc-800 text-left group border-b-2 border-black dark:border-white last:border-b-0"
+                className="w-full flex items-center gap-3 px-4 py-3.5 hover:bg-teal-50 dark:hover:bg-zinc-800 text-left group border-b-2 border-black dark:border-white last:border-b-0"
 
               >
                 {/* Avatar with unique gradient */}

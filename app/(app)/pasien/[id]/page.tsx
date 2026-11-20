@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { ArrowLeft, Loader2, User, Calendar, QrCode, TrendingUp, ClipboardList, Eye } from 'lucide-react';
+import { ArrowLeft, Loader2, QrCode, TrendingUp, ClipboardList, Eye } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';

@@ -187,8 +187,7 @@ export default function RiwayatDetailPage() {
         {/* Kop Surat — logo + header custom dari Settings bila ada */}
         <div className="flex items-center justify-center border-b-[3px] border-black pb-4 mb-6">
           {printCfg.logo_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={printCfg.logo_url} alt="" className="h-16 w-16 object-contain mr-4" />
+            <img src={printCfg.logo_url} alt="Logo Puskesmas" className="h-16 w-16 object-contain mr-4" />
           ) : null}
           <div className="text-center">
             {printCfg.print_template ? (

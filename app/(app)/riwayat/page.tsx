@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import HistoryTable from '@/components/dashboard/HistoryTable';
 import { useConfirm } from '@/components/ui/ConfirmDialog';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
-import { exportToExcel, exportMonthlyToExcel } from '@/lib/export';
+import { exportMonthlyToExcel } from '@/lib/export';
 import { getTodayWIB } from '@/lib/utils';
 import type { HistoryRow } from '@/types';
 

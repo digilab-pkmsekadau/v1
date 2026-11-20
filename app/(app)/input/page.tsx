@@ -1,15 +1,15 @@
 ﻿'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertTriangle, CheckCircle2, User, Plus, Trash2, CheckCircle, RotateCcw, Loader2, Stethoscope, Search, ChevronDown, Camera } from 'lucide-react';
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { AlertTriangle, CheckCircle2, User, CheckCircle, RotateCcw, Loader2, Stethoscope, ChevronDown, Camera } from 'lucide-react';
+import { useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
 import PatientAutocomplete, { type PatientSuggestion } from '@/components/input/PatientAutocomplete';
 import { isAbnormal, getNormalRangeText, isPositivePregnancy } from '@/lib/normal-ranges';
-import { PARAM_OPTIONS, ALL_PARAMS, getParamInfo } from '@/lib/param-options';
+import { PARAM_OPTIONS, ALL_PARAMS } from '@/lib/param-options';
 import { getTodayWIB } from '@/lib/utils';
 import type { FormInputData, ParamItem, StatusBiaya } from '@/types';
 
@@ -33,109 +33,6 @@ const patientSchema = z.object({
 
 type PatientFormData = z.infer<typeof patientSchema>;
 
-function SearchableParamSelect({
-  value, onChange, usedKeys,
-}: {
-  value: string;
-  onChange: (key: string) => void;
-  usedKeys: Set<string>;
-}) {
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const ref = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const handleOutside = useCallback((e: MouseEvent) => {
-    if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-  }, []);
-
-  useEffect(() => {
-    if (open) {
-      document.addEventListener('mousedown', handleOutside);
-      setTimeout(() => inputRef.current?.focus(), 50);
-    } else {
-      document.removeEventListener('mousedown', handleOutside);
-      setQuery('');
-    }
-    return () => document.removeEventListener('mousedown', handleOutside);
-  }, [open, handleOutside]);
-
-  const q = query.toLowerCase();
-  const filtered = PARAM_OPTIONS.map(group => ({
-    group: group.group,
-    params: group.params.filter(p =>
-      (!usedKeys.has(p.key) || p.key === value) &&
-      (q === '' || p.label.toLowerCase().includes(q) || p.key.toLowerCase().includes(q))
-    ),
-  })).filter(g => g.params.length > 0);
-
-  const selected = ALL_PARAMS.find(p => p.key === value);
-
-  return (
-    <div ref={ref} className="relative min-w-0 flex-1">
-      <button
-        type="button"
-        onClick={() => setOpen(o => !o)}
-        className={`brutal-input w-full flex items-center justify-between gap-2 text-left ${open ? '!border-orange-500 !shadow-[0_0_0_3px_rgba(249,115,22,0.2)]' : ''} ${selected ? 'text-black dark:text-white font-bold' : 'text-gray-400'}`}
-      >
-        <span className="truncate">{selected ? selected.label : '— Pilih Parameter —'}</span>
-        <ChevronDown size={14} className={`flex-shrink-0 text-slate-400 transition-transform duration-150 ${open ? 'rotate-180' : ''}`} />
-      </button>
-
-      {open && (
-        <div className="brutal-card relative z-40 mt-2 max-h-[40dvh] overflow-hidden sm:absolute sm:left-0 sm:right-0 sm:top-full sm:mt-1 sm:max-h-96"
-        >
-          <div className="p-2 border-b-2 border-black dark:border-white bg-gray-50 dark:bg-zinc-800">
-            <div className="flex items-center gap-2 bg-white dark:bg-zinc-900 rounded-lg px-3 py-2 border-2 border-black dark:border-white">
-              <Search size={13} className="text-gray-400 flex-shrink-0" />
-              <input
-                ref={inputRef}
-                type="text"
-                value={query}
-                onChange={e => setQuery(e.target.value)}
-                placeholder="Cari parameter..."
-                className="flex-1 bg-transparent text-sm text-black dark:text-white font-bold outline-none placeholder-gray-400"
-              />
-              {query && (
-                <button type="button" onClick={() => setQuery('')}
-                  className="text-gray-400 hover:text-black dark:hover:text-white text-xs font-black">✕</button>
-              )}
-            </div>
-          </div>
-          <div className="max-h-[calc(40dvh-3.75rem)] overflow-y-auto overscroll-contain sm:max-h-[20.25rem]">
-            {filtered.length === 0 ? (
-              <p className="text-center text-xs text-gray-400 font-bold py-6 uppercase tracking-wider">Tidak ditemukan</p>
-            ) : (
-              filtered.map(group => (
-                <div key={group.group}>
-                  <div className="px-3 py-1.5 text-[10px] font-black text-gray-600 dark:text-gray-300 uppercase tracking-widest bg-gray-100 dark:bg-zinc-800 border-b-2 border-black dark:border-white">
-                    {group.group}
-                  </div>
-                  {group.params.map(param => (
-                    <button
-                      key={param.key}
-                      type="button"
-                      onClick={() => { onChange(param.key); setOpen(false); }}
-                      className={`w-full text-left px-4 py-2.5 text-sm font-bold transition-colors border-b border-gray-200 dark:border-zinc-700 last:border-b-0
-                        ${param.key === value
-                          ? 'bg-teal-700 text-white'
-                          : 'text-black dark:text-white hover:bg-teal-50 dark:hover:bg-zinc-800'}`}
-                    >
-                      {param.label}
-                      {param.unit && <span className="text-gray-400 dark:text-gray-500 text-xs ml-1">({param.unit})</span>}
-                    </button>
-                  ))}
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-const makeId = () => Math.random().toString(36).slice(2);
 
 
 export default function InputPage() {
@@ -148,7 +45,9 @@ export default function InputPage() {
   });
 
   const patient = watch();
-  const [params, setParams] = useState<ParamItem[]>([]);
+  // Nilai semua parameter: key -> value. Kosong = tidak disimpan (diabaikan saat submit).
+  const [values, setValues] = useState<Record<string, string>>({});
+  const [openGroups, setOpenGroups] = useState<string[]>(['Hematologi']);
   const [dokters, setDokters] = useState<string[]>([]);
   const [petugasList, setPetugasList] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
@@ -188,26 +87,13 @@ export default function InputPage() {
     });
   };
 
-  // Tambah baris parameter baru
-  const addParam = () => {
-    setParams(prev => [...prev, { id: makeId(), paramKey: '', value: '' }]);
-  };
+  const setParamValue = (paramKey: string, val: string) =>
+    setValues(prev => (val ? { ...prev, [paramKey]: val } : (({ [paramKey]: _, ...rest }) => rest)(prev)));
 
-  // Hapus baris
-  const removeParam = (id: string) =>
-    setParams(prev => prev.filter(p => p.id !== id));
+  const toggleGroup = (group: string) =>
+    setOpenGroups(prev => prev.includes(group) ? prev.filter(g => g !== group) : [...prev, group]);
 
-  // Update paramKey atau value
-  const updateParam = (id: string, field: 'paramKey' | 'value', val: string) =>
-    setParams(prev => prev.map(p => {
-      if (p.id !== id) return p;
-      // Jika ganti paramKey, reset value
-      if (field === 'paramKey') return { ...p, paramKey: val, value: '' };
-      return { ...p, [field]: val };
-    }));
-
-  // Kunci para key yang sudah dipilih (cegah duplikat)
-  const usedKeys = new Set(params.map(p => p.paramKey).filter(Boolean));
+  const filledCount = Object.keys(values).length;
 
   // Kompres + ubah file gambar jadi data URL (batasi sisi terpanjang 1600px, JPEG 80%)
   // supaya payload OCR kecil, cepat, dan hemat kuota AI.
@@ -264,16 +150,21 @@ export default function InputPage() {
         }
       }
 
-      // Merge param AI ke baris yang sudah ada; jangan buang param yang sudah diisi manual.
-      const existingKeys = new Set(params.map(x => x.paramKey));
-      const aiParams: ParamItem[] = Array.isArray(data.params)
-        ? data.params
-            .filter((x: { paramKey?: string; value?: string }) => x.paramKey && x.value && !existingKeys.has(x.paramKey))
-            .map((x: { paramKey: string; value: string }) => ({ id: makeId(), paramKey: x.paramKey, value: x.value }))
-        : [];
-      if (aiParams.length > 0) setParams(prev => [...prev, ...aiParams]);
+      // Merge param AI: hanya isi key yang masih kosong.
+      const incoming: Record<string, string> = {};
+      if (Array.isArray(data.params)) {
+        for (const x of data.params as { paramKey?: string; value?: string }[]) {
+          if (x.paramKey && x.value && !values[x.paramKey]) incoming[x.paramKey] = x.value;
+        }
+      }
+      if (Object.keys(incoming).length > 0) {
+        setValues(prev => ({ ...prev, ...incoming }));
+        const groups = PARAM_OPTIONS.filter(g => g.params.some(p => incoming[p.key])).map(g => g.group);
+        setOpenGroups(prev => [...new Set([...prev, ...groups])]);
+      }
 
-      toast.success(`AI menambah ${aiParams.length} parameter`, {
+      const added = Object.keys(incoming).length;
+      toast.success(added > 0 ? `AI menambah ${added} parameter` : 'AI tidak menemukan nilai baru', {
         description: 'Periksa & koreksi bila ada yang salah baca sebelum menyimpan.',
       });
       topRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -289,7 +180,7 @@ export default function InputPage() {
       nama_pasien: '', nik: '', jenis_kelamin: '', alamat: '', tgl_lahir: '',
       tgl_permintaan: getTodayWIB(), dokter: '', petugas: '', status_biaya: 'Umum'
     });
-    setParams([]);
+    setValues({});
     setSuccessNo(null);
     setMatchedPatientId(null);
     topRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -297,7 +188,9 @@ export default function InputPage() {
   };
 
   const onSubmitForm = async (data: PatientFormData) => {
-    const filledParams = params.filter(p => p.paramKey && p.value.trim());
+    const filledParams: ParamItem[] = Object.entries(values)
+      .filter(([, v]) => v.trim())
+      .map(([paramKey, value], i) => ({ id: `p${i}`, paramKey, value }));
     if (filledParams.length === 0) {
       toast.error('Minimal satu parameter pemeriksaan harus diisi'); return;
     }
@@ -320,7 +213,7 @@ export default function InputPage() {
       const abnormals = filledParams.filter(p => isAbnormal(p.paramKey, p.value, patient.jenis_kelamin));
       setSuccessNo(responseData.no_urut);
       reset({ nama_pasien: '', nik: '', jenis_kelamin: '', alamat: '', tgl_lahir: '', tgl_permintaan: getTodayWIB(), dokter: '', petugas: '', status_biaya: 'Umum' });
-      setParams([]);
+      setValues({});
       setMatchedPatientId(null);
       topRef.current?.scrollIntoView({ behavior: 'smooth' });
 
@@ -343,16 +236,15 @@ export default function InputPage() {
     }
   };
 
-  const filledCount = params.filter(p => p.paramKey && p.value).length;
-  const totalFields = 4; // required fields
-  const filledRequired = [patient.nama_pasien, patient.tgl_permintaan, patient.dokter, patient.petugas].filter(Boolean).length;
-  const progressPct = Math.round(((filledRequired + filledCount) / (totalFields + Math.max(params.length, 1))) * 100);
+  const filledRequired = [patient.nama_pasien, patient.jenis_kelamin, patient.tgl_permintaan, patient.dokter, patient.petugas].filter(Boolean).length;
+  // Progress jujur: 5 identitas + param terisi. Tidak pernah 100 palsu.
+  const progressPct = Math.min(99, Math.round(((filledRequired + filledCount) / (5 + Math.max(filledCount, 1))) * 100));
 
   return (
     <div className="px-3 py-4 sm:px-4 sm:py-5 animate-slide-up" ref={topRef}>
       <div className="mb-5">
         <h1 className="text-2xl font-black text-black dark:text-white tracking-tight uppercase">Input Pemeriksaan</h1>
-        <p className="text-xs text-gray-500 dark:text-gray-400 font-bold mt-1">Isi identitas pasien lalu tambahkan parameter pemeriksaan</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 font-bold mt-1">Isi identitas pasien, lalu isi hasil pemeriksaan yang ada</p>
         {/* Progress bar */}
         <div className="mt-3 h-2 rounded-full bg-gray-200 dark:bg-zinc-800 border-2 border-black dark:border-white overflow-hidden">
           <div
@@ -530,112 +422,98 @@ export default function InputPage() {
             <Stethoscope size={16} className="text-white" />
           </div>
           <span className="font-black text-sm text-black dark:text-white uppercase">Parameter Lab</span>
-          {params.length > 0 && (
-            <span className="ml-auto text-xs bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400 font-bold px-2.5 py-1 rounded-full border border-blue-100 dark:border-blue-900/40">
-              {filledCount} terisi
+          {filledCount > 0 && (
+            <span className="ml-auto text-xs bg-teal-50 dark:bg-teal-950/50 text-teal-700 dark:text-teal-400 font-bold px-2.5 py-1 rounded-full border border-teal-100 dark:border-teal-900/40">
+              {filledCount} terisi — kosong tidak disimpan
             </span>
           )}
         </div>
 
-        {/* Baris parameter */}
-        {params.length === 0 && (
-          <p className="text-xs text-slate-400 text-center py-4">
-            Belum ada parameter. Klik tombol di bawah untuk menambahkan.
-          </p>
-        )}
-
+        {/* Semua 52 parameter, dikelompokkan. Kosong = diabaikan saat simpan. */}
         <div className="flex flex-col gap-3">
-          {params.map((item) => {
-            const info = getParamInfo(item.paramKey);
+          {PARAM_OPTIONS.map(group => {
+            const groupFilled = group.params.filter(p => values[p.key]?.trim()).length;
+            const isOpen = openGroups.includes(group.group);
             return (
-              <div key={item.id} className="brutal-card animate-stagger p-3 sm:p-3.5 transition-all duration-150" >
-                {/* Row header: dropdown pilih param + tombol hapus */}
-                <div className="flex items-start gap-2 mb-2">
-                  <SearchableParamSelect
-                    value={item.paramKey}
-                    onChange={key => updateParam(item.id, 'paramKey', key)}
-                    usedKeys={usedKeys}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeParam(item.id)}
-                    className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl border-2 border-black text-red-500 dark:border-white dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 active:scale-95"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
-
-                {/* Input nilai */}
-                {item.paramKey && info && (() => {
-                  const abnormal = item.value ? isAbnormal(item.paramKey, item.value, patient.jenis_kelamin) : false;
-                  const positive = item.value ? isPositivePregnancy(item.paramKey, item.value) : false;
-                  const rangeText = getNormalRangeText(item.paramKey, patient.jenis_kelamin);
-                  return (
-                    <div className="flex flex-col gap-1">
-                      <div className="flex items-center justify-between">
-                        <label className="text-[11px] font-semibold text-slate-400">
-                          Nilai/Hasil{info.unit && <span className="text-slate-300"> ({info.unit})</span>}
-                        </label>
-                        {rangeText && (
-                          <span className={`text-[10px] font-medium ${abnormal ? 'text-red-500' : 'text-slate-400'}`}>
-                            {rangeText}
-                          </span>
-                        )}
-                      </div>
-                      {info.type === 'select' && info.opts ? (
-                        <select
-                          value={item.value}
-                          onChange={e => updateParam(item.id, 'value', e.target.value)}
-                          className={`input-premium ${abnormal ? '!border-red-300 dark:!border-red-800 !text-red-700 dark:!text-red-400 !bg-red-50 dark:!bg-red-950/30' : ''} ${positive ? '!border-emerald-300 dark:!border-emerald-800 !text-emerald-700 dark:!text-emerald-400 !bg-emerald-50 dark:!bg-emerald-950/30' : ''}`}
-                        >
-                          <option value="">— Pilih —</option>
-                          {info.opts.map(o => <option key={o} value={o}>{o}</option>)}
-                        </select>
-                      ) : (
-                        <input
-                          type="text"
-                          inputMode={info.type === 'number' ? 'decimal' : 'text'}
-                          value={item.value}
-                          onChange={e => updateParam(item.id, 'value', e.target.value)}
-                          placeholder={info.type === 'number' ? '0' : 'Isi hasil...'}
-                          className={`input-premium ${abnormal ? '!border-red-300 dark:!border-red-800 !text-red-700 dark:!text-red-400 !bg-red-50 dark:!bg-red-950/30' : ''} ${positive ? '!border-emerald-300 dark:!border-emerald-800 !text-emerald-700 dark:!text-emerald-400 !bg-emerald-50 dark:!bg-emerald-950/30' : ''}`}
-                        />
-                      )}
-                      {/* Inline abnormal warning */}
-                      {abnormal && (
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <AlertTriangle size={11} className="text-red-500 flex-shrink-0" />
-                          <span className="text-[11px] font-semibold text-red-600">
-                            Nilai di luar batas normal — segera laporkan ke dokter
-                          </span>
+              <div key={group.group} className="rounded-xl border-2 border-black dark:border-white overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => toggleGroup(group.group)}
+                  aria-expanded={isOpen}
+                  className="w-full flex items-center gap-2 px-3.5 py-3 bg-gray-50 dark:bg-zinc-800 hover:bg-teal-50 dark:hover:bg-zinc-700 transition-colors"
+                >
+                  <ChevronDown size={15} className={`text-teal-700 dark:text-teal-400 transition-transform duration-150 ${isOpen ? '' : '-rotate-90'}`} aria-hidden="true" />
+                  <span className="font-black text-xs text-black dark:text-white uppercase tracking-wide text-left flex-1">{group.group}</span>
+                    <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${groupFilled > 0 ? 'bg-teal-700 text-white' : 'bg-gray-200 dark:bg-zinc-700 text-gray-500 dark:text-gray-400'}`}>
+                    {groupFilled > 0 ? `${groupFilled} terisi` : `${group.params.length} parameter`}
+                  </span>
+                </button>
+                {isOpen && (
+                  <div className="p-3 flex flex-col gap-3 bg-white dark:bg-zinc-900">
+                    {group.params.map(param => {
+                      const val = values[param.key] ?? '';
+                      const abnormal = val ? isAbnormal(param.key, val, patient.jenis_kelamin) : false;
+                      const positive = val ? isPositivePregnancy(param.key, val) : false;
+                      const rangeText = getNormalRangeText(param.key, patient.jenis_kelamin);
+                      return (
+                        <div key={param.key} className="flex flex-col gap-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <label htmlFor={`param-${param.key}`} className="text-xs font-bold text-slate-700 dark:text-slate-200">
+                              {param.label}
+                              {param.unit && <span className="text-slate-400 font-medium"> ({param.unit})</span>}
+                            </label>
+                            {rangeText && (
+                              <span className={`text-[10px] font-medium flex-shrink-0 ${abnormal ? 'text-red-500' : 'text-slate-400'}`}>
+                                {rangeText}
+                              </span>
+                            )}
+                          </div>
+                          {param.type === 'select' && param.opts ? (
+                            <select
+                              id={`param-${param.key}`}
+                              value={val}
+                              onChange={e => setParamValue(param.key, e.target.value)}
+                              className={`brutal-input ${abnormal ? '!border-red-400 !bg-red-50 dark:!bg-red-950/30' : ''} ${positive ? '!border-emerald-400 !bg-emerald-50 dark:!bg-emerald-950/30' : ''}`}
+                            >
+                              <option value="">— Pilih —</option>
+                              {param.opts.map(o => <option key={o} value={o}>{o}</option>)}
+                            </select>
+                          ) : (
+                            <input
+                              id={`param-${param.key}`}
+                              type="text"
+                              inputMode={param.type === 'number' ? 'decimal' : 'text'}
+                              value={val}
+                              onChange={e => setParamValue(param.key, e.target.value)}
+                              placeholder={param.type === 'number' ? '0' : 'Isi hasil...'}
+                              className={`brutal-input ${abnormal ? '!border-red-400 !bg-red-50 dark:!bg-red-950/30' : ''} ${positive ? '!border-emerald-400 !bg-emerald-50 dark:!bg-emerald-950/30' : ''}`}
+                            />
+                          )}
+                          {abnormal && (
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <AlertTriangle size={11} className="text-red-500 flex-shrink-0" />
+                              <span className="text-[11px] font-semibold text-red-600">
+                                Nilai di luar batas normal — segera laporkan ke dokter
+                              </span>
+                            </div>
+                          )}
+                          {positive && (
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <CheckCircle2 size={11} className="text-emerald-500 flex-shrink-0" />
+                              <span className="text-[11px] font-semibold text-emerald-600">
+                                Hasil positif — kehamilan terdeteksi
+                              </span>
+                            </div>
+                          )}
                         </div>
-                      )}
-                      {/* Inline pregnancy positive */}
-                      {positive && (
-                        <div className="flex items-center gap-1.5 mt-0.5">
-                          <CheckCircle2 size={11} className="text-emerald-500 flex-shrink-0" />
-                          <span className="text-[11px] font-semibold text-emerald-600">
-                            Hasil positif — kehamilan terdeteksi
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })()}
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
-
-        {/* Tombol tambah parameter */}
-        <button
-          type="button"
-          onClick={addParam}
-          className="w-full min-h-12 mt-3 flex items-center justify-center gap-2 py-3 rounded-xl border-2 border-dashed border-black dark:border-white text-black dark:text-white text-sm font-black uppercase hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors duration-150"
-        >
-          <Plus size={16} />
-          TAMBAH PARAMETER
-        </button>
       </div>
 
       {/* Tombol aksi */}

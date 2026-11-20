@@ -328,7 +328,9 @@ export default function PasienDetailPage() {
               const a = document.createElement('a');
               a.href = url;
               a.download = `QR-${patient.nama.replace(/\s+/g, '-')}.svg`;
+              document.body.appendChild(a);
               a.click();
+              a.remove();
               URL.revokeObjectURL(url);
             }}
             className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-black uppercase text-white border-2 border-black dark:border-white bg-orange-500 shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] dark:shadow-[3px_3px_0px_0px_rgba(255,255,255,1)] hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] active:translate-x-[3px] active:translate-y-[3px] active:shadow-none transition-all"

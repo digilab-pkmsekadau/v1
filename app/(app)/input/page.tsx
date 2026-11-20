@@ -1,10 +1,7 @@
 ﻿'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertTriangle, CheckCircle2 } from 'lucide-react';
-import {
-  User, Plus, Trash2, CheckCircle, RotateCcw, Loader2, Stethoscope, Search, ChevronDown, Camera
-} from 'lucide-react';
+import { AlertTriangle, CheckCircle2, User, Plus, Trash2, CheckCircle, RotateCcw, Loader2, Stethoscope, Search, ChevronDown, Camera } from 'lucide-react';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -13,6 +10,7 @@ import { z } from 'zod';
 import PatientAutocomplete, { type PatientSuggestion } from '@/components/input/PatientAutocomplete';
 import { isAbnormal, getNormalRangeText, isPositivePregnancy } from '@/lib/normal-ranges';
 import { PARAM_OPTIONS, ALL_PARAMS, getParamInfo } from '@/lib/param-options';
+import { getTodayWIB } from '@/lib/utils';
 import type { FormInputData, ParamItem, StatusBiaya } from '@/types';
 
 // Daftar semua parameter lab (dikelompokkan)
@@ -165,8 +163,7 @@ export default function InputPage() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const today = new Date().toISOString().split('T')[0];
-    setValue('tgl_permintaan', today);
+    setValue('tgl_permintaan', getTodayWIB());
     fetch('/api/config')
       .then(r => r.json())
       .then(data => {
@@ -291,10 +288,9 @@ export default function InputPage() {
   };
 
   const handleReset = () => {
-    const today = new Date().toISOString().split('T')[0];
     reset({
       nama_pasien: '', nik: '', jenis_kelamin: '', alamat: '', tgl_lahir: '',
-      tgl_permintaan: today, dokter: '', petugas: '', status_biaya: 'Umum'
+      tgl_permintaan: getTodayWIB(), dokter: '', petugas: '', status_biaya: 'Umum'
     });
     setParams([]);
     setSuccessNo(null);
@@ -324,10 +320,12 @@ export default function InputPage() {
       const responseData = await res.json();
       if (!res.ok) { toast.error(responseData.error || 'Gagal menyimpan data'); return; }
 
-      // Cek nilai kritis setelah simpan
       const abnormals = filledParams.filter(p => isAbnormal(p.paramKey, p.value, patient.jenis_kelamin));
       setSuccessNo(responseData.no_urut);
-      handleReset();
+      reset({ nama_pasien: '', nik: '', jenis_kelamin: '', alamat: '', tgl_lahir: '', tgl_permintaan: getTodayWIB(), dokter: '', petugas: '', status_biaya: 'Umum' });
+      setParams([]);
+      setMatchedPatientId(null);
+      topRef.current?.scrollIntoView({ behavior: 'smooth' });
 
       if (abnormals.length > 0) {
         const labels = abnormals.map(p => {
@@ -418,7 +416,7 @@ export default function InputPage() {
         <div className="grid grid-cols-1 gap-3">
           {/* Nama */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center justify-between">
+            <label htmlFor="nama-pasien" className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center justify-between">
               <span>Nama Lengkap *</span>
               {matchedPatientId && (
                 <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 normal-case tracking-normal flex items-center gap-1">
@@ -427,6 +425,7 @@ export default function InputPage() {
               )}
             </label>
             <PatientAutocomplete
+              id="nama-pasien"
               field="nama"
               value={patient.nama_pasien}
               onChange={(v) => { setField('nama_pasien', v); setMatchedPatientId(null); }}
@@ -439,8 +438,9 @@ export default function InputPage() {
           {/* NIK, Jenis Kelamin, Tgl Lahir */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">NIK</label>
+              <label htmlFor="nik-pasien" className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">NIK</label>
               <PatientAutocomplete
+                id="nik-pasien"
                 field="nik"
                 value={patient.nik || ''}
                 onChange={(v) => { setField('nik', v); setMatchedPatientId(null); }}
@@ -452,19 +452,22 @@ export default function InputPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className={`text-[11px] font-bold uppercase tracking-widest flex justify-between ${errors.jenis_kelamin ? "text-red-500" : "text-slate-400 dark:text-slate-500"}`}><span>Jenis Kelamin *</span>{errors.jenis_kelamin && <span className="text-[10px] text-red-500 normal-case tracking-normal">{errors.jenis_kelamin.message}</span>}</label>
-              <select value={patient.jenis_kelamin || ""}
-                onChange={e => setField('jenis_kelamin', e.target.value)}
-                className="brutal-input appearance-none"
-              >
-                <option value="" disabled>-- Pilih --</option>
-                <option value="L">Laki-laki (L)</option>
-                <option value="P">Perempuan (P)</option>
-              </select>
+              <label htmlFor="jk-pasien" className={`text-[11px] font-bold uppercase tracking-widest flex justify-between ${errors.jenis_kelamin ? "text-red-500" : "text-slate-400 dark:text-slate-500"}`}><span>Jenis Kelamin *</span>{errors.jenis_kelamin && <span className="text-[10px] text-red-500 normal-case tracking-normal">{errors.jenis_kelamin.message}</span>}</label>
+              <div className="relative">
+                <select id="jk-pasien" value={patient.jenis_kelamin || ""}
+                  onChange={e => setField('jenis_kelamin', e.target.value)}
+                  className="brutal-input appearance-none pr-10"
+                >
+                  <option value="" disabled>-- Pilih --</option>
+                  <option value="L">Laki-laki (L)</option>
+                  <option value="P">Perempuan (P)</option>
+                </select>
+                <ChevronDown size={16} aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              </div>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Tanggal Lahir</label>
-              <input type="date" value={patient.tgl_lahir}
+              <label htmlFor="tgl-lahir" className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Tanggal Lahir</label>
+              <input id="tgl-lahir" type="date" value={patient.tgl_lahir}
                 onChange={e => setField('tgl_lahir', e.target.value)}
                 className="brutal-input" />
             </div>
@@ -472,8 +475,8 @@ export default function InputPage() {
 
           {/* Alamat */}
           <div className="flex flex-col gap-1">
-            <label className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Alamat</label>
-            <textarea value={patient.alamat}
+            <label htmlFor="alamat-pasien" className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Alamat</label>
+            <textarea id="alamat-pasien" value={patient.alamat}
               onChange={e => setField('alamat', e.target.value)}
               rows={2} placeholder="Alamat lengkap"
               className="brutal-input resize-none" />
@@ -482,14 +485,14 @@ export default function InputPage() {
           {/* Tgl Permintaan + Status Biaya */}
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div className="flex flex-col gap-1">
-              <label className={`text-[11px] font-bold uppercase tracking-widest flex justify-between ${errors.tgl_permintaan ? "text-red-500" : "text-slate-400 dark:text-slate-500"}`}><span>Tgl Permintaan *</span>{errors.tgl_permintaan && <span className="text-[10px] text-red-500 normal-case tracking-normal">{errors.tgl_permintaan.message}</span>}</label>
-              <input type="date" value={patient.tgl_permintaan}
+              <label htmlFor="tgl-permintaan" className={`text-[11px] font-bold uppercase tracking-widest flex justify-between ${errors.tgl_permintaan ? "text-red-500" : "text-slate-400 dark:text-slate-500"}`}><span>Tgl Permintaan *</span>{errors.tgl_permintaan && <span className="text-[10px] text-red-500 normal-case tracking-normal">{errors.tgl_permintaan.message}</span>}</label>
+              <input id="tgl-permintaan" type="date" value={patient.tgl_permintaan}
                 onChange={e => setField('tgl_permintaan', e.target.value)}
                 className="brutal-input" />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Status Biaya</label>
-              <select value={patient.status_biaya}
+              <label htmlFor="status-biaya" className="text-[11px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest">Status Biaya</label>
+              <select id="status-biaya" value={patient.status_biaya}
                 onChange={e => setField('status_biaya', e.target.value)}
                 className="brutal-input">
                 {['Umum', 'BPJS', 'Gratis'].map(o => <option key={o} value={o}>{o}</option>)}

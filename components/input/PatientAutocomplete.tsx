@@ -25,9 +25,10 @@ interface Props {
   onSelect: (patient: PatientSuggestion) => void;
   /** Placeholder input */
   placeholder?: string;
+  /** id unik untuk pasangan <label htmlFor> */
+  id?: string;
   /** className tambahan untuk input */
   className?: string;
-  /** Atribut HTML lain pada <input> */
   inputMode?: 'text' | 'numeric' | 'decimal';
   pattern?: string;
 }
@@ -37,7 +38,7 @@ interface Props {
  * Memunculkan dropdown saat user mengetik ≥ 2 karakter.
  */
 export default function PatientAutocomplete({
-  field, value, onChange, onSelect, placeholder, className, inputMode, pattern,
+  field, value, onChange, onSelect, placeholder, className, inputMode, pattern, id,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -45,6 +46,7 @@ export default function PatientAutocomplete({
   const [highlight, setHighlight] = useState(0);
   const wrapRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
   // Lock pencarian saat user baru saja memilih item, supaya dropdown tidak muncul lagi
   const skipNextSearchRef = useRef(false);
 
@@ -74,18 +76,23 @@ export default function PatientAutocomplete({
     }
 
     debounceRef.current = setTimeout(async () => {
+      const ctrl = new AbortController();
+      abortRef.current?.abort();
+      abortRef.current = ctrl;
       setLoading(true);
       try {
-        const res = await fetch(`/api/patients?q=${encodeURIComponent(q)}`);
+        const res = await fetch(`/api/patients?q=${encodeURIComponent(q)}`, { signal: ctrl.signal });
         if (!res.ok) throw new Error();
         const json = await res.json();
+        if (abortRef.current !== ctrl) return;
         setItems(json.data || []);
         setOpen(true);
         setHighlight(0);
-      } catch {
+      } catch (e) {
+        if ((e as Error)?.name === 'AbortError') return;
         setItems([]);
       } finally {
-        setLoading(false);
+        if (abortRef.current === ctrl) setLoading(false);
       }
     }, 250);
 
@@ -125,6 +132,7 @@ export default function PatientAutocomplete({
     <div ref={wrapRef} className="relative">
       <div className="relative">
         <input
+          id={id}
           type="text"
           value={value}
           onChange={e => onChange(e.target.value)}

@@ -27,57 +27,68 @@ export async function GET(request: NextRequest) {
     const lastDay = new Date(year, mon, 0).getDate(); // hari terakhir bulan
     const endDate = `${month}-${String(lastDay).padStart(2, '0')}`;
 
-    const { data: examinations, error } = await db
-      .from('examinations')
-      .select('*, patients(nama, nik, alamat, tgl_lahir)')
-      .gte('tgl_permintaan', startDate)
-      .lte('tgl_permintaan', endDate)
-      .order('tgl_permintaan', { ascending: true });
-
-    if (error) {
-      console.error('DB error:', error);
-      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
+    // Paginasi: rekap bulanan wajib lengkap, jangan terpotong cap 1000 baris.
+    const PAGE_SIZE = 1000;
+    const examinations: Record<string, unknown>[] = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data: page, error: pageError } = await db
+        .from('examinations')
+        .select('*, patients(nama, nik, alamat, tgl_lahir)')
+        .gte('tgl_permintaan', startDate)
+        .lte('tgl_permintaan', endDate)
+        .order('tgl_permintaan', { ascending: true })
+        .range(from, from + PAGE_SIZE - 1);
+      if (pageError) {
+        console.error('DB error:', pageError);
+        return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
+      }
+      if (!page || page.length === 0) break;
+      examinations.push(...(page as unknown as Record<string, unknown>[]));
+      if (page.length < PAGE_SIZE) break;
     }
 
+
+    const str = (v: unknown): string => (typeof v === 'string' ? v : '');
     const rows = (examinations || []).map(exam => {
       const patient = Array.isArray(exam.patients) ? exam.patients[0] : exam.patients;
       return {
-        'No Urut': exam.no_urut || '-',
-        'Tgl Pemeriksaan': formatDateDisplay(exam.tgl_permintaan),
+        'No Urut': str(exam.no_urut) || '-',
+        'Tgl Pemeriksaan': formatDateDisplay(typeof exam.tgl_permintaan === 'string' ? exam.tgl_permintaan : null),
         'Nama Pasien': (patient as { nama?: string })?.nama || '-',
         'NIK': (patient as { nik?: string })?.nik || '-',
-        'Dokter': exam.dokter || '-',
-        'Petugas': exam.petugas || '-',
-        'Status Biaya': exam.status_biaya || '-',
+        'Dokter': str(exam.dokter) || '-',
+        'Petugas': str(exam.petugas) || '-',
+        'Status Biaya': str(exam.status_biaya) || '-',
         // Hematologi
-        'RBC': exam.rbc || '', 'HGB': exam.hgb || '', 'HCT': exam.hct || '',
-        'MCV': exam.mcv || '', 'MCH': exam.mch || '', 'MCHC': exam.mchc || '',
-        'PLT': exam.plt || '', 'WBC': exam.wbc || '', 'LYM': exam.lym || '',
-        'MON': exam.mon || '', 'GRA': exam.gra || '', 'LED': exam.led || '',
-        'Gol. Darah': exam.goldar || '', 'BT': exam.bt || '', 'CT': exam.ct || '',
+        'RBC': str(exam.rbc), 'HGB': str(exam.hgb), 'HCT': str(exam.hct),
+        'MCV': str(exam.mcv), 'MCH': str(exam.mch), 'MCHC': str(exam.mchc),
+        'PLT': str(exam.plt), 'WBC': str(exam.wbc), 'LYM': str(exam.lym),
+        'MON': str(exam.mon), 'GRA': str(exam.gra), 'LED': str(exam.led),
+        'Gol. Darah': str(exam.goldar), 'BT': str(exam.bt), 'CT': str(exam.ct),
         // Imunologi & Serologi
-        'HBsAg': exam.hbsag || '', 'Anti HIV': exam.hiv || '',
-        'Syphilis': exam.syphilis || '', 'Anti HCV': exam.hcv || '',
-        'Anti HBs': exam.anti_hbs || '', 'NS1': exam.ns1 || '',
-        'Dengue IgG/IgM': exam.dengue_ig || '', 'Malaria Rapid': exam.malaria_rapid || '',
-        'Widal': exam.widal || '',
+        'HBsAg': str(exam.hbsag), 'Anti HIV': str(exam.hiv),
+        'Syphilis': str(exam.syphilis), 'Anti HCV': str(exam.hcv),
+        'Anti HBs': str(exam.anti_hbs), 'NS1 Ag Dengue': str(exam.ns1),
+        'Dengue IgG & IgM': str(exam.dengue_ig), 'Malaria Rapid': str(exam.malaria_rapid),
+        'Widal': str(exam.widal), 'NAPZA': str(exam.napza),
         // Kimia Klinik
-        'GDS': exam.gds || '', 'GDP': exam.gdp || '', 'GD2PP': exam.gd2pp || '',
-        'Kolesterol': exam.kolesterol || '', 'Trigliserida': exam.trigliserida || '',
-        'Asam Urat': exam.asam_urat || '',
+        'GDS': str(exam.gds), 'GDP': str(exam.gdp), 'GD2PP': str(exam.gd2pp),
+        'Kolesterol': str(exam.kolesterol), 'LDL': str(exam.ldl), 'HDL': str(exam.hdl),
+        'Trigliserida': str(exam.trigliserida),
+        'Asam Urat': str(exam.asam_urat),
         // Mikrobiologi
-        'BTA': exam.bta || '', 'Gram': exam.gram || '', 'Malaria Slide': exam.malaria_slide || '',
+        'BTA': str(exam.bta), 'Gram': str(exam.gram), 'Malaria Slide': str(exam.malaria_slide),
         // Urinalisa
-        'Urin Warna': exam.u_warna || '', 'Urin Jernih': exam.u_jernih || '',
-        'BJ': exam.u_bj || '', 'Leukosit Urin': exam.u_leukosit || '',
-        'Nitrit': exam.u_nitrit || '', 'pH': exam.u_ph || '',
-        'Protein': exam.u_protein || '', 'Glukosa': exam.u_glukosa || '',
-        'Keton': exam.u_keton || '', 'Urobilinogen': exam.u_urobilinogen || '',
-        'Bilirubin': exam.u_bilirubin || '', 'Blood': exam.u_blood || '',
-        'HCG': exam.u_hcg || '',
+        'Urin Warna': str(exam.u_warna), 'Urin Jernih': str(exam.u_jernih),
+        'BJ': str(exam.u_bj), 'Leukosit Urin': str(exam.u_leukosit),
+        'Nitrit': str(exam.u_nitrit), 'pH': str(exam.u_ph),
+        'Protein': str(exam.u_protein), 'Glukosa': str(exam.u_glukosa),
+        'Keton': str(exam.u_keton), 'Urobilinogen': str(exam.u_urobilinogen),
+        'Bilirubin': str(exam.u_bilirubin), 'Blood': str(exam.u_blood),
+        'HCG': str(exam.u_hcg),
         // Sedimen Urin
-        'Sed. Leukosit': exam.m_leukosit || '', 'Sed. Eritrosit': exam.m_eritrosit || '',
-        'Sed. Epitel': exam.m_epitel || '',
+        'Sed. Leukosit': str(exam.m_leukosit), 'Sed. Eritrosit': str(exam.m_eritrosit),
+        'Sed. Epitel': str(exam.m_epitel),
       };
     });
 
@@ -85,8 +96,8 @@ export async function GET(request: NextRequest) {
     const paramCounts: Record<string, number> = {};
     const paramKeys = [
       'RBC','HGB','HCT','MCV','MCH','MCHC','PLT','WBC','LYM','MON','GRA','LED','Gol. Darah','BT','CT',
-      'HBsAg','Anti HIV','Syphilis','Anti HCV','Anti HBs','NS1','Dengue IgG/IgM','Malaria Rapid','Widal',
-      'GDS','GDP','GD2PP','Kolesterol','Trigliserida','Asam Urat',
+      'HBsAg','Anti HIV','Syphilis','Anti HCV','Anti HBs','NS1 Ag Dengue','Dengue IgG & IgM','Malaria Rapid','Widal','NAPZA',
+      'GDS','GDP','GD2PP','Kolesterol','LDL','HDL','Trigliserida','Asam Urat',
       'BTA','Gram','Malaria Slide',
       'Urin Warna','Urin Jernih','BJ','Leukosit Urin','Nitrit','pH','Protein','Glukosa','Keton','Urobilinogen','Bilirubin','Blood','HCG',
       'Sed. Leukosit','Sed. Eritrosit','Sed. Epitel',

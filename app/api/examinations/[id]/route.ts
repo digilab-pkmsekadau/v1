@@ -1,14 +1,23 @@
-import type { NextRequest} from 'next/server';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { z } from 'zod';
 
 import { writeAudit } from '@/lib/audit';
 import { ALL_PARAMS } from '@/lib/param-options';
-import { getAuthedUser } from '@/lib/require-auth';
+import { getAuthedUser, requireAuth } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
 
 export const dynamic = 'force-dynamic';
 
 type RouteParams = { params: Promise<{ id: string }> };
+
+// Batas nilai PUT: cegah string raksasa/tipe salah masuk DB (DoS/korupsi data).
+const updateSchema = z.object({
+  tgl_permintaan: z.string().trim().max(20).optional(),
+  dokter: z.string().trim().max(200).nullable().optional(),
+  petugas: z.string().trim().max(200).nullable().optional(),
+  status_biaya: z.enum(['Umum', 'BPJS', 'Gratis']).optional(),
+}).catchall(z.string().trim().max(500));
 
 // Allowlist kolom yang boleh diupdate: metadata pemeriksaan + semua kolom hasil lab.
 // Mencegah mass-assignment ke kolom sistem (id, patient_id, no_urut, created_at).
@@ -26,9 +35,8 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    if (!(await getAuthedUser())) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const denied = await requireAuth();
+    if (denied) return denied;
     const db = createServerClient();
     const { id } = await params;
 
@@ -55,17 +63,21 @@ export async function PUT(
   { params }: RouteParams
 ) {
   try {
+    const denied = await requireAuth();
+    if (denied) return denied;
     const user = await getAuthedUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     const db = createServerClient();
     const { id } = await params;
-    const body = await request.json();
-
+    const parsed = updateSchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Data tidak valid' }, { status: 400 });
+    }
     const updateData: Record<string, unknown> = {};
-    for (const [key, value] of Object.entries(body ?? {})) {
-      if (EDITABLE_COLUMNS.has(key)) updateData[key] = value;
+    for (const [key, value] of Object.entries(parsed.data)) {
+      if (value !== undefined && EDITABLE_COLUMNS.has(key)) updateData[key] = value;
     }
 
     if (Object.keys(updateData).length === 0) {
@@ -104,6 +116,8 @@ export async function DELETE(
   { params }: RouteParams
 ) {
   try {
+    const denied = await requireAuth();
+    if (denied) return denied;
     const user = await getAuthedUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

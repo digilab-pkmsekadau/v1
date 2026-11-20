@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
-import { requireAdmin } from '@/lib/require-auth';
+import { writeAudit } from '@/lib/audit';
+import { getAuthedUser, requireAdmin } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
-
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
@@ -64,7 +64,12 @@ export async function GET() {
     const json = JSON.stringify(backup, null, 2);
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
     const filename = `backup_digilab_${dateStr}.json`;
-
+    const user = await getAuthedUser();
+    await writeAudit(user?.email, {
+      action: 'EXPORT',
+      entity: 'backup',
+      description: `Unduh backup: ${backup.meta.total_patients} pasien, ${backup.meta.total_examinations} pemeriksaan`,
+    });
     return new NextResponse(json, {
       status: 200,
       headers: {

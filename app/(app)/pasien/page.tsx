@@ -97,17 +97,17 @@ export default function PasienPage() {
 
       {/* Search */}
       <div className="bg-white dark:bg-zinc-900 border-2 border-black dark:border-white rounded-2xl p-3 mb-5" style={{ boxShadow: '3px 3px 0px 0px rgba(0,0,0,1)' }}>
-        <div className="flex items-center gap-2.5 rounded-xl px-4 py-3 border-2 border-black dark:border-white bg-white dark:bg-zinc-900"
-          
-        >
-          <Search size={16} className="text-slate-400 dark:text-slate-500 flex-shrink-0" />
+        <label htmlFor="cari-pasien" className="sr-only">Cari nama atau NIK pasien</label>
+        <div className="flex items-center gap-2.5 rounded-xl px-4 py-3 border-2 border-black dark:border-white bg-white dark:bg-zinc-900 focus-within:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <Search size={16} className="text-slate-400 dark:text-slate-500 flex-shrink-0" aria-hidden="true" />
           <input
-            type="text"
+            id="cari-pasien"
+            type="search"
             value={query}
             onChange={e => { setQuery(e.target.value); setPage(1); }}
             placeholder="Cari nama atau NIK pasien..."
+            autoComplete="off"
             className="flex-1 bg-transparent text-sm text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none"
-            autoFocus
           />
           {loading && <Loader2 size={14} className="animate-spin text-teal-500 flex-shrink-0" />}
         </div>

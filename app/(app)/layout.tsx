@@ -12,7 +12,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
   return (
     <>
       <TopHeader />
-      <main className="mx-auto min-h-dvh w-full max-w-2xl pt-16 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] sm:pb-24">
+      <main className="mx-auto min-h-dvh w-full max-w-2xl pt-16 pb-[calc(5rem+env(safe-area-inset-bottom,0px))] sm:pb-24 lg:max-w-4xl">
         {children}
       </main>
       <NavDock />

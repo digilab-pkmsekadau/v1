@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { writeAudit } from '@/lib/audit';
-import { getAuthedUser } from '@/lib/require-auth';
+import { getAuthedUser, requireAuth } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
-import { generateNoUrut, formatDateDisplay } from '@/lib/utils';
+import { generateNoUrut } from '@/lib/utils';
 import type { ParamItem } from '@/types';
 
 export const dynamic = 'force-dynamic';
@@ -91,9 +91,8 @@ const PARAM_MAP: Record<string, { col: string; unit?: string }> = {
 
 export async function GET() {
   try {
-    if (!(await getAuthedUser())) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const denied = await requireAuth();
+    if (denied) return denied;
     const db = createServerClient();
     const { data, error } = await db
       .from('examinations')
@@ -118,6 +117,8 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    const denied = await requireAuth();
+    if (denied) return denied;
     const user = await getAuthedUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -181,45 +182,49 @@ export async function POST(request: NextRequest) {
       }
       patientId = newP.id;
     }
-
-    // 2. Generate no_urut
-    const { data: lastExam } = await db
-      .from('examinations').select('no_urut')
-      .order('created_at', { ascending: false }).limit(1).maybeSingle();
-    const noUrut = generateNoUrut(lastExam?.no_urut ?? null);
-
-    // 3. Konversi dynamic params → object kolom
+    // 2. Konversi dynamic params → object kolom (validasi key via allowlist PARAM_MAP).
     const labCols: Record<string, string> = {};
-    if (params && !Array.isArray(params)) {
-      return NextResponse.json({ error: 'params harus berupa array' }, { status: 400 });
-    }
     for (const item of (params || []) as ParamItem[]) {
       const { paramKey, value } = item;
       if (!paramKey || !value?.trim()) continue;
       const mapping = PARAM_MAP[paramKey];
       if (!mapping) continue;
-      const finalVal = mapping.unit
-        ? `${value.trim()} ${mapping.unit}`
-        : value.trim();
-      labCols[mapping.col] = finalVal;
+      labCols[mapping.col] = mapping.unit ? `${value.trim()} ${mapping.unit}` : value.trim();
     }
-
-    // 4. Insert examination (single table)
-    const { data: exam, error: examErr } = await db
-      .from('examinations')
-      .insert({
-        no_urut: noUrut,
-        patient_id: patientId,
-        tgl_permintaan,
-        dokter: dokter?.trim() || null,
-        petugas: petugas?.trim() || null,
-        status_biaya: status_biaya || 'Umum',
-        ...labCols,
-      })
-      .select('id').single();
-
-    if (examErr || !exam) {
-      console.error('examinations insert error:', examErr);
+    // 3-4. Insert dengan retry: dua submit bareng bisa baca no_urut terakhir yang
+    // sama. UNIQUE(no_urut) di DB jadi penentu; 23505 = kalah race, coba nomor berikut.
+    // ponytail: retry 3x cukup untuk tool internal; ceiling: RPC/sequence per hari.
+    let exam: { id: string } | null = null;
+    let noUrut = '';
+    let lastNo: string | null = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      if (attempt > 0 || lastNo === null) {
+        const { data: lastExam } = await db
+          .from('examinations').select('no_urut')
+          .order('no_urut', { ascending: false }).limit(1).maybeSingle();
+        lastNo = lastExam?.no_urut ?? null;
+      }
+      noUrut = generateNoUrut(lastNo);
+      lastNo = noUrut;
+      const { data, error: examErr } = await db
+        .from('examinations')
+        .insert({
+          no_urut: noUrut,
+          patient_id: patientId,
+          tgl_permintaan,
+          dokter: dokter?.trim() || null,
+          petugas: petugas?.trim() || null,
+          status_biaya: status_biaya || 'Umum',
+          ...labCols,
+        })
+        .select('id').single();
+      if (!examErr && data) { exam = data; break; }
+      if (examErr?.code !== '23505' || attempt === 2) {
+        console.error('examinations insert error:', examErr);
+        return NextResponse.json({ error: 'Gagal simpan pemeriksaan' }, { status: 500 });
+      }
+    }
+    if (!exam) {
       return NextResponse.json({ error: 'Gagal simpan pemeriksaan' }, { status: 500 });
     }
 

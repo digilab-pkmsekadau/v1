@@ -13,10 +13,9 @@ const csp = [
   "frame-ancestors 'none'",
   "form-action 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ''}`,
-  "style-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
-  "font-src 'self' data:",
-  `connect-src 'self' ${supabaseOrigin}`.trim(),
+  "font-src 'self' data: https://fonts.gstatic.com",
 ].join('; ');
 
 const securityHeaders = [

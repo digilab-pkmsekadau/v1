@@ -78,12 +78,16 @@ export async function PUT(request: Request) {
     const db = createServerClient();
     const body = await request.json();
     const key = typeof body.key === 'string' ? body.key : '';
-    const value = typeof body.value === 'string' ? body.value.trim() : '';
-
+    const value = typeof body.value === 'string' ? body.value.trim().slice(0, 20000) : '';
     if (!WRITABLE_CONFIG_KEYS.includes(key as (typeof WRITABLE_CONFIG_KEYS)[number])) {
       return NextResponse.json({ error: 'key tidak valid' }, { status: 400 });
     }
-
+    if ((key === 'logo_url' || key === 'doctor_signature' || key === 'tech_signature') && value) {
+      // Tolak javascript:/data: agar <img src> settings tidak jadi sink XSS.
+      if (!/^https?:\/\//i.test(value)) {
+        return NextResponse.json({ error: 'URL harus http(s)' }, { status: 400 });
+      }
+    }
     if (!value && !OPTIONAL_CONFIG_KEYS.has(key)) {
       return NextResponse.json({ error: 'value diperlukan' }, { status: 400 });
     }

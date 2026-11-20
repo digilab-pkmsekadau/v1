@@ -34,22 +34,30 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Parameter tidak valid' }, { status: 400 });
     }
 
-    // Single query with JOIN — fixes N+1 problem
-    const { data: examinations, error } = await db
-      .from('examinations')
-      .select(`
-        no_urut, tgl_permintaan, dokter, petugas, ${column},
-        patient:patients(nama, nik, alamat, tgl_lahir)
-      `)
-      .gte('tgl_permintaan', startDate)
-      .lte('tgl_permintaan', endDate)
-      .not(column, 'is', null)
-      .order('tgl_permintaan', { ascending: true });
-
-    if (error) {
-      console.error('DB error:', error);
-      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
+    // Paginasi: Supabase cap 1000 baris/query; tanpa ini export terpotong diam-diam.
+    const PAGE_SIZE = 1000;
+    const examinations: Record<string, unknown>[] = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data: page, error: pageError } = await db
+        .from('examinations')
+        .select(`
+          no_urut, tgl_permintaan, dokter, petugas, ${column},
+          patient:patients(nama, nik, alamat, tgl_lahir)
+        `)
+        .gte('tgl_permintaan', startDate)
+        .lte('tgl_permintaan', endDate)
+        .not(column, 'is', null)
+        .order('tgl_permintaan', { ascending: true })
+        .range(from, from + PAGE_SIZE - 1);
+      if (pageError) {
+        console.error('DB error:', pageError);
+        return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
+      }
+      if (!page || page.length === 0) break;
+      examinations.push(...(page as unknown as Record<string, unknown>[]));
+      if (page.length < PAGE_SIZE) break;
     }
+
 
     const result: ExportRow[] = [];
 

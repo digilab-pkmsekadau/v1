@@ -6,6 +6,7 @@
    Bold borders, hard shadows, playful colors, high contrast
    =============================================================== */
 :root {
+  color-scheme: light dark;
   /* Base colors */
   --bg-body: #FAF9F6;
   --bg-card: #ffffff;
@@ -79,7 +80,10 @@ html.dark {
   * {
     box-sizing: border-box;
   }
-  
+  html {
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-muted) transparent;
+  }
   body {
     font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
     background: var(--bg-body);

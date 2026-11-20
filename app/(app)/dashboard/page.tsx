@@ -150,7 +150,7 @@ export default function DashboardPage() {
           </span>
           <h2 className="font-black text-sm tracking-wide text-black dark:text-white uppercase">Filter Periode</h2>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2">
           <div>
             <label htmlFor="start-date" className="label-caps text-[10px] font-black text-gray-500 dark:text-gray-400 mb-1.5 block">Dari</label>
             <input
@@ -173,7 +173,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Summary Stats */}
-      <div className="grid grid-cols-2 gap-3 mb-6">
+      <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 mb-6">
         <div className="brutal-card p-4 bg-orange-500! border-black dark:border-white">
           <div className="flex items-center gap-2 mb-3">
             <div className="w-9 h-9 rounded-lg bg-white/20 border-2 border-white flex items-center justify-center">

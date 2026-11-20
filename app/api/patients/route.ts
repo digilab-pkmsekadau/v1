@@ -1,14 +1,17 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-import { getAuthedUser } from '@/lib/require-auth';
+import { requireAuth } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
 
 export const dynamic = 'force-dynamic';
 
 function sanitizeSearchTerm(value: string) {
+  // Escape wildcard LIKE (_ \) agar input user tidak jadi pola pencarian.
+  // ponytail: PostgREST .or() tanpa ESCAPE clause; ceiling: pindah ke full-text search.
   return value
-    .replace(/[%,()]/g, ' ')
+    .replace(/[\\%(),]/g, ' ')
+    .replace(/_/g, ' ')
     .replace(/\s+/g, ' ')
     .trim()
     .slice(0, 80);
@@ -18,9 +21,8 @@ function sanitizeSearchTerm(value: string) {
 // Mengembalikan juga `last_status_biaya` dari examination terbaru pasien
 export async function GET(request: NextRequest) {
   try {
-    if (!(await getAuthedUser())) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    const denied = await requireAuth();
+    if (denied) return denied;
     const db = createServerClient();
     const { searchParams } = new URL(request.url);
     const q = searchParams.get('q')?.trim() ?? '';

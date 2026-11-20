@@ -3,91 +3,50 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { writeAudit } from '@/lib/audit';
+import { ALL_PARAMS, PARAM_UNITS } from '@/lib/param-options';
 import { getAuthedUser, requireAuth } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
-import { generateNoUrut } from '@/lib/utils';
+import { appendUnit, generateNoUrut } from '@/lib/utils';
 import type { ParamItem } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const examinationSchema = z.object({
   nama_pasien: z.string().trim().min(1, 'Nama pasien wajib diisi').max(200),
   nik: z.string().trim().max(20).optional(),
-  jenis_kelamin: z.string().max(10).optional(),
+  jenis_kelamin: z.enum(['L', 'P'], { message: 'Jenis kelamin wajib L/P' }),
   alamat: z.string().max(500).optional(),
-  tgl_lahir: z.string().max(20).optional(),
-  tgl_permintaan: z.string().min(1, 'Tanggal permintaan wajib diisi').max(20),
-  dokter: z.string().max(200).optional().default(''),
-  petugas: z.string().max(200).optional().default(''),
+  tgl_lahir: z.string().regex(DATE_RE, 'Tanggal lahir format YYYY-MM-DD').max(20).optional().or(z.literal('')),
+  tgl_permintaan: z.string().regex(DATE_RE, 'Tanggal permintaan format YYYY-MM-DD'),
+  dokter: z.string().trim().min(1, 'Dokter wajib diisi').max(200),
+  petugas: z.string().trim().min(1, 'Petugas wajib diisi').max(200),
   status_biaya: z.enum(['Umum', 'BPJS', 'Gratis']),
   patient_id: z.string().uuid().optional(),
   params: z.array(z.object({
     id: z.string(),
-    paramKey: z.string().max(100),
+    paramKey: z.string().max(100).refine(k => k in PARAM_UNITS, 'Parameter tidak dikenal'),
     value: z.string().max(500),
-  })).default([]),
+  })).default([]).superRefine((arr, ctx) => {
+    arr.forEach((item, i) => {
+      const info = ALL_PARAMS.find(p => p.key === item.paramKey);
+      if (info?.type === 'number' && item.value.trim()) {
+        const raw = item.value.trim();
+        // "13,0" (ID) -> 13.0; "1.200" (ribuan ID) -> 1200; "13.0" (EN) -> 13.0.
+        const n = raw.includes(',')
+          ? Number(raw.replace(/\./g, '').replace(',', '.'))
+          : Number(raw);
+        if (Number.isNaN(n)) {
+          ctx.addIssue({ code: 'custom', message: `${info.label} harus angka`, path: [i, 'value'] });
+        }
+      }
+      if (info?.type === 'select' && info.opts && item.value.trim() && !info.opts.includes(item.value.trim())) {
+        ctx.addIssue({ code: 'custom', message: `${info.label} nilai tidak valid`, path: [i, 'value'] });
+      }
+    });
+  }),
 });
 
-// Mapping: paramKey → { dbCol, unit? }
-const PARAM_MAP: Record<string, { col: string; unit?: string }> = {
-  // Hematologi
-  rbc:           { col: 'rbc',   unit: '10^6/µl' },
-  hgb:           { col: 'hgb',   unit: 'g/dl' },
-  hct:           { col: 'hct',   unit: '%' },
-  mcv:           { col: 'mcv',   unit: 'fL' },
-  mch:           { col: 'mch',   unit: 'pg' },
-  mchc:          { col: 'mchc',  unit: 'g/dl' },
-  plt:           { col: 'plt',   unit: '10^3/µl' },
-  wbc:           { col: 'wbc',   unit: '10^3/µl' },
-  lym:           { col: 'lym',   unit: '%' },
-  mon:           { col: 'mon',   unit: '%' },
-  gra:           { col: 'gra',   unit: '%' },
-  led:           { col: 'led',   unit: 'mm/Jam' },
-  goldar:        { col: 'goldar' },
-  bt:            { col: 'bt' },
-  ct:            { col: 'ct' },
-  // Serologi/Imunologi
-  hbsag:         { col: 'hbsag' },
-  hiv:           { col: 'hiv' },
-  syphilis:      { col: 'syphilis' },
-  hcv:           { col: 'hcv' },
-  anti_hbs:      { col: 'anti_hbs' },
-  ns1:           { col: 'ns1' },
-  dengue_ig:     { col: 'dengue_ig' },
-  malaria_rapid: { col: 'malaria_rapid' },
-  widal:         { col: 'widal' },
-  // Kimia Darah
-  gds:           { col: 'gds',          unit: 'mg/dl' },
-  gdp:           { col: 'gdp',          unit: 'mg/dl' },
-  gd2pp:         { col: 'gd2pp',        unit: 'mg/dl' },
-  kolesterol:    { col: 'kolesterol',   unit: 'mg/dl' },
-  ldl:           { col: 'ldl',          unit: 'mg/dl' },
-  hdl:           { col: 'hdl',          unit: 'mg/dl' },
-  trigliserida:  { col: 'trigliserida', unit: 'mg/dl' },
-  asam_urat:     { col: 'asam_urat',    unit: 'mg/dl' },
-  napza:         { col: 'napza' },
-  // Mikrobiologi
-  bta:           { col: 'bta' },
-  gram:          { col: 'gram' },
-  malaria_slide: { col: 'malaria_slide' },
-  // Urinalisis
-  u_warna:         { col: 'u_warna' },
-  u_jernih:        { col: 'u_jernih' },
-  u_bj:            { col: 'u_bj' },
-  u_leukosit:      { col: 'u_leukosit',     unit: '/µl' },
-  u_nitrit:        { col: 'u_nitrit' },
-  u_ph:            { col: 'u_ph' },
-  u_protein:       { col: 'u_protein' },
-  u_glukosa:       { col: 'u_glukosa' },
-  u_keton:         { col: 'u_keton' },
-  u_urobilinogen:  { col: 'u_urobilinogen', unit: 'mg/dl' },
-  u_bilirubin:     { col: 'u_bilirubin' },
-  u_blood:         { col: 'u_blood' },
-  u_hcg:           { col: 'u_hcg' },
-  m_leukosit:      { col: 'm_leukosit',     unit: '/LPB' },
-  m_eritrosit:     { col: 'm_eritrosit',    unit: '/LPB' },
-  m_epitel:        { col: 'm_epitel',       unit: '/LPK' },
-};
 
 export async function GET() {
   try {
@@ -183,13 +142,14 @@ export async function POST(request: NextRequest) {
       patientId = newP.id;
     }
     // 2. Konversi dynamic params → object kolom (validasi key via allowlist PARAM_MAP).
+    // Strip unit dulu: nilai edit bisa bawa unit lama ("90 mg/dl") — tanpa ini
+    // tiap simpan menumpuk jadi "90 mg/dl mg/dl".
     const labCols: Record<string, string> = {};
     for (const item of (params || []) as ParamItem[]) {
       const { paramKey, value } = item;
       if (!paramKey || !value?.trim()) continue;
-      const mapping = PARAM_MAP[paramKey];
-      if (!mapping) continue;
-      labCols[mapping.col] = mapping.unit ? `${value.trim()} ${mapping.unit}` : value.trim();
+      if (!PARAM_UNITS.hasOwnProperty(paramKey)) continue;
+      labCols[paramKey] = appendUnit(value, PARAM_UNITS[paramKey]);
     }
     // 3-4. Insert dengan retry: dua submit bareng bisa baca no_urut terakhir yang
     // sama. UNIQUE(no_urut) di DB jadi penentu; 23505 = kalah race, coba nomor berikut.

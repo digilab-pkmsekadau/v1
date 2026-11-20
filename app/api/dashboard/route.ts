@@ -1,6 +1,7 @@
-import type { NextRequest} from 'next/server';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { ALL_PARAMS } from '@/lib/param-options';
 import { requireAuth } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
 import { formatDateDisplay, getTodayWIB } from '@/lib/utils';
@@ -109,36 +110,22 @@ export async function GET(request: NextRequest) {
       if (page.length < PAGE_SIZE) break;
     }
 
+    // Key stats = label form (single source dgn export). Dulu label hardcode
+    // beda dgn PARAM_OPTIONS ("GDS (Gula...)" vs "Gula Darah...") — join pecah.
+    const labelOf = (key: string) => ALL_PARAMS.find(p => p.key === key)?.label ?? key;
+    const chemKeys = ['gds', 'gdp', 'gd2pp', 'kolesterol', 'ldl', 'hdl', 'trigliserida', 'asam_urat'];
+    const imKeys: [string, 'reactive' | 'positive'][] = [
+      ['hbsag', 'reactive'], ['hiv', 'reactive'], ['syphilis', 'reactive'], ['hcv', 'reactive'],
+      ['anti_hbs', 'reactive'], ['ns1', 'positive'], ['dengue_ig', 'positive'],
+      ['malaria_rapid', 'positive'], ['widal', 'positive'], ['napza', 'positive'],
+    ];
+    const micKeys = ['bta', 'gram', 'malaria_slide'];
     const stats: DashboardStats = {
       today: 0,
       filtered: 0,
-      chemistry: {
-        'Gula Darah Sewaktu': 0,
-        'Gula Darah Puasa': 0,
-        'Gula Darah 2 Jam PP': 0,
-        'Kolesterol': 0,
-        'LDL': 0,
-        'HDL': 0,
-        'Trigliserida': 0,
-        'Asam Urat': 0,
-      },
-      immunology: {
-        'HBsAg': { type: 'reactive', pos: 0, neg: 0 },
-        'Anti HIV': { type: 'reactive', pos: 0, neg: 0 },
-        'Syphilis': { type: 'reactive', pos: 0, neg: 0 },
-        'Anti HCV': { type: 'reactive', pos: 0, neg: 0 },
-        'Anti HBs': { type: 'reactive', pos: 0, neg: 0 },
-        'NS1 Ag Dengue': { type: 'positive', pos: 0, neg: 0 },
-        'Dengue IgG & IgM': { type: 'positive', pos: 0, neg: 0 },
-        'Malaria Rapid': { type: 'positive', pos: 0, neg: 0 },
-        'Widal': { type: 'positive', pos: 0, neg: 0 },
-        'NAPZA': { type: 'positive', pos: 0, neg: 0 },
-      },
-      microbiology: {
-        'Pewarnaan BTA': { pos: 0, neg: 0 },
-        'Pewarnaan Gram': { pos: 0, neg: 0 },
-        'Malaria Slide': { pos: 0, neg: 0 },
-      },
+      chemistry: Object.fromEntries(chemKeys.map(k => [labelOf(k), 0])),
+      immunology: Object.fromEntries(imKeys.map(([k, t]) => [labelOf(k), { type: t, pos: 0, neg: 0 }])),
+      microbiology: Object.fromEntries(micKeys.map(k => [labelOf(k), { pos: 0, neg: 0 }])),
     };
 
     const history: HistoryRow[] = [];
@@ -153,17 +140,21 @@ export async function GET(request: NextRequest) {
     const countImmuno = (value: unknown, key: string) => {
       if (typeof value !== 'string' || !value.trim()) return;
       const v = value.toLowerCase();
-      const isNeg = v.includes('non') || v.includes('negatif');
-      if (isNeg) stats.immunology[key].neg++;
-      else stats.immunology[key].pos++;
+      // Non/negatif eksplisit -> neg; malaria_slide positif berupa spesies
+      // ("P. falciparum") tanpa kata positif -> selain neg = pos.
+      const isNeg = v.includes('non') || v.includes('negatif') || v === '-' || v === 'tidak ada';
+      const label = labelOf(key);
+      if (isNeg) stats.immunology[label].neg++;
+      else stats.immunology[label].pos++;
     };
 
     const countMicro = (value: unknown, key: string) => {
       if (typeof value !== 'string' || !value.trim()) return;
       const v = value.toLowerCase();
-      const isNeg = v.includes('negatif') || v.includes('non');
-      if (isNeg) stats.microbiology[key].neg++;
-      else stats.microbiology[key].pos++;
+      const isNeg = v.includes('negatif') || v.includes('non') || v === '-' || v === 'tidak ada';
+      const label = labelOf(key);
+      if (isNeg) stats.microbiology[label].neg++;
+      else stats.microbiology[label].pos++;
     };
 
     for (const exam of examinations || []) {
@@ -183,29 +174,29 @@ export async function GET(request: NextRequest) {
         exam_id: exam.id,
       });
 
-      if (exam.gds) stats.chemistry['Gula Darah Sewaktu']++;
-      if (exam.gdp) stats.chemistry['Gula Darah Puasa']++;
-      if (exam.gd2pp) stats.chemistry['Gula Darah 2 Jam PP']++;
-      if (exam.kolesterol) stats.chemistry['Kolesterol']++;
-      if (exam.ldl) stats.chemistry['LDL']++;
-      if (exam.hdl) stats.chemistry['HDL']++;
-      if (exam.trigliserida) stats.chemistry['Trigliserida']++;
-      if (exam.asam_urat) stats.chemistry['Asam Urat']++;
+      if (exam.gds) stats.chemistry[labelOf('gds')]++;
+      if (exam.gdp) stats.chemistry[labelOf('gdp')]++;
+      if (exam.gd2pp) stats.chemistry[labelOf('gd2pp')]++;
+      if (exam.kolesterol) stats.chemistry[labelOf('kolesterol')]++;
+      if (exam.ldl) stats.chemistry[labelOf('ldl')]++;
+      if (exam.hdl) stats.chemistry[labelOf('hdl')]++;
+      if (exam.trigliserida) stats.chemistry[labelOf('trigliserida')]++;
+      if (exam.asam_urat) stats.chemistry[labelOf('asam_urat')]++;
 
-      countImmuno(exam.hbsag, 'HBsAg');
-      countImmuno(exam.hiv, 'Anti HIV');
-      countImmuno(exam.syphilis, 'Syphilis');
-      countImmuno(exam.hcv, 'Anti HCV');
-      countImmuno(exam.anti_hbs, 'Anti HBs');
-      countImmuno(exam.ns1, 'NS1 Ag Dengue');
-      countImmuno(exam.dengue_ig, 'Dengue IgG & IgM');
-      countImmuno(exam.malaria_rapid, 'Malaria Rapid');
-      countImmuno(exam.widal, 'Widal');
-      countImmuno(exam.napza, 'NAPZA');
+      countImmuno(exam.hbsag, 'hbsag');
+      countImmuno(exam.hiv, 'hiv');
+      countImmuno(exam.syphilis, 'syphilis');
+      countImmuno(exam.hcv, 'hcv');
+      countImmuno(exam.anti_hbs, 'anti_hbs');
+      countImmuno(exam.ns1, 'ns1');
+      countImmuno(exam.dengue_ig, 'dengue_ig');
+      countImmuno(exam.malaria_rapid, 'malaria_rapid');
+      countImmuno(exam.widal, 'widal');
+      countImmuno(exam.napza, 'napza');
 
-      countMicro(exam.bta, 'Pewarnaan BTA');
-      countMicro(exam.gram, 'Pewarnaan Gram');
-      countMicro(exam.malaria_slide, 'Malaria Slide');
+      countMicro(exam.bta, 'bta');
+      countMicro(exam.gram, 'gram');
+      countMicro(exam.malaria_slide, 'malaria_slide');
     }
 
     return NextResponse.json({ stats, history });

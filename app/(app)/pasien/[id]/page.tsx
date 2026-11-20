@@ -93,7 +93,7 @@ export default function PasienDetailPage() {
 
   const qrUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/pasien/${id}`
-    : '';
+    : `/pasien/${id}`;
 
   if (loading) {
     return (
@@ -305,7 +305,7 @@ export default function PasienDetailPage() {
         <div className="brutal-card p-6 flex flex-col items-center gap-4">
           <div className="p-4 bg-white rounded-2xl shadow-sm border border-slate-100 qr-container">
             <QRCodeSVG
-              value={qrUrl || `patient:${id}`}
+              value={qrUrl}
               size={200}
               level="M"
               fgColor="#0f172a"

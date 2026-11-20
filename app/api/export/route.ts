@@ -1,6 +1,7 @@
-import type { NextRequest} from 'next/server';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
+import { ALL_PARAMS } from '@/lib/param-options';
 import { requireAuth } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
 import { formatDateDisplay } from '@/lib/utils';
@@ -8,15 +9,11 @@ import type { ExportRow } from '@/types';
 
 export const dynamic = 'force-dynamic';
 
-const PARAM_COLUMN: Record<string, string> = {
-  'HBsAg': 'hbsag', 'Anti HIV': 'hiv', 'Syphilis': 'syphilis',
-  'Anti HCV': 'hcv', 'Anti HBs': 'anti_hbs', 'NS1 Ag Dengue': 'ns1',
-  'Dengue IgG & IgM': 'dengue_ig', 'Malaria Rapid': 'malaria_rapid', 'Widal': 'widal',
-  'NAPZA': 'napza',
-  'Pewarnaan BTA': 'bta', 'Pewarnaan Gram': 'gram', 'Malaria Slide': 'malaria_slide',
-  'Gula Darah Sewaktu': 'gds', 'Gula Darah Puasa': 'gdp', 'Gula Darah 2 Jam PP': 'gd2pp',
-  'Kolesterol': 'kolesterol', 'LDL': 'ldl', 'HDL': 'hdl', 'Trigliserida': 'trigliserida', 'Asam Urat': 'asam_urat',
-};
+// Label export <- label form (single source). Dulu 21 label hardcode:
+// hematologi + urin tak bisa export (400). Sekarang 52 semua.
+const PARAM_COLUMN: Record<string, string> = Object.fromEntries(
+  ALL_PARAMS.map(p => [p.label, p.key])
+);
 
 export async function GET(request: NextRequest) {
   const denied = await requireAuth();
@@ -68,8 +65,10 @@ export async function GET(request: NextRequest) {
       if (!val.trim()) continue;
 
       const valLower = val.toLowerCase();
-      const isNeg = valLower.includes('non') || valLower.includes('negatif');
-      const isPos = valLower.includes('positif') || (valLower.includes('reaktif') && !valLower.includes('non'));
+      // Spesies malaria ("P. falciparum") tak mengandung kata positif —
+      // selain neg eksplisit = positif.
+      const isNeg = valLower.includes('non') || valLower.includes('negatif') || valLower.trim() === '-' || valLower.includes('tidak ada');
+      const isPos = !isNeg && (valLower.includes('positif') || valLower.includes('reaktif') || /p\.\s?\w+/.test(valLower) || valLower.includes('(+)'));
 
       let shouldExport = false;
       if (filterMode === 'all_filled') shouldExport = true;

@@ -97,4 +97,14 @@ export const PARAM_OPTIONS: ParamGroup[] = [
 
 // Flatten untuk lookup
 export const ALL_PARAMS = PARAM_OPTIONS.flatMap(g => g.params);
+
+// Satuan kanonis untuk penyimpanan (single source of truth POST + PUT).
+// Override glyph: simpan ASCII "10^6/µl" agar konsisten dengan data lama.
+const UNIT_OVERRIDE: Record<string, string> = {
+  rbc: '10^6/µl', plt: '10^3/µl', wbc: '10^3/µl',
+};
+
+export const PARAM_UNITS: Record<string, string | undefined> = Object.fromEntries(
+  ALL_PARAMS.map(p => [p.key, UNIT_OVERRIDE[p.key] ?? p.unit])
+);
 export const getParamInfo = (key: string) => ALL_PARAMS.find(p => p.key === key);

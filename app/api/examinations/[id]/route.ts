@@ -3,19 +3,22 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 
 import { writeAudit } from '@/lib/audit';
-import { ALL_PARAMS } from '@/lib/param-options';
+import { ALL_PARAMS, PARAM_UNITS } from '@/lib/param-options';
 import { getAuthedUser, requireAuth } from '@/lib/require-auth';
 import { createServerClient } from '@/lib/supabase-service';
+import { appendUnit } from '@/lib/utils';
 
 export const dynamic = 'force-dynamic';
 
 type RouteParams = { params: Promise<{ id: string }> };
 
 // Batas nilai PUT: cegah string raksasa/tipe salah masuk DB (DoS/korupsi data).
+// Format tanggal disamakan dengan POST agar tak ada data cacat via edit.
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const updateSchema = z.object({
-  tgl_permintaan: z.string().trim().max(20).optional(),
-  dokter: z.string().trim().max(200).nullable().optional(),
-  petugas: z.string().trim().max(200).nullable().optional(),
+  tgl_permintaan: z.string().regex(DATE_RE, 'Tanggal format YYYY-MM-DD').optional(),
+  dokter: z.string().trim().min(1).max(200).nullable().optional(),
+  petugas: z.string().trim().min(1).max(200).nullable().optional(),
   status_biaya: z.enum(['Umum', 'BPJS', 'Gratis']).optional(),
 }).catchall(z.string().trim().max(500));
 
@@ -77,7 +80,11 @@ export async function PUT(
     }
     const updateData: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(parsed.data)) {
-      if (value !== undefined && EDITABLE_COLUMNS.has(key)) updateData[key] = value;
+      if (value === undefined || !EDITABLE_COLUMNS.has(key)) continue;
+      // Normalisasi unit: nilai dari form edit bisa bawa unit lama.
+      updateData[key] = PARAM_UNITS.hasOwnProperty(key) && typeof value === 'string'
+        ? appendUnit(value, PARAM_UNITS[key])
+        : value;
     }
 
     if (Object.keys(updateData).length === 0) {

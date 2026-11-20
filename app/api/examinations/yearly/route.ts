@@ -26,25 +26,34 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Tahun di luar rentang yang diizinkan' }, { status: 400 });
     }
 
-    const { data: target, error: countErr } = await db
-      .from('examinations')
-      .select('id')
-      .gte('tgl_permintaan', `${year}-01-01`)
-      .lte('tgl_permintaan', `${year}-12-31`);
-    if (countErr) {
-      console.error('DB error:', countErr);
-      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
+    // Hitung + hapus per-batch: tanpa paginasi cap 1000 bikin audit undercount
+    // (tahun >1000 baris) dan delete bisa tak tuntas. ponytail: 2 pass
+    // (collect id lalu delete per-100); ceiling: RPC server-side bila >10rb/thn.
+    const PAGE_SIZE = 1000;
+    const ids: string[] = [];
+    for (let from = 0; ; from += PAGE_SIZE) {
+      const { data: page, error: pageErr } = await db
+        .from('examinations')
+        .select('id')
+        .gte('tgl_permintaan', `${year}-01-01`)
+        .lte('tgl_permintaan', `${year}-12-31`)
+        .range(from, from + PAGE_SIZE - 1);
+      if (pageErr) {
+        console.error('DB error:', pageErr);
+        return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
+      }
+      if (!page || page.length === 0) break;
+      ids.push(...page.map((r: { id: string }) => r.id));
+      if (page.length < PAGE_SIZE) break;
     }
-    const deletedCount = target?.length ?? 0;
-    const { error } = await db
-      .from('examinations')
-      .delete()
-      .gte('tgl_permintaan', `${year}-01-01`)
-      .lte('tgl_permintaan', `${year}-12-31`);
-    if (error) {
-      console.error('DB error:', error);
-      return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
+    for (let i = 0; i < ids.length; i += 100) {
+      const { error } = await db.from('examinations').delete().in('id', ids.slice(i, i + 100));
+      if (error) {
+        console.error('DB error:', error);
+        return NextResponse.json({ error: 'Terjadi kesalahan pada server' }, { status: 500 });
+      }
     }
+    const deletedCount = ids.length;
     const user = await getAuthedUser();
     await writeAudit(user?.email, {
       action: 'DELETE_YEAR',

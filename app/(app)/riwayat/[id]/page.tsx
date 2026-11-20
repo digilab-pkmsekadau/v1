@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 
 import { isAbnormal, getNormalRangeText } from '@/lib/normal-ranges';
 import { PARAM_OPTIONS } from '@/lib/param-options';
-
+import { stripUnit } from '@/lib/utils';
 // semua param flat
 const ALL_PARAMS = PARAM_OPTIONS.flatMap(g => g.params.map(p => ({ ...p, group: g.group })));
 
@@ -89,6 +89,7 @@ export default function RiwayatDetailPage() {
   const [editMode, setEditMode] = useState(false);
   const [editData, setEditData] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
+  const [printCfg, setPrintCfg] = useState({ logo_url: '', doctor_signature: '', tech_signature: '', print_template: '' });
 
   const fetchDetail = useCallback(async () => {
     setLoading(true);
@@ -97,6 +98,10 @@ export default function RiwayatDetailPage() {
       if (!res.ok) throw new Error();
       const json = await res.json();
       setData(json.data);
+      fetch('/api/config').then(r => r.json()).then(c => setPrintCfg({
+        logo_url: c.logo_url || '', doctor_signature: c.doctor_signature || '',
+        tech_signature: c.tech_signature || '', print_template: c.print_template || '',
+      })).catch(() => {});
     } catch {
       toast.error('Gagal memuat detail pemeriksaan');
     } finally {
@@ -116,7 +121,7 @@ export default function RiwayatDetailPage() {
       status_biaya: data.status_biaya ?? '',
     };
     ALL_PARAMS.forEach(p => {
-      initial[p.key] = (data[p.key] as string) ?? '';
+      initial[p.key] = stripUnit((data[p.key] as string) ?? '');
     });
     setEditData(initial);
     setEditMode(true);
@@ -179,13 +184,23 @@ export default function RiwayatDetailPage() {
     <>
       {/* ── Print-only Layout ─────────────────────────────────── */}
       <div className="hidden print:block text-black bg-white" style={{ fontFamily: '"Times New Roman", Times, serif' }}>
-        {/* Kop Surat */}
+        {/* Kop Surat — logo + header custom dari Settings bila ada */}
         <div className="flex items-center justify-center border-b-[3px] border-black pb-4 mb-6">
+          {printCfg.logo_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={printCfg.logo_url} alt="" className="h-16 w-16 object-contain mr-4" />
+          ) : null}
           <div className="text-center">
-            <h1 className="text-xl font-bold uppercase tracking-wider mb-1">Pemerintah Kabupaten Sekadau</h1>
-            <h2 className="text-lg font-bold uppercase mb-1">Dinas Kesehatan, Pengendalian Penduduk dan KB</h2>
-            <h3 className="text-2xl font-black uppercase tracking-widest mb-1">UPTD Puskesmas Sekadau</h3>
-            <p className="text-xs">Jl. Merdeka Timur, Kec. Sekadau Hilir, Kab. Sekadau, Kalimantan Barat</p>
+            {printCfg.print_template ? (
+              <h1 className="text-xl font-bold uppercase tracking-wider mb-1 whitespace-pre-line">{printCfg.print_template}</h1>
+            ) : (
+              <>
+                <h1 className="text-xl font-bold uppercase tracking-wider mb-1">Pemerintah Kabupaten Sekadau</h1>
+                <h2 className="text-lg font-bold uppercase mb-1">Dinas Kesehatan, Pengendalian Penduduk dan KB</h2>
+                <h3 className="text-2xl font-black uppercase tracking-widest mb-1">UPTD Puskesmas Sekadau</h3>
+                <p className="text-xs">Jl. Merdeka Timur, Kec. Sekadau Hilir, Kab. Sekadau, Kalimantan Barat</p>
+              </>
+            )}
           </div>
         </div>
 
@@ -260,7 +275,7 @@ export default function RiwayatDetailPage() {
                       <td className="py-2 px-2 text-center">{pIdx + 1}</td>
                       <td className="py-2 px-2">{param.label}</td>
                       <td className={`py-2 px-2 text-center font-bold`}>
-                        {val || '-'} {isAbn ? '*' : ''}
+                        {stripUnit(val) || '-'} {isAbn ? '*' : ''}
                       </td>
                       <td className="py-2 px-2 text-center">{param.unit || '-'}</td>
                       <td className="py-2 px-2 text-center">{getNormalRangeText(param.key, data.patients?.jenis_kelamin) || '-'}</td>
@@ -280,12 +295,12 @@ export default function RiwayatDetailPage() {
         <div className="flex justify-between mt-8 text-sm text-center">
           <div className="w-48">
             <p className="mb-20">Dokter Pengirim,</p>
-            <p className="font-bold underline">{data.dokter || '..................................'}</p>
+            <p className="font-bold underline">{data.dokter || printCfg.doctor_signature || '..................................'}</p>
           </div>
           <div className="w-56">
             <p className="mb-1 text-right">Sekadau, {new Date().toLocaleDateString('id-ID', {day: 'numeric', month: 'long', year: 'numeric'})}</p>
             <p className="mb-20 text-center">Petugas Laboratorium,</p>
-            <p className="font-bold underline text-center">{data.petugas || '..................................'}</p>
+            <p className="font-bold underline text-center">{data.petugas || printCfg.tech_signature || '..................................'}</p>
           </div>
         </div>
       </div>

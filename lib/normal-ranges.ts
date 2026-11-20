@@ -38,16 +38,9 @@ export const NORMAL_RANGES: Record<string, NormalRange> = {
   // Asam Urat — berbeda per gender
   asam_urat:        { min: 2.4, max: 7.0, pria: { min: 3.4, max: 7.0 }, wanita: { min: 2.4, max: 6.0 }, unit: 'mg/dL' },
 
-  // Fungsi Hati
-  sgot:             { min: 0,   max: 40,   unit: 'U/L' },
-  sgpt:             { min: 0,   max: 41,   unit: 'U/L' },
-  protein_total:    { min: 6.4, max: 8.3,  unit: 'g/dL' },
-  albumin:          { min: 3.5, max: 5.2,  unit: 'g/dL' },
-  bilirubin_total:  { min: 0,   max: 1.2,  unit: 'mg/dL' },
-
-  // Fungsi Ginjal
-  ureum:            { min: 10,  max: 50,   unit: 'mg/dL' },
-  kreatinin:        { min: 0.5, max: 1.3, pria: { min: 0.7, max: 1.3 }, wanita: { min: 0.5, max: 1.1 }, unit: 'mg/dL' },
+  // Fungsi Hati/Ginjal: alat tidak ada di Puskesmas Sekadau — dulu ada range
+  // tapi tak pernah dipakai (tak ada di PARAM_OPTIONS). Dihapus agar tak
+  // disangka terdeteksi. Tambah lagi saat alat tersedia + PARAM_MAP siap.
 
   // ── URINALISA ─────────────────────────────────────────────────
   u_ph:             { min: 4.5, max: 8.5,  unit: '' },

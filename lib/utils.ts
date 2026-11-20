@@ -56,3 +56,20 @@ export function getStartOfMonth(): string {
   const now = new Date();
   return `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-01`;
 }
+
+/**
+ * Buang satuan di ekor nilai lab ("90 mg/dl" -> "90").
+ * Regex case-insensitive menutup varian glyph (g/dl vs g/dL, 10⁶ vs 10^6).
+ */
+export function stripUnit(value: string): string {
+  return value.replace(/\s*(10\^[36]\/µl|10[⁶³]\/µl|mg\/dl|g\/dl|%|fl|pg|mm\/jam|\/µl|\/lpb|\/lpk)$/i, '').trim();
+}
+
+/**
+ * Normalisasi nilai sebelum simpan: strip unit lama lalu tambah unit kanonis.
+ * Mencegah "90 mg/dl mg/dl" saat edit berulang.
+ */
+export function appendUnit(raw: string, unit?: string): string {
+  const clean = stripUnit(raw.trim());
+  return unit && clean ? `${clean} ${unit}` : clean;
+}

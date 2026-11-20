@@ -199,13 +199,18 @@ export async function POST(request: NextRequest) {
     let lastNo: string | null = null;
     for (let attempt = 0; attempt < 3; attempt++) {
       if (attempt > 0 || lastNo === null) {
-        const { data: lastExam } = await db
-          .from('examinations').select('no_urut')
-          .order('no_urut', { ascending: false }).limit(1).maybeSingle();
-        lastNo = lastExam?.no_urut ?? null;
+        // Max harus NUMERIK: order string menaruh 'P-999' di atas 'P-1000'
+        // ('9' > '1'), sehingga max salah dan insert selalu 23505.
+        // ponytail: scan satu kolom pendek, cukup untuk tool internal;
+        // ceiling: RPC max(nomor) / sequence bila tabel puluhan ribu baris.
+        const { data: allNo } = await db.from('examinations').select('no_urut');
+        let maxNum = 0;
+        for (const r of (allNo ?? []) as { no_urut: string }[]) {
+          const m = /^P-(\d+)$/.exec(r.no_urut ?? '');
+          if (m) maxNum = Math.max(maxNum, parseInt(m[1], 10));
+        }
+        lastNo = `P-${String(maxNum).padStart(2, '0')}`;
       }
-      noUrut = generateNoUrut(lastNo);
-      lastNo = noUrut;
       const { data, error: examErr } = await db
         .from('examinations')
         .insert({

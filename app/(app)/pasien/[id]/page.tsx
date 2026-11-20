@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import { ArrowLeft, Loader2, QrCode, TrendingUp, ClipboardList, Eye } from 'lucide-react';
+import { ArrowLeft, QrCode, TrendingUp, ClipboardList, Eye } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState, useCallback } from 'react';
@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 
 import { isAbnormal } from '@/lib/normal-ranges';
 import { ALL_PARAMS } from '@/lib/param-options';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 
 // QR Code - lazy loaded (client only)
 const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => m.QRCodeSVG), { ssr: false });
@@ -114,8 +115,8 @@ export default function PasienDetailPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <Loader2 size={32} className="animate-spin text-teal-500" />
-        <p className="text-sm text-slate-400">Memuat data pasien...</p>
+        <AnimatedLoader size={32} label="Memuat data pasien..." />
+        <p className="text-sm text-slate-500 font-semibold">Memuat data pasien...</p>
       </div>
     );
   }

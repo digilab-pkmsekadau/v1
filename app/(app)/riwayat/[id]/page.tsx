@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 import { isAbnormal, getNormalRangeText } from '@/lib/normal-ranges';
 import { PARAM_OPTIONS } from '@/lib/param-options';
 import { stripUnit } from '@/lib/utils';
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 // semua param flat
 const ALL_PARAMS = PARAM_OPTIONS.flatMap(g => g.params.map(p => ({ ...p, group: g.group })));
 
@@ -152,8 +153,8 @@ export default function RiwayatDetailPage() {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
-        <Loader2 size={32} className="animate-spin text-teal-500" />
-        <p className="text-sm text-slate-400">Memuat data...</p>
+        <AnimatedLoader size={32} label="Memuat data..." />
+        <p className="text-sm text-slate-500 font-semibold">Memuat data...</p>
       </div>
     );
   }

@@ -4,6 +4,8 @@ import { Search, User, ChevronRight, ChevronLeft, Loader2, Users } from 'lucide-
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
+
 interface Patient {
   id: string;
   nama: string;
@@ -116,8 +118,9 @@ export default function PasienPage() {
       {/* Patient List */}
       <div className="bg-white dark:bg-zinc-900 border-2 border-black dark:border-white rounded-2xl overflow-hidden" style={{ boxShadow: '3px 3px 0px 0px rgba(0,0,0,1)' }}>
         {loading && patients.length === 0 ? (
-          <div className="flex justify-center py-12">
-            <Loader2 size={24} className="animate-spin text-teal-500" />
+          <div className="flex flex-col items-center gap-2 py-12">
+            <AnimatedLoader label="Memuat daftar pasien..." />
+            <p className="text-xs text-slate-500 font-semibold">Memuat daftar pasien...</p>
           </div>
         ) : patients.length === 0 && searched ? (
           <div className="flex flex-col items-center py-14 text-center">

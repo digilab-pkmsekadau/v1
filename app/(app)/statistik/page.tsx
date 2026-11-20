@@ -1,7 +1,9 @@
 ﻿'use client';
 
-import { BarChart3, PieChart, Loader2 } from 'lucide-react';
+import { BarChart3, PieChart } from 'lucide-react';
 import { useEffect, useState } from 'react';
+
+import AnimatedLoader from '@/components/ui/AnimatedLoader';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart as RechartsPie, Pie, Cell, Legend,
@@ -78,8 +80,9 @@ export default function StatistikPage() {
       </div>
 
       {loading ? (
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 size={28} className="animate-spin text-teal-500" />
+        <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
+          <AnimatedLoader label="Memuat statistik..." />
+          <p className="text-sm text-slate-500 font-semibold">Memuat statistik...</p>
         </div>
       ) : (
         <>

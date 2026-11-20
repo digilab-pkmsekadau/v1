@@ -40,11 +40,10 @@ export interface DashboardStats {
   today: number;
   filtered: number;
   chemistry: Record<string, number>;
-  immunology: Record<
-    string,
-    { type: "reactive" | "positive"; pos: number; neg: number }
-  >;
+  hematology: Record<string, number>;
+  immunology: Record<string, { type: 'reactive' | 'positive'; pos: number; neg: number }>;
   microbiology: Record<string, { pos: number; neg: number }>;
+  urinalysis: Record<string, { pos: number; neg: number }>;
 }
 
 export interface MonthlyVisit {

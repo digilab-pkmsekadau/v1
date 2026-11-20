@@ -328,6 +328,76 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      {/* Hematology Stats — hitung terisi per parameter */}
+      <div className="section-header">
+        <span className="brutal-icon-sm bg-rose-400 border-black dark:border-white">
+          <TestTube size={15} strokeWidth={2.5} className="text-white" />
+        </span>
+        <span className="section-title text-black dark:text-white">Hematologi</span>
+      </div>
+      <div className="brutal-card p-4 mb-6">
+        <div className="flex flex-wrap gap-3">
+          {loading ? (
+            Array(6).fill(0).map((_, i) => <SkeletonCard key={i} />)
+          ) : stats?.hematology ? (
+            Object.entries(stats.hematology).map(([label, count], i) => (
+              <div key={label}
+                className="cat-surface-hema animate-stagger flex-1 min-w-[calc(50%-6px)] rounded-xl border-2 p-3.5 flex flex-col gap-1.5 hover:-translate-y-0.5 transition-all duration-150 cursor-default"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className="label-caps text-[10px] font-black leading-tight text-rose-700 dark:text-rose-400">{label}</div>
+                <div className="font-mono-data text-2xl font-black tracking-tight text-rose-600 dark:text-rose-400">
+                  <span className="counter-animate">{count}</span>
+                </div>
+                <div className="label-caps text-[10px] text-rose-500 dark:text-rose-300">terisi</div>
+                <button
+                  onClick={() => handleDownload(label, 'all_filled')}
+                  aria-label={`Unduh data ${label}`}
+                  className="brutal-btn-primary flex items-center justify-center gap-1 py-1.5 px-3 rounded-lg text-[11px] font-black text-white cursor-pointer hover:translate-x-[1px] hover:translate-y-[1px] active:translate-x-[2px] active:translate-y-[2px]"
+                >
+                  <Download size={11} /> Unduh
+                </button>
+              </div>
+            ))
+          ) : null}
+        </div>
+      </div>
+
+      {/* Urinalysis Stats — pos/neg kategorikal, terisi numerik */}
+      <div className="section-header">
+        <span className="brutal-icon-sm bg-sky-400 border-black dark:border-white">
+          <FlaskConical size={15} strokeWidth={2.5} className="text-white" />
+        </span>
+        <span className="section-title text-black dark:text-white">Urinalisis</span>
+      </div>
+      <div className="brutal-card p-4 mb-6">
+        <div className="flex flex-wrap gap-3">
+          {loading ? (
+            Array(6).fill(0).map((_, i) => <SkeletonCard key={i} />)
+          ) : stats?.urinalysis ? (
+            Object.entries(stats.urinalysis).map(([label, obj], i) => (
+              <div key={label}
+                className="cat-surface-urin animate-stagger flex-1 min-w-[calc(50%-6px)] rounded-xl border-2 p-3.5 flex flex-col gap-1.5 hover:-translate-y-0.5 transition-all duration-150 cursor-default"
+                style={{ animationDelay: `${i * 50}ms` }}
+              >
+                <div className="flex items-start justify-between gap-1">
+                  <div className="label-caps text-[10px] font-black text-gray-600 dark:text-gray-300 leading-tight flex-1">{label}</div>
+                  <DownloadMenu menuKey={`urin_${label}`} options={[
+                    { label: 'Positif saja', filterMode: 'positif_only', color: 'text-sky-600 dark:text-sky-400' },
+                    { label: 'Negatif saja', filterMode: 'negatif_only', color: 'text-sky-600 dark:text-sky-400' },
+                    { label: 'Semua data', filterMode: 'all_filled', color: 'text-gray-600 dark:text-gray-300' },
+                  ]} openMenu={openMenu} setOpenMenu={setOpenMenu} onDownload={handleDownload} startDate={startDate} endDate={endDate} />
+                </div>
+                <div className="text-sm font-black leading-tight">
+                  <span className="text-sky-600 dark:text-sky-400"><span className="font-mono-data">{obj.pos + obj.neg}</span> Terisi</span>
+                  <span className="text-gray-400 dark:text-gray-500 text-xs"> / <span className="font-mono-data">{obj.pos}</span> Pos</span>
+                </div>
+              </div>
+            ))
+          ) : null}
+        </div>
+      </div>
+
     </div>
   );
 }

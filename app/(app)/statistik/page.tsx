@@ -12,12 +12,14 @@ import type { DashboardStats, MonthlyVisit } from '@/types';
 
 const COLORS = ['#14b8a6', '#0891b2', '#7c3aed', '#e11d48', '#d97706', '#0284c7', '#059669', '#db2777', '#22d3ee', '#0d9488'];
 
-type GroupKey = 'chemistry' | 'immunology' | 'microbiology';
+type GroupKey = 'chemistry' | 'hematology' | 'immunology' | 'microbiology' | 'urinalysis';
 
 const GROUPS: { key: GroupKey; label: string; a: string; b: string }[] = [
   { key: 'chemistry',    label: 'Kimia Klinik',                a: '#14b8a6', b: '#0d9488' },
+  { key: 'hematology',   label: 'Hematologi',                  a: '#fb7185', b: '#e11d48' },
   { key: 'immunology',   label: 'Imunologi',                   a: '#a855f7', b: '#7c3aed' },
   { key: 'microbiology', label: 'Mikrobiologi & Parasitologi', a: '#f59e0b', b: '#d97706' },
+  { key: 'urinalysis',   label: 'Urinalisis',                  a: '#38bdf8', b: '#0284c7' },
 ];
 
 export default function StatistikPage() {
@@ -50,22 +52,23 @@ export default function StatistikPage() {
 
   const activeGroup = GROUPS.find(g => g.key === group)!;
 
-  // Kimia = jumlah pemeriksaan per parameter; imunologi/mikrobiologi = pos+neg.
+  // Kimia + hematologi = jumlah terisi per parameter; imunologi/mikro/urin = pos+neg.
+  // ponytail: key stats = label form; label export monthly beda skema, jangan join.
   const pieData = (() => {
     if (!stats) return [];
-    if (group === 'chemistry') {
-      return Object.entries(stats.chemistry)
+    if (group === 'chemistry' || group === 'hematology') {
+      return Object.entries(stats[group])
         .filter(([, v]) => v > 0)
         .map(([name, value], i) => ({ name, value, color: COLORS[i % COLORS.length] }));
     }
-    const src = group === 'immunology' ? stats.immunology : stats.microbiology;
+    const src = group === 'immunology' ? stats.immunology : group === 'microbiology' ? stats.microbiology : stats.urinalysis;
     return Object.entries(src)
       .map(([name, v]) => ({ name, value: (v.pos ?? 0) + (v.neg ?? 0) }))
       .filter(d => d.value > 0)
       .map((d, i) => ({ ...d, color: COLORS[i % COLORS.length] }));
   })();
 
-  const totalChemistry = pieData.reduce((sum, d) => sum + d.value, 0);
+  const totalValues = pieData.reduce((sum, d) => sum + d.value, 0);
 
   return (
     <div className="px-4 py-5 animate-slide-up">
@@ -185,8 +188,8 @@ export default function StatistikPage() {
                 </ResponsiveContainer>
                 <div className="mt-4 flex items-center justify-center gap-2">
                   <span className="label-caps text-slate-400">Total</span>
-                  <span className="font-mono-data text-xl font-bold text-teal-600 dark:text-teal-400">{totalChemistry}</span>
-                  <span className="label-caps text-slate-400">pemeriksaan</span>
+                  <span className="font-mono-data text-xl font-bold text-teal-600 dark:text-teal-400">{totalValues}</span>
+                  <span className="label-caps text-slate-400">nilai terisi</span>
                 </div>
               </>
             )}

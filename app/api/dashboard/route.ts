@@ -95,7 +95,10 @@ export async function GET(request: NextRequest) {
           patient:patients(nama, nik, alamat, tgl_lahir),
           gds, gdp, gd2pp, kolesterol, ldl, hdl, trigliserida, asam_urat,
           hbsag, hiv, syphilis, hcv, anti_hbs, ns1, dengue_ig, malaria_rapid, widal, napza,
-          bta, gram, malaria_slide
+          bta, gram, malaria_slide,
+          rbc, hgb, hct, mcv, mch, mchc, plt, wbc, lym, mon, gra, led, goldar, bt, ct,
+          u_warna, u_jernih, u_bj, u_leukosit, u_nitrit, u_ph, u_protein, u_glukosa,
+          u_keton, u_urobilinogen, u_bilirubin, u_blood, u_hcg, m_leukosit, m_eritrosit, m_epitel
         `)
         .order('created_at', { ascending: false })
         .range(from, from + PAGE_SIZE - 1);
@@ -114,6 +117,8 @@ export async function GET(request: NextRequest) {
     // beda dgn PARAM_OPTIONS ("GDS (Gula...)" vs "Gula Darah...") — join pecah.
     const labelOf = (key: string) => ALL_PARAMS.find(p => p.key === key)?.label ?? key;
     const chemKeys = ['gds', 'gdp', 'gd2pp', 'kolesterol', 'ldl', 'hdl', 'trigliserida', 'asam_urat'];
+    const hemaKeys = ['rbc', 'hgb', 'hct', 'mcv', 'mch', 'mchc', 'plt', 'wbc', 'lym', 'mon', 'gra', 'led', 'goldar', 'bt', 'ct'];
+    const urineKeys = ['u_warna', 'u_jernih', 'u_bj', 'u_leukosit', 'u_nitrit', 'u_ph', 'u_protein', 'u_glukosa', 'u_keton', 'u_urobilinogen', 'u_bilirubin', 'u_blood', 'u_hcg', 'm_leukosit', 'm_eritrosit', 'm_epitel'];
     const imKeys: [string, 'reactive' | 'positive'][] = [
       ['hbsag', 'reactive'], ['hiv', 'reactive'], ['syphilis', 'reactive'], ['hcv', 'reactive'],
       ['anti_hbs', 'reactive'], ['ns1', 'positive'], ['dengue_ig', 'positive'],
@@ -124,8 +129,10 @@ export async function GET(request: NextRequest) {
       today: 0,
       filtered: 0,
       chemistry: Object.fromEntries(chemKeys.map(k => [labelOf(k), 0])),
+      hematology: Object.fromEntries(hemaKeys.map(k => [labelOf(k), 0])),
       immunology: Object.fromEntries(imKeys.map(([k, t]) => [labelOf(k), { type: t, pos: 0, neg: 0 }])),
       microbiology: Object.fromEntries(micKeys.map(k => [labelOf(k), { pos: 0, neg: 0 }])),
+      urinalysis: Object.fromEntries(urineKeys.map(k => [labelOf(k), { pos: 0, neg: 0 }])),
     };
 
     const history: HistoryRow[] = [];
@@ -197,6 +204,24 @@ export async function GET(request: NextRequest) {
       countMicro(exam.bta, 'bta');
       countMicro(exam.gram, 'gram');
       countMicro(exam.malaria_slide, 'malaria_slide');
+
+      for (const k of hemaKeys) {
+        if (exam[k]) stats.hematology[labelOf(k)]++;
+      }
+      for (const k of urineKeys) {
+        const v = exam[k];
+        if (typeof v !== 'string' || !v.trim()) continue;
+        const info = ALL_PARAMS.find(p => p.key === k);
+        // Numerik: hitung terisi. Kategorikal: pos/neg.
+        if (info?.type === 'number') {
+          stats.urinalysis[labelOf(k)].pos++;
+        } else {
+          const vl = v.toLowerCase();
+          const isNeg = vl.includes('negatif') || vl.includes('non') || vl.includes('jernih') || vl.includes('kuning') || vl.trim() === '-';
+          if (isNeg) stats.urinalysis[labelOf(k)].neg++;
+          else stats.urinalysis[labelOf(k)].pos++;
+        }
+      }
     }
 
     return NextResponse.json({ stats, history });

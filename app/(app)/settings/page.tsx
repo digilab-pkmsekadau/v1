@@ -1,7 +1,7 @@
-﻿'use client';
+﻿﻿'use client';
 
 import { Settings, Users, Stethoscope, Save, Loader2, Shield, Tag, Trash2, AlertTriangle, Download, DatabaseBackup, Upload, Image, FileText } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
 import { useConfirm } from '@/components/ui/ConfirmDialog';
@@ -40,12 +40,14 @@ export default function SettingsPage() {
   const [petugasList, setPetugasList] = useState('');
   const [saving, setSaving] = useState<string | null>(null);
   const [backingUp, setBackingUp] = useState(false);
-  
   const [deleteYear, setDeleteYear] = useState('');
   const [logoUrl, setLogoUrl] = useState('');
   const [doctorSignature, setDoctorSignature] = useState('');
   const [techSignature, setTechSignature] = useState('');
   const [printTemplate, setPrintTemplate] = useState('');
+  const [restoring, setRestoring] = useState(false);
+  const [restorePreview, setRestorePreview] = useState<{ patients: { baru: number; ada: number }; examinations: { baru: number; ada: number } } | null>(null);
+  const restoreFileRef = useRef<File | null>(null);
   const confirm = useConfirm();
 
   useEffect(() => {
@@ -144,6 +146,61 @@ export default function SettingsPage() {
     }
   };
 
+  const handleRestoreFile = async (file: File) => {
+    setRestoring(true);
+    setRestorePreview(null);
+    try {
+      const json = JSON.parse(await file.text());
+      const payload = json.data ? json : { data: json };
+      const res = await fetch('/api/backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dry_run: true, ...payload }),
+      });
+      const out = await res.json();
+      if (!res.ok) throw new Error(out.error || 'File tidak valid');
+      restoreFileRef.current = file;
+      setRestorePreview(out);
+      toast.info(`Simulasi: ${out.patients.baru} pasien baru, ${out.examinations.baru} pemeriksaan baru`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Gagal membaca file');
+    } finally {
+      setRestoring(false);
+    }
+  };
+
+  const handleRestoreExec = async () => {
+    const file = restoreFileRef.current;
+    if (!file) return;
+    const ok = await confirm({
+      title: 'Restore Backup?',
+      message: `Menulis ${restorePreview?.patients.baru ?? 0} pasien + ${restorePreview?.examinations.baru ?? 0} pemeriksaan baru (data lama ber-id sama DITIMPA). Ketik RESTORE untuk lanjut.`,
+      confirmLabel: 'Ya, Restore',
+      variant: 'danger',
+      icon: 'warning',
+      verificationText: 'RESTORE',
+    });
+    if (!ok) return;
+    setRestoring(true);
+    try {
+      const json = JSON.parse(await file.text());
+      const payload = json.data ? json : { data: json };
+      const res = await fetch('/api/backup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dry_run: false, ...payload }),
+      });
+      const out = await res.json();
+      if (!res.ok) throw new Error(out.error || 'Restore gagal');
+      toast.success(`Restore selesai: ${out.restoredPatients} pasien, ${out.restoredExams} pemeriksaan`);
+      setRestorePreview(null);
+      restoreFileRef.current = null;
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Restore gagal');
+    } finally {
+      setRestoring(false);
+    }
+  };
   return (
     <div className="px-4 py-5 animate-slide-up">
       <div className="flex items-center gap-3 mb-6">
@@ -275,6 +332,41 @@ export default function SettingsPage() {
               <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{item.desc}</div>
             </div>
           ))}
+        </div>
+
+        {/* Restore — admin only, diawali simulasi */}
+        <div className="mt-4 p-4 rounded-xl border-2 border-dashed border-slate-300 dark:border-slate-600">
+          <div className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">
+            Restore dari File Backup (.JSON)
+          </div>
+          <div className="flex flex-col gap-2 min-[480px]:flex-row min-[480px]:items-center">
+            <label className="cursor-pointer flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black uppercase border-2 border-black dark:border-white bg-white dark:bg-zinc-800 hover:translate-x-[1px] hover:translate-y-[1px] transition-all">
+              <Upload size={14} />
+              {restoring ? 'Memproses...' : 'Pilih File (simulasi)'}
+              <input
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                disabled={restoring}
+                onChange={e => { const f = e.target.files?.[0]; e.target.value = ''; if (f) handleRestoreFile(f); }}
+              />
+            </label>
+            {restorePreview && (
+              <button
+                onClick={handleRestoreExec}
+                disabled={restoring}
+                className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-black uppercase text-white border-2 border-black dark:border-white bg-red-500 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] disabled:opacity-50 transition-all"
+              >
+                Eksekusi Restore ({restorePreview.patients.baru} baru)
+              </button>
+            )}
+          </div>
+          {restorePreview && (
+            <p className="text-[11px] text-slate-500 mt-2 font-semibold">
+              Simulasi: {restorePreview.patients.baru} pasien baru + {restorePreview.examinations.baru} pemeriksaan baru.
+              {' '}Data ber-id sama DITIMPA. Ketik RESTORE untuk konfirmasi.
+            </p>
+          )}
         </div>
       </div>
 

@@ -16,22 +16,38 @@ import { ALL_PARAMS } from '@/lib/param-options';
 // QR Code - lazy loaded (client only)
 const QRCodeSVG = dynamic(() => import('qrcode.react').then(m => m.QRCodeSVG), { ssr: false });
 
-// Parameter numerik berbasis kolom examinations yang bisa digrafik.
-const TREND_PARAMS: { key: string; label: string; color: string }[] = [
-  { key: 'gds',         label: 'GDS',         color: '#0d9488' },
-  { key: 'gdp',         label: 'GDP',         color: '#2563eb' },
-  { key: 'gd2pp',       label: 'GD2PP',       color: '#7c3aed' },
-  { key: 'kolesterol',  label: 'Kolesterol',  color: '#dc2626' },
-  { key: 'ldl',         label: 'LDL',         color: '#f97316' },
-  { key: 'hdl',         label: 'HDL',         color: '#84cc16' },
-  { key: 'trigliserida',label: 'Trigliserida',color: '#d97706' },
-  { key: 'asam_urat',   label: 'Asam Urat',   color: '#059669' },
-  { key: 'hgb',         label: 'HGB',         color: '#db2777' },
-  { key: 'wbc',         label: 'WBC',         color: '#0891b2' },
-  { key: 'plt',         label: 'PLT',         color: '#65a30d' },
+// Semua param numerik bisa digrafik (dulu cuma 11: rbc/hct/u_ph/dll hilang).
+// Sumbu-Y dipisah per satuan di bawah agar skala tak campur (GDS 100 vs HGB 13).
+const TREND_PARAMS: { key: string; label: string; color: string; unit: string }[] = [
+  { key: 'gds',          label: 'GDS',          color: '#0d9488', unit: 'mg/dl' },
+  { key: 'gdp',          label: 'GDP',          color: '#2563eb', unit: 'mg/dl' },
+  { key: 'gd2pp',        label: 'GD2PP',        color: '#7c3aed', unit: 'mg/dl' },
+  { key: 'kolesterol',   label: 'Kolesterol',   color: '#dc2626', unit: 'mg/dl' },
+  { key: 'ldl',          label: 'LDL',          color: '#f97316', unit: 'mg/dl' },
+  { key: 'hdl',          label: 'HDL',          color: '#84cc16', unit: 'mg/dl' },
+  { key: 'trigliserida', label: 'Trigliserida', color: '#d97706', unit: 'mg/dl' },
+  { key: 'asam_urat',    label: 'Asam Urat',    color: '#059669', unit: 'mg/dl' },
+  { key: 'u_urobilinogen', label: 'Urobilinogen', color: '#eab308', unit: 'mg/dl' },
+  { key: 'rbc',          label: 'RBC',          color: '#e11d48', unit: '10^6/µl' },
+  { key: 'plt',          label: 'PLT',          color: '#65a30d', unit: '10^3/µl' },
+  { key: 'wbc',          label: 'WBC',          color: '#0891b2', unit: '10^3/µl' },
+  { key: 'hgb',          label: 'HGB',          color: '#db2777', unit: 'g/dl' },
+  { key: 'mchc',         label: 'MCHC',         color: '#a855f7', unit: 'g/dl' },
+  { key: 'hct',          label: 'HCT',          color: '#0284c7', unit: '%' },
+  { key: 'lym',          label: 'LYM',          color: '#0ea5e9', unit: '%' },
+  { key: 'mon',          label: 'MON',          color: '#8b5cf6', unit: '%' },
+  { key: 'gra',          label: 'GRA',          color: '#6366f1', unit: '%' },
+  { key: 'mcv',          label: 'MCV',          color: '#14b8a6', unit: 'fL' },
+  { key: 'mch',          label: 'MCH',          color: '#f43f5e', unit: 'pg' },
+  { key: 'led',          label: 'LED',          color: '#78716c', unit: 'mm/Jam' },
+  { key: 'u_bj',         label: 'BJ Urin',      color: '#0d9488', unit: '' },
+  { key: 'u_ph',         label: 'pH Urin',      color: '#84cc16', unit: '' },
+  { key: 'u_leukosit',   label: 'Leu Urin',     color: '#f97316', unit: '/µl' },
+  { key: 'm_leukosit',   label: 'Sed Leu',      color: '#dc2626', unit: '/LPB' },
+  { key: 'm_eritrosit',  label: 'Sed Eri',      color: '#e11d48', unit: '/LPB' },
+  { key: 'm_epitel',     label: 'Sed Epi',      color: '#a855f7', unit: '/LPK' },
 ];
 const LAB_PARAM_KEYS = new Set(ALL_PARAMS.map(param => param.key));
-
 interface Patient {
   id: string; nama: string; nik?: string;
   alamat?: string; tgl_lahir?: string; jenis_kelamin?: string;
@@ -278,18 +294,31 @@ export default function PasienDetailPage() {
                           contentStyle={{ borderRadius: 12, border: '1px solid #e2e8f0', fontSize: 11 }}
                         />
                         <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-                        {TREND_PARAMS.filter(p => displayedParams.includes(p.key)).map(p => (
-                          <Line
-                            key={p.key}
-                            type="monotone"
-                            dataKey={p.key}
-                            name={p.label}
-                            stroke={p.color}
-                            strokeWidth={2}
-                            dot={{ r: 4, fill: p.color }}
-                            connectNulls
-                          />
-                        ))}
+                        {(() => {
+                          const shown = TREND_PARAMS.filter(p => displayedParams.includes(p.key));
+                          const units = [...new Set(shown.map(p => p.unit))];
+                          const [first, ...rest] = units;
+                          return (
+                            <>
+                              {rest.map(u => (
+                                <YAxis key={u || 't'} yAxisId={u} orientation="right" tick={{ fontSize: 9 }} width={34} />
+                              ))}
+                              {shown.map(p => (
+                                <Line
+                                  key={p.key}
+                                  {...(p.unit === first ? {} : { yAxisId: p.unit })}
+                                  type="monotone"
+                                  dataKey={p.key}
+                                  name={`${p.label}${p.unit ? ` (${p.unit})` : ''}`}
+                                  stroke={p.color}
+                                  strokeWidth={2}
+                                  dot={{ r: 4, fill: p.color }}
+                                  connectNulls
+                                />
+                              ))}
+                            </>
+                          );
+                        })()}
                       </LineChart>
                     </ResponsiveContainer>
                   </>
